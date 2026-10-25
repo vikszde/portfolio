@@ -1,0 +1,55 @@
+---
+// Switches between Light and Dark and remembers the choice. Without a saved
+// choice the site follows the visitor's system setting (see tokens.css).
+---
+
+<button class="theme-toggle text-label-strong" type="button" aria-pressed="false" data-theme-toggle>
+  <span data-theme-label>Dark mode</span>
+</button>
+
+<script>
+  const root = document.documentElement;
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const current = () => root.dataset.theme ?? (prefersDark.matches ? "dark" : "light");
+
+  function render() {
+    const dark = current() === "dark";
+    document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(dark));
+      const label = button.querySelector("[data-theme-label]");
+      if (label) label.textContent = dark ? "Light mode" : "Dark mode";
+    });
+  }
+
+  document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const next = current() === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem("theme", next);
+      } catch {}
+      render();
+    });
+  });
+  prefersDark.addEventListener("change", render);
+  render();
+</script>
+
+<style>
+  .theme-toggle {
+    padding: var(--spacing-2) var(--spacing-3);
+    border: var(--border-regular) solid var(--color-border-default);
+    border-radius: var(--radius-none);
+    background: var(--color-bg-surface);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition:
+      background var(--motion-duration-fast) var(--motion-ease-out),
+      color var(--motion-duration-fast) var(--motion-ease-out);
+  }
+
+  .theme-toggle:hover {
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+  }
+</style>
