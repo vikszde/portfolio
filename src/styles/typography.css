@@ -1,0 +1,58 @@
+/*
+ * Text styles from Figma, one class per style. Display and H1 sizes are the
+ * desktop values from Figma and scale down fluidly on small screens.
+ */
+
+.text-display-xl {
+  font: 400 clamp(4rem, 11vw, 10rem) / 0.9 var(--font-display);
+  text-transform: uppercase;
+}
+
+.text-display-l {
+  font: 400 clamp(3.5rem, 7.8vw, 7rem) / 0.93 var(--font-display);
+  text-transform: uppercase;
+}
+
+.text-h1 {
+  font: 700 clamp(2.5rem, 4.5vw, 4rem) / 1.0625 var(--font-sans);
+  letter-spacing: -1.5px;
+}
+
+.text-h2 {
+  font: 700 2.5rem / 2.75rem var(--font-sans);
+  letter-spacing: -0.5px;
+}
+
+.text-h3 {
+  font: 700 1.75rem / 2rem var(--font-sans);
+}
+
+.text-body-l {
+  font: 400 1.25rem / 1.875rem var(--font-sans);
+}
+
+.text-body-m {
+  font: 400 1rem / 1.5rem var(--font-sans);
+}
+
+.text-label-m {
+  font: 500 0.875rem / 1.25rem var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.text-label-s {
+  font: 500 0.75rem / 1rem var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.text-label-strong {
+  font: 700 0.875rem / 1.25rem var(--font-sans);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.text-katakana {
+  font: 900 2rem / 2rem var(--font-jp);
+}
