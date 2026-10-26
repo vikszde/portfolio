@@ -1,0 +1,41 @@
+---
+// Pill label from the Figma "Tag" set. Yellow is reserved for stickers and
+// highlights, so use it sparingly.
+interface Props {
+  color?: "pink" | "aqua" | "yellow" | "neutral";
+  class?: string;
+}
+
+const { color = "pink", class: className } = Astro.props;
+---
+
+<span class:list={["tag", `tag--${color}`, "text-label-s", className]}><slot /></span>
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-1) var(--spacing-3);
+    border: var(--border-thin) solid var(--color-border-default);
+    border-radius: var(--radius-full);
+    color: var(--color-text-on-accent);
+    white-space: nowrap;
+  }
+
+  .tag--pink {
+    background: var(--color-bg-accent);
+  }
+
+  .tag--aqua {
+    background: var(--color-bg-secondary);
+  }
+
+  .tag--yellow {
+    background: var(--color-bg-highlight);
+  }
+
+  .tag--neutral {
+    background: var(--color-bg-surface);
+    color: var(--color-text-primary);
+  }
+</style>

@@ -1,0 +1,184 @@
+---
+// Living reference for the coded components, mirroring the Figma
+// "Components" page. Use the theme toggle to check Dark.
+import Base from "../layouts/Base.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
+import Button from "../components/Button.astro";
+import Tag from "../components/Tag.astro";
+import Chip from "../components/Chip.astro";
+import Sparkle from "../components/Sparkle.astro";
+import Sticker from "../components/Sticker.astro";
+import Halftone from "../components/Halftone.astro";
+
+const variants = ["primary", "secondary", "ghost"] as const;
+const filters = ["All", "Illustration", "Sketch", "Graphic", "Experimental", "Daily"];
+---
+
+<Base title="Components · Viktória Varga">
+  <main class="page">
+    <header class="top">
+      <p class="text-label-m accent">Components</p>
+      <ThemeToggle />
+    </header>
+
+    <section class="block" aria-labelledby="button">
+      <p class="text-label-m accent">01 / Button</p>
+      <h2 id="button" class="text-h2">Button</h2>
+      <p class="text-body-m secondary">
+        Primary is the one main action per view. Hover flips the colours; pressing adds a pink border.
+      </p>
+      <div class="grid-buttons">
+        {
+          variants.map((variant) => (
+            <div class="row">
+              <Button variant={variant} href="#" arrow>
+                View my work
+              </Button>
+              <Button variant={variant}>About me</Button>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="tag">
+      <p class="text-label-m accent">02 / Tag</p>
+      <h2 id="tag" class="text-h2">Tag</h2>
+      <div class="row">
+        <Tag color="pink">Pink</Tag>
+        <Tag color="aqua">Aqua</Tag>
+        <Tag color="yellow">Yellow</Tag>
+        <Tag color="neutral">Neutral</Tag>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="chip">
+      <p class="text-label-m accent">03 / Chip</p>
+      <h2 id="chip" class="text-h2">Chip</h2>
+      <p class="text-body-m secondary">As filter buttons (click to toggle) and as static category labels.</p>
+      <div class="row" data-filters>
+        {
+          filters.map((label, i) => (
+            <Chip as="button" selected={i === 0}>
+              {label}
+            </Chip>
+          ))
+        }
+      </div>
+      <div class="row">
+        <Chip>Product design</Chip>
+        <Chip>UX/UI</Chip>
+        <Chip>App</Chip>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="sparkle">
+      <p class="text-label-m accent">04 / Sparkle</p>
+      <h2 id="sparkle" class="text-h2">Sparkle</h2>
+      <div class="row">
+        <Sparkle color="pink" />
+        <Sparkle color="ink" />
+        <Sparkle color="aqua" />
+        <Sparkle shape="heart" color="pink" />
+        <Sparkle shape="heart" color="ink" />
+        <Sparkle shape="heart" color="aqua" />
+        <Sparkle color="pink" size={56} />
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="sticker">
+      <p class="text-label-m accent">05 / Sticker</p>
+      <h2 id="sticker" class="text-h2">Sticker</h2>
+      <div class="row row--loose">
+        <Sticker>Good design<br />brighter days</Sticker>
+        <Sticker color="pink">Same ideas<br />more sparks</Sticker>
+        <Sticker color="white" tilt={6}>Now<br />booking</Sticker>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="halftone">
+      <p class="text-label-m accent">06 / Halftone</p>
+      <h2 id="halftone" class="text-h2">Halftone</h2>
+      <div class="halftone-demo">
+        <Halftone />
+      </div>
+    </section>
+  </main>
+</Base>
+
+<script>
+  // Demo only: single-select filter chips.
+  document.querySelectorAll("[data-filters]").forEach((group) => {
+    group.addEventListener("click", (event) => {
+      const chip = (event.target as HTMLElement).closest("button");
+      if (!chip) return;
+      group.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === chip)));
+    });
+  });
+</script>
+
+<style>
+  .page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: var(--spacing-16) clamp(var(--spacing-4), 5.5vw, 80px) var(--spacing-24);
+    display: grid;
+    gap: var(--spacing-16);
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding-bottom: var(--spacing-4);
+    border-bottom: var(--border-heavy) solid var(--color-border-default);
+  }
+
+  .accent {
+    color: var(--color-text-accent);
+  }
+
+  .secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .block {
+    display: grid;
+    gap: var(--spacing-4);
+    padding-top: var(--spacing-6);
+    border-top: var(--border-heavy) solid var(--color-border-default);
+  }
+
+  /* The header already draws a rule, so the first section skips its own. */
+  .top + .block {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .grid-buttons {
+    display: grid;
+    gap: var(--spacing-4);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .row--loose {
+    gap: var(--spacing-8);
+    padding: var(--spacing-4) 0;
+  }
+
+  .halftone-demo {
+    height: 240px;
+    display: flex;
+    align-items: flex-end;
+    border: var(--border-heavy) solid var(--color-border-default);
+    background: var(--color-bg-accent-subtle);
+    overflow: hidden;
+  }
+</style>
