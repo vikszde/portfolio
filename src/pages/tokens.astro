@@ -1,0 +1,202 @@
+---
+// Temporary home page: a quick visual check that tokens, fonts and Light/Dark
+// work. Replace it with the real landing page.
+import Base from "../layouts/Base.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+
+const surfaces = [
+  ["bg-page", "text-primary"],
+  ["bg-surface", "text-primary"],
+  ["bg-inverse", "text-inverse"],
+  ["bg-primary", "text-on-primary"],
+  ["bg-accent", "text-on-accent"],
+  ["bg-accent-subtle", "text-primary"],
+  ["bg-secondary", "text-on-accent"],
+  ["bg-secondary-subtle", "text-primary"],
+  ["bg-highlight", "text-on-accent"],
+];
+
+const typeStyles = [
+  ["text-display-l", "Display/L", "Selected work"],
+  ["text-h1", "Heading/H1", "Designing calm products"],
+  ["text-h2", "Heading/H2", "Research and discovery"],
+  ["text-h3", "Heading/H3", "Checkout redesign"],
+  ["text-body-l", "Body/L", "I am a product designer who turns messy problems into clear, playful interfaces."],
+  ["text-body-m", "Body/M", "Body copy for case studies, with comfortable line height."],
+  ["text-label-strong", "Label/Strong", "View my work"],
+  ["text-label-m", "Label/M", "Case study · 2024"],
+  ["text-label-s", "Label/S", "Product design"],
+  ["text-katakana", "Accent/Katakana", "デザイン・ポートフォリオ"],
+];
+---
+
+<Base title="Design tokens · Viktória Varga">
+  <main class="page">
+    <header class="top">
+      <p class="text-label-m accent">Setup check</p>
+      <a class="text-label-m" href={`${base}components/`}>Components →</a>
+      <ThemeToggle />
+    </header>
+
+    <h1 class="text-display-l">Tokens check</h1>
+    <p class="text-body-l secondary">
+      Every colour, font and size here comes from the Figma variables. Switch the theme to check Dark.
+    </p>
+
+    <section class="block" aria-labelledby="colours">
+      <h2 id="colours" class="text-h3">Semantic colours</h2>
+      <ul class="swatches">
+        {
+          surfaces.map(([bg, fg]) => (
+            <li class="swatch text-label-s" style={`background: var(--color-${bg}); color: var(--color-${fg});`}>
+              <span>{bg}</span>
+              <span>{fg}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="block" aria-labelledby="buttons">
+      <h2 id="buttons" class="text-h3">Buttons</h2>
+      <div class="row">
+        <a class="btn btn-primary text-label-strong" href="#">View my work →</a>
+        <a class="btn btn-secondary text-label-strong" href="#">Selected work</a>
+        <a class="btn btn-ghost text-label-strong" href="#">About me</a>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="type">
+      <h2 id="type" class="text-h3">Type</h2>
+      <dl class="type">
+        {
+          typeStyles.map(([cls, name, sample]) => (
+            <div class="type-row">
+              <dt class="text-label-s secondary">{name}</dt>
+              <dd class={cls}>{sample}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: var(--spacing-16) clamp(var(--spacing-4), 5.5vw, 80px) var(--spacing-24);
+    display: grid;
+    gap: var(--spacing-8);
+  }
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding-bottom: var(--spacing-4);
+    border-bottom: var(--border-heavy) solid var(--color-border-default);
+  }
+
+  .accent {
+    color: var(--color-text-accent);
+  }
+
+  .secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .block {
+    display: grid;
+    gap: var(--spacing-6);
+    padding-top: var(--spacing-8);
+    border-top: var(--border-thin) solid var(--color-border-default);
+  }
+
+  .swatches {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--spacing-4);
+  }
+
+  .swatch {
+    min-height: 120px;
+    padding: var(--spacing-3);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--spacing-1);
+    border: var(--border-regular) solid var(--color-border-default);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-6);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-3) var(--spacing-6);
+    border: var(--border-regular) solid;
+    text-decoration: none;
+    transition:
+      background var(--motion-duration-fast) var(--motion-ease-out),
+      color var(--motion-duration-fast) var(--motion-ease-out);
+  }
+
+  .btn-primary {
+    background: var(--color-bg-primary);
+    border-color: var(--color-border-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  .btn-secondary {
+    background: var(--color-bg-inverse);
+    border-color: var(--color-border-default);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-ghost {
+    background: var(--color-bg-surface);
+    border-color: var(--color-border-default);
+    color: var(--color-text-primary);
+  }
+
+  .btn-primary:hover,
+  .btn-ghost:hover {
+    background: var(--color-bg-inverse);
+    border-color: var(--color-border-default);
+    color: var(--color-text-inverse);
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-bg-primary);
+    border-color: var(--color-border-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  .type {
+    margin: 0;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .type-row {
+    display: grid;
+    gap: var(--spacing-2);
+  }
+
+  .type-row dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+</style>

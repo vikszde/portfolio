@@ -1,0 +1,191 @@
+---
+// Project card from the Figma "Project card" set: a slightly skewed paper
+// cut-out with a number tab, cover, condensed title, one arrow box and
+// hashtag tags. The whole card is the link. `shape` picks one of three paper
+// outlines and `tilt` rotates the card a little so a row looks hand-placed.
+import Halftone from "./Halftone.astro";
+
+interface Props {
+  number: string;
+  title: string;
+  summary: string;
+  tags: string[];
+  href: string;
+  cover?: string;
+  coverAlt?: string;
+  shape?: "A" | "B" | "C";
+  tilt?: number;
+}
+
+const { number, title, summary, tags, href, cover, coverAlt = "", shape = "A", tilt = 0 } = Astro.props;
+
+const outlines = {
+  A: "10,26 398,0 400,520 0,510",
+  B: "0,6 392,0 400,514 8,520",
+  C: "6,0 400,16 394,520 0,506",
+};
+---
+
+<a class="card" href={href} style={`--tilt: ${tilt}deg`}>
+  <svg class="card__paper" viewBox="0 0 400 520" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <polygon points={outlines[shape]} vector-effect="non-scaling-stroke"></polygon>
+  </svg>
+  <div class="card__cover">
+    {
+      cover ? (
+        <img src={cover} alt={coverAlt} loading="lazy" decoding="async" />
+      ) : (
+        <div class="card__placeholder" aria-hidden="true">
+          <Halftone height={140} />
+        </div>
+      )
+    }
+    <span class="card__number">{number}</span>
+  </div>
+  <div class="card__body">
+    <div class="card__title-row">
+      <h3 class="card__title">{title}</h3>
+      <span class="card__arrow" aria-hidden="true">↗</span>
+    </div>
+    <p class="card__summary text-body-m">{summary}</p>
+    <p class="card__tags text-label-s">
+      {tags.map((tag, i) => <span>{i > 0 && <span class="card__dot" aria-hidden="true">·</span>}# {tag}</span>)}
+    </p>
+  </div>
+</a>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* The paper's top edge slopes down by up to 5% of the card height, so the
+       cover needs this much room to stay inside it. */
+    padding: 42px 20px 20px;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    rotate: var(--tilt);
+    transition:
+      rotate var(--motion-duration-base) var(--motion-ease-snap),
+      translate var(--motion-duration-base) var(--motion-ease-snap);
+  }
+
+  .card__paper {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .card__paper polygon {
+    fill: var(--color-bg-surface);
+    stroke: var(--color-border-default);
+    stroke-width: 2.5;
+    stroke-linejoin: miter;
+  }
+
+  .card__cover {
+    position: relative;
+    aspect-ratio: 372 / 330;
+    overflow: hidden;
+    background: var(--color-bg-accent-subtle);
+  }
+
+  .card__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .card__placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .card__number {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 8px 14px;
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+    font: 700 1.125rem / 1 var(--font-sans);
+  }
+
+  .card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 10px 0;
+  }
+
+  .card__title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .card__title {
+    flex: 1;
+    font: 400 2.25rem / 1.05 var(--font-display);
+  }
+
+  .card__arrow {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border: 2.5px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-surface);
+    font: 700 1.625rem / 1 var(--font-sans);
+    transition:
+      background var(--motion-duration-fast) var(--motion-ease-out),
+      color var(--motion-duration-fast) var(--motion-ease-out),
+      border-color var(--motion-duration-fast) var(--motion-ease-out);
+  }
+
+  .card__summary {
+    color: var(--color-text-secondary);
+  }
+
+  .card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--spacing-2);
+  }
+
+  .card__dot {
+    margin-right: var(--spacing-2);
+    color: var(--color-text-accent);
+  }
+
+  @media (hover: hover) {
+    .card:hover {
+      rotate: 0deg;
+      translate: 0 -6px;
+    }
+
+    .card:hover .card__arrow {
+      background: var(--color-bg-primary);
+      border-color: var(--color-border-primary);
+      color: var(--color-text-on-primary);
+    }
+  }
+
+  .card:focus-visible {
+    outline-offset: 6px;
+  }
+
+  .card:focus-visible .card__arrow {
+    background: var(--color-bg-primary);
+    border-color: var(--color-border-primary);
+    color: var(--color-text-on-primary);
+  }
+</style>

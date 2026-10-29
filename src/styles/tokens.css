@@ -3,8 +3,9 @@
  * (R6vptEuIx0g0CGVrl02Y6F). Names match each variable's Web code syntax.
  * Figma is the source of truth: change a value there first, then here.
  *
- * Light is the default. Dark applies when the visitor's system prefers it,
- * unless data-theme="light" is set, or always when data-theme="dark" is set.
+ * Light is the default, whatever the visitor's system prefers: the design is a
+ * light page with dark and pink sections. Dark applies only when the visitor
+ * picks it with the theme toggle (data-theme="dark").
  */
 
 :root {
@@ -98,26 +99,29 @@
   --font-jp: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
 }
 
-/* Semantic colours: Dark. Kept identical in both blocks below. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --color-bg-page: var(--color-ink-1000);
-    --color-bg-surface: var(--color-ink-900);
-    --color-bg-inverse: var(--color-paper-100);
-    --color-bg-accent-subtle: var(--color-pink-900);
-    --color-bg-secondary-subtle: var(--color-aqua-900);
-    --color-text-primary: var(--color-paper-100);
-    --color-text-secondary: var(--color-ink-300);
-    --color-text-inverse: var(--color-ink-1000);
-    --color-text-accent: var(--color-pink-300);
-    --color-border-default: var(--color-paper-100);
-    --color-border-subtle: var(--color-ink-700);
-    --color-shadow-default: var(--color-pink-500);
-    --color-shadow-accent: var(--color-aqua-500);
-  }
+/*
+ * Section themes. A section can pin itself to Light or Dark whatever the page
+ * theme is, like Figma's per-frame variable modes: the dark Skills band and
+ * the pink Contact band use these.
+ */
+.theme-light {
+  color-scheme: light;
+  --color-bg-page: var(--color-paper-100);
+  --color-bg-surface: var(--color-white-1000);
+  --color-bg-inverse: var(--color-ink-1000);
+  --color-bg-accent-subtle: var(--color-pink-100);
+  --color-bg-secondary-subtle: var(--color-aqua-100);
+  --color-text-primary: var(--color-ink-1000);
+  --color-text-secondary: var(--color-ink-700);
+  --color-text-inverse: var(--color-paper-100);
+  --color-text-accent: var(--color-pink-700);
+  --color-border-default: var(--color-ink-1000);
+  --color-border-subtle: var(--color-ink-300);
+  --color-shadow-default: var(--color-ink-1000);
+  --color-shadow-accent: var(--color-pink-500);
 }
 
+.theme-dark,
 :root[data-theme="dark"] {
   color-scheme: dark;
   --color-bg-page: var(--color-ink-1000);

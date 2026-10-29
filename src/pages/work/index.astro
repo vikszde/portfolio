@@ -1,0 +1,74 @@
+---
+// All projects. Same cards as the landing page's Selected work.
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { projects } from "../../data/site";
+import nearbioCover from "../../assets/work/nearbio-cover.webp?url";
+import barterlandCover from "../../assets/work/barterland-cover.webp?url";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const covers: Record<string, string | undefined> = { nearbio: nearbioCover, barterland: barterlandCover };
+const shapes = ["A", "B", "C"] as const;
+const tilts = [-1.5, 1, -0.8];
+---
+
+<Base title="Work · Viktória Varga">
+  <Nav current="Work" />
+  <main class="work">
+    <p class="text-label-m accent">Work</p>
+    <h1 class="text-display-l">All projects</h1>
+    <ul class="cards">
+      {
+        projects.map((project, i) => (
+          <li>
+            <ProjectCard
+              number={project.number}
+              title={project.title}
+              summary={project.summary}
+              tags={[...project.tags]}
+              href={`${base}work/${project.slug}/`}
+              cover={covers[project.slug]}
+              shape={shapes[i % 3]}
+              tilt={tilts[i % 3]}
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</Base>
+
+<style>
+  .work {
+    display: grid;
+    gap: var(--spacing-6);
+    padding: var(--spacing-16) var(--gutter) var(--spacing-24);
+  }
+
+  .accent {
+    color: var(--color-text-accent);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-8);
+    margin: var(--spacing-8) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 1023px) {
+    .cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .cards {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-12);
+    }
+  }
+</style>
