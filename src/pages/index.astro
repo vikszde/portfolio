@@ -1,105 +1,187 @@
 ---
-// Temporary home page: a quick visual check that tokens, fonts and Light/Dark
-// work. Replace it with the real landing page.
+// Landing page, built from the Figma "Landing / Desktop" and "Landing / Mobile"
+// frames: hero, selected work, skills & tools, about, contact.
 import Base from "../layouts/Base.astro";
-import ThemeToggle from "../components/ThemeToggle.astro";
+import Nav from "../components/Nav.astro";
+import Button from "../components/Button.astro";
+import Sticker from "../components/Sticker.astro";
+import Sparkle from "../components/Sparkle.astro";
+import Decor from "../components/Decor.astro";
+import Halftone from "../components/Halftone.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import ToolChip from "../components/ToolChip.astro";
+import Logo from "../components/Logo.astro";
+import { site, projects } from "../data/site";
+import charTrace from "../assets/art/char-trace.webp?url";
+import eyeStrip from "../assets/art/eye-strip.webp?url";
+import nearbioCover from "../assets/work/nearbio-cover.webp?url";
+import barterlandCover from "../assets/work/barterland-cover.webp?url";
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-
-const surfaces = [
-  ["bg-page", "text-primary"],
-  ["bg-surface", "text-primary"],
-  ["bg-inverse", "text-inverse"],
-  ["bg-primary", "text-on-primary"],
-  ["bg-accent", "text-on-accent"],
-  ["bg-accent-subtle", "text-primary"],
-  ["bg-secondary", "text-on-accent"],
-  ["bg-secondary-subtle", "text-primary"],
-  ["bg-highlight", "text-on-accent"],
-];
-
-const typeStyles = [
-  ["text-display-l", "Display/L", "Selected work"],
-  ["text-h1", "Heading/H1", "Designing calm products"],
-  ["text-h2", "Heading/H2", "Research and discovery"],
-  ["text-h3", "Heading/H3", "Checkout redesign"],
-  ["text-body-l", "Body/L", "I am a product designer who turns messy problems into clear, playful interfaces."],
-  ["text-body-m", "Body/M", "Body copy for case studies, with comfortable line height."],
-  ["text-label-strong", "Label/Strong", "View my work"],
-  ["text-label-m", "Label/M", "Case study · 2024"],
-  ["text-label-s", "Label/S", "Product design"],
-  ["text-katakana", "Accent/Katakana", "デザイン・ポートフォリオ"],
-];
+const covers: Record<string, string | undefined> = { nearbio: nearbioCover, barterland: barterlandCover };
+const shapes = ["A", "B", "C"] as const;
+const tilts = [-1.5, 1, -0.8];
 ---
 
-<Base title="Design tokens · Viktória Varga">
-  <main class="page">
-    <header class="top">
-      <p class="text-label-m accent">Setup check</p>
-      <a class="text-label-m" href={`${base}components/`}>Components →</a>
-      <ThemeToggle />
-    </header>
+<Base title="Viktória Varga · Product designer & visual creator">
+  <Nav current="Home" />
 
-    <h1 class="text-display-l">Tokens check</h1>
-    <p class="text-body-l secondary">
-      Every colour, font and size here comes from the Figma variables. Switch the theme to check Dark.
-    </p>
+  <main>
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__copy">
+        <p class="text-label-m accent">Product designer &amp; illustrator</p>
+        <h1 id="hero-title" class="hero__title">Product<br />designer <span class="pink">&amp;</span><br />visual creator</h1>
+        <p class="text-body-l secondary hero__intro">I turn messy problems into clear, playful interfaces — and draw a little anime on the side.</p>
+        <div class="row">
+          <Button href="#work" arrow>View my work</Button>
+          <Button variant="ghost" href="#about">About me</Button>
+        </div>
+        <a class="hero__scroll text-label-m" href="#work">Scroll <span aria-hidden="true">↓</span></a>
+      </div>
 
-    <section class="block" aria-labelledby="colours">
-      <h2 id="colours" class="text-h3">Semantic colours</h2>
-      <ul class="swatches">
+      <div class="hero__art">
+        <Decor name="halftone-patch" tone="accent" class="hero__patch hero__patch--top" />
+        <Decor name="orbit" class="hero__orbit" />
+        <span class="hero__circle" aria-hidden="true"></span>
+        <img class="hero__character" src={charTrace} alt="Anime-style character illustration in a black and pink outfit" width="832" height="1216" />
+        <Sparkle color="pink" size={56} class="hero__spark hero__spark--pink" />
+        <Sparkle color="ink" size={28} class="hero__spark hero__spark--ink" />
+        <Sparkle shape="heart" color="pink" size={44} class="hero__spark hero__spark--heart" />
+        <Sticker color="aqua" tilt={8} class="hero__sticker">Good design<br />brighter days</Sticker>
+      </div>
+
+      <Decor name="halftone-patch" tone="accent" class="hero__patch hero__patch--bottom" />
+      <Decor name="perspective-grid" tone="accent" class="hero__grid" />
+    </section>
+
+    <!-- Selected work -->
+    <section class="work" id="work" aria-labelledby="work-title">
+      <Decor name="orbit" class="work__orbit" />
+      <header class="section-head">
+        <p class="text-label-m accent">01 / Work</p>
+        <h2 id="work-title" class="text-display-l section-head__title">Selected work <Sparkle color="pink" size={36} /></h2>
+        <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
+        <p class="text-body-m secondary">Case studies on turning messy problems into calm, playful products.</p>
+      </header>
+      <ul class="work__cards">
         {
-          surfaces.map(([bg, fg]) => (
-            <li class="swatch text-label-s" style={`background: var(--color-${bg}); color: var(--color-${fg});`}>
-              <span>{bg}</span>
-              <span>{fg}</span>
+          projects.map((project, i) => (
+            <li>
+              <ProjectCard
+                number={project.number}
+                title={project.title}
+                summary={project.summary}
+                tags={[...project.tags]}
+                href={`${base}work/${project.slug}/`}
+                cover={covers[project.slug]}
+                shape={shapes[i]}
+                tilt={tilts[i]}
+              />
             </li>
           ))
         }
       </ul>
-    </section>
-
-    <section class="block" aria-labelledby="buttons">
-      <h2 id="buttons" class="text-h3">Buttons</h2>
-      <div class="row">
-        <a class="btn btn-primary text-label-strong" href="#">View my work →</a>
-        <a class="btn btn-secondary text-label-strong" href="#">Selected work</a>
-        <a class="btn btn-ghost text-label-strong" href="#">About me</a>
+      <div class="work__more">
+        <Button variant="ghost" href={`${base}work/`} arrow>All projects</Button>
       </div>
     </section>
 
-    <section class="block" aria-labelledby="type">
-      <h2 id="type" class="text-h3">Type</h2>
-      <dl class="type">
-        {
-          typeStyles.map(([cls, name, sample]) => (
-            <div class="type-row">
-              <dt class="text-label-s secondary">{name}</dt>
-              <dd class={cls}>{sample}</dd>
-            </div>
-          ))
-        }
-      </dl>
+    <!-- Skills & tools (always dark) -->
+    <section class="skills theme-dark" aria-labelledby="skills-title">
+      <Decor name="stripes" class="skills__stripes" />
+      <Decor name="halftone-patch" tone="accent" class="skills__patch" />
+      <div class="skills__copy">
+        <p class="text-label-m accent">02 / Skills</p>
+        <h2 id="skills-title" class="skills__title">Skills &amp; tools</h2>
+        <p class="text-katakana" lang="ja">スキルとツール</p>
+        <p class="text-body-l secondary">A mix of product thinking, visual design and illustration to create cohesive digital experiences.</p>
+        <ul class="skills__tools" aria-label="Tools I use">
+          <ToolChip tool="figma" />
+          <ToolChip tool="illustrator" />
+          <ToolChip tool="photoshop" />
+          <ToolChip tool="claude" />
+          <ToolChip tool="rive" />
+        </ul>
+        <div><Button variant="ghost" href={`${base}about/`} arrow>See more</Button></div>
+      </div>
+      <div class="skills__art" aria-hidden="true">
+        <Decor name="halftone-patch" tone="accent" class="skills__burst" />
+        <Decor name="slab" stretch class="skills__shard" />
+        <img class="skills__strip" src={eyeStrip} alt="" width="560" height="160" loading="lazy" />
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="about" id="about" aria-labelledby="about-title">
+      <Decor name="wedge" tone="ink" class="about__wedge" />
+      <Decor name="halftone-patch" tone="accent" class="about__patch" />
+      <Decor name="sparkle-burst" tone="aqua" class="about__burst" />
+      <Decor name="dot-grid" tone="aqua" class="about__dots" />
+      <Sparkle color="ink" size={40} class="about__spark" />
+
+      <div class="about__portrait" aria-hidden="true">
+        <Decor name="slab" class="about__slab" />
+        <div class="about__panel">
+          <div class="about__halftone"><Halftone height={160} /></div>
+          <img src={charTrace} alt="" width="832" height="1216" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="about__copy">
+        <p class="text-label-m accent">03 / About</p>
+        <h2 id="about-title" class="about__title">About <span class="pink">me</span></h2>
+        <p class="text-katakana" lang="ja">私について</p>
+        <p class="text-body-l secondary">I'm Viki, a product designer and visual creator who loves anime, games and creative worlds. I enjoy turning ideas into clean, playful and meaningful experiences.</p>
+        <dl class="stats">
+          <div><dt class="text-label-s">Years<br />experience</dt><dd>3+</dd></div>
+          <div><dt class="text-label-s">Projects</dt><dd>20+</dd></div>
+          <div><dt class="text-label-s">Full-time<br />cat lover</dt><dd>1</dd></div>
+        </dl>
+        <div><Button variant="ghost" href={`${base}about/`} arrow>More about me</Button></div>
+      </div>
+
+      <ul class="about__interests text-label-m" aria-label="Interests">
+        <li aria-hidden="true"><Sparkle color="pink" size={28} /></li>
+        <li>Design</li>
+        <li>Illustration</li>
+        <li>Anime</li>
+        <li>Games</li>
+        <li>and more.</li>
+        <li aria-hidden="true"><Decor name="doodle-heart" tone="text" width={44} /></li>
+      </ul>
+    </section>
+
+    <!-- Contact (always pink, light tokens) -->
+    <section class="contact theme-light" id="contact" aria-labelledby="contact-title">
+      <Decor name="perspective-grid" tone="ink" class="contact__grid" />
+      <Decor name="city" class="contact__city" />
+      <Sparkle color="ink" size={96} class="contact__spark" />
+      <p class="text-label-m">04 / Contact</p>
+      <h2 id="contact-title" class="contact__title">Let's make<br />something bright</h2>
+      <p class="contact__invite">Have a project in mind? Let's talk.</p>
+      <div class="row">
+        {site.email && <Button variant="secondary" href={`mailto:${site.email}`} arrow>Say hello</Button>}
+        {site.linkedin && <Button variant="ghost" href={site.linkedin}>LinkedIn</Button>}
+      </div>
     </section>
   </main>
+
+  <footer class="footer theme-dark">
+    <Logo variant="wordmark" height={40} label="VIKSZDE" />
+    <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
+    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+  </footer>
 </Base>
 
 <style>
-  .page {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: var(--spacing-16) clamp(var(--spacing-4), 5.5vw, 80px) var(--spacing-24);
-    display: grid;
-    gap: var(--spacing-8);
+  main {
+    overflow-x: clip;
   }
 
-  .top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--spacing-4);
-    padding-bottom: var(--spacing-4);
-    border-bottom: var(--border-heavy) solid var(--color-border-default);
+  section {
+    position: relative;
+    padding-inline: var(--gutter);
   }
 
   .accent {
@@ -110,93 +192,629 @@ const typeStyles = [
     color: var(--color-text-secondary);
   }
 
-  .block {
-    display: grid;
-    gap: var(--spacing-6);
-    padding-top: var(--spacing-8);
-    border-top: var(--border-thin) solid var(--color-border-default);
-  }
-
-  .swatches {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: var(--spacing-4);
-  }
-
-  .swatch {
-    min-height: 120px;
-    padding: var(--spacing-3);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    gap: var(--spacing-1);
-    border: var(--border-regular) solid var(--color-border-default);
+  .pink {
+    color: var(--color-bg-primary);
   }
 
   .row {
     display: flex;
     flex-wrap: wrap;
+    gap: var(--spacing-4);
+  }
+
+  /* Decor sits behind content. */
+  section > :global(.decor),
+  .hero__art > :global(*) {
+    position: absolute;
+  }
+
+  /* Hero */
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    align-items: center;
+    min-height: 820px;
+    padding-block: var(--spacing-12);
+    overflow: clip;
+    /* The art is cut off here, so the cut gets a visible floor line. */
+    border-bottom: var(--border-heavy) solid var(--color-border-default);
+  }
+
+  .hero__copy {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    justify-items: start;
     gap: var(--spacing-6);
   }
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--spacing-3) var(--spacing-6);
-    border: var(--border-regular) solid;
+  .hero__title {
+    font: 400 clamp(3.5rem, 8.3vw, 7.5rem) / 0.98 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .hero__intro {
+    max-width: 560px;
+  }
+
+  .hero__scroll {
+    margin-top: var(--spacing-12);
+    color: var(--color-text-primary);
     text-decoration: none;
-    transition:
-      background var(--motion-duration-fast) var(--motion-ease-out),
-      color var(--motion-duration-fast) var(--motion-ease-out);
   }
 
-  .btn-primary {
+  .hero__scroll span {
+    font-size: 1.75rem;
+    vertical-align: middle;
+  }
+
+  .hero__art {
+    position: relative;
+    align-self: stretch;
+    margin-right: calc(-1 * var(--gutter));
+    min-height: 680px;
+  }
+
+  .hero__circle {
+    left: 12%;
+    top: 12%;
+    width: 78%;
+    aspect-ratio: 1;
+    border: var(--border-heavy) solid var(--color-border-default);
+    border-radius: 50%;
+    background: var(--color-bg-accent-subtle);
+  }
+
+  .hero__character {
+    left: 14%;
+    top: 2%;
+    width: 75%;
+    height: auto;
+  }
+
+  :global(.hero__patch--top) {
+    right: -14%;
+    top: -18%;
+    width: 56%;
+  }
+
+  :global(.hero__orbit) {
+    left: 4%;
+    top: 8%;
+    width: 108%;
+    rotate: -18deg;
+  }
+
+  :global(.hero__spark--pink) {
+    left: 8%;
+    top: 16%;
+  }
+
+  :global(.hero__spark--ink) {
+    left: 83%;
+    top: 20%;
+  }
+
+  :global(.hero__spark--heart) {
+    left: 77%;
+    top: 36%;
+  }
+
+  :global(.hero__sticker) {
+    left: 69%;
+    top: 57%;
+  }
+
+  :global(.hero__patch--bottom) {
+    left: 34%;
+    bottom: -22%;
+    width: 31%;
+  }
+
+  :global(.hero__grid) {
+    left: 0;
+    bottom: -10%;
+    width: 55%;
+    opacity: 0.4;
+  }
+
+  /* Selected work: the quietest background on the page. */
+  .work {
+    padding-block: var(--spacing-24);
+  }
+
+  :global(.work__orbit) {
+    left: 71%;
+    top: 34%;
+    width: 54%;
+    rotate: -18deg;
+  }
+
+  .section-head {
+    position: relative;
+    display: grid;
+    gap: var(--spacing-4);
+  }
+
+  .section-head__title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .work__more {
+    position: relative;
+    margin-top: var(--spacing-16);
+  }
+
+  .work__cards {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-8);
+    margin: var(--spacing-16) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Skills & tools */
+  .skills {
+    display: grid;
+    grid-template-columns: minmax(0, 560px) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacing-12);
+    padding-block: 72px;
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+    overflow: clip;
+  }
+
+  :global(.skills__stripes) {
+    left: var(--gutter);
+    top: 24px;
+    width: 96px;
+  }
+
+  :global(.skills__patch) {
+    right: -90px;
+    top: -166px;
+    width: 400px;
+  }
+
+  .skills__copy {
+    position: relative;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .skills__title {
+    font: 400 clamp(3rem, 6.7vw, 6rem) / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .skills__tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-6);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* As in Figma: one large tilted eye strip in front of a long, flat pink
+     shard and a halftone burst. */
+  .skills__art {
+    position: relative;
+    min-height: 320px;
+  }
+
+  .skills__art > :global(*) {
+    position: absolute;
+  }
+
+  :global(.skills__burst) {
+    left: 16%;
+    top: 17%;
+    width: 52%;
+  }
+
+  :global(.skills__shard) {
+    left: 7%;
+    top: 22%;
+    width: 88%;
+    height: auto;
+    aspect-ratio: 580 / 171;
+    rotate: 6deg;
+  }
+
+  .skills__strip {
+    left: 1%;
+    top: 12%;
+    width: 106%;
+    max-width: none;
+    height: auto;
+    rotate: -4deg;
+  }
+
+  /* About */
+  .about {
+    display: grid;
+    grid-template-columns: 480px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--spacing-16);
+    padding-block: var(--spacing-24);
+    overflow: clip;
+  }
+
+  :global(.about__wedge) {
+    left: -30px;
+    top: -10px;
+    width: 360px;
+    rotate: 180deg;
+  }
+
+  :global(.about__patch) {
+    left: 16%;
+    top: 64%;
+    width: 400px;
+  }
+
+  :global(.about__spark) {
+    position: absolute;
+    left: 81%;
+    top: 78%;
+  }
+
+  :global(.about__burst) {
+    right: 6%;
+    top: 7%;
+    width: 100px;
+  }
+
+  :global(.about__dots) {
+    right: 3%;
+    bottom: 6%;
+    width: 128px;
+  }
+
+  .about__portrait {
+    position: relative;
+    height: 580px;
+  }
+
+  :global(.about__slab) {
+    position: absolute;
+    left: 40px;
+    top: 20px;
+    width: 500px;
+    rotate: 7deg;
+  }
+
+  .about__panel {
+    position: absolute;
+    left: 20px;
+    top: 40px;
+    width: 420px;
+    height: 520px;
+    overflow: hidden;
+    border: 6px solid var(--color-border-default);
+    background: var(--color-bg-accent-subtle);
+    rotate: -3deg;
+  }
+
+  .about__panel img {
+    position: absolute;
+    left: -70.5%;
+    top: -12.4%;
+    width: 228%;
+    max-width: none;
+  }
+
+  .about__halftone {
+    position: absolute;
+    inset: auto 0 0;
+  }
+
+  .about__copy {
+    position: relative;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .about__title {
+    font: 400 clamp(3.5rem, 7.8vw, 7rem) / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .stats {
+    display: flex;
+    margin: 0;
+  }
+
+  .stats div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 6px;
+    padding-inline: 24px;
+    border-left: var(--border-thin) solid var(--color-border-subtle);
+  }
+
+  .stats div:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .stats dt {
+    color: var(--color-text-secondary);
+  }
+
+  .stats dd {
+    margin: 0;
+    font: 400 3.5rem / 1 var(--font-display);
+  }
+
+  .about__interests {
+    position: relative;
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Contact: pink, white text, graphics bottom-right. */
+  .contact {
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-8);
+    padding-block: var(--spacing-24);
     background: var(--color-bg-primary);
-    border-color: var(--color-border-primary);
     color: var(--color-text-on-primary);
+    overflow: clip;
+    --decor-sun: var(--color-yellow-500);
+    --decor-skyline: var(--color-ink-900);
   }
 
-  .btn-secondary {
-    background: var(--color-bg-inverse);
-    border-color: var(--color-border-default);
-    color: var(--color-text-inverse);
+  .contact > p,
+  .contact > h2,
+  .contact > .row {
+    position: relative;
   }
 
-  .btn-ghost {
-    background: var(--color-bg-surface);
-    border-color: var(--color-border-default);
+  /* Only the near end of the floor shows, as a band along the bottom edge. */
+  :global(.contact__grid) {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    opacity: 0.22;
+    clip-path: inset(62% 0 0 0);
+  }
+
+  :global(.contact__city) {
+    right: 10px;
+    bottom: 0;
+    width: min(492px, 40vw);
+  }
+
+  :global(.contact__spark) {
+    position: absolute;
+    left: 62%;
+    top: 13%;
+  }
+
+  .contact__title {
+    font: 400 clamp(4rem, 11vw, 10rem) / 0.95 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .contact__invite {
+    font: 700 1.75rem / 2rem var(--font-sans);
+  }
+
+  /* Footer */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) var(--gutter);
+    border-top: 1px solid var(--color-border-subtle);
+    background: var(--color-bg-page);
     color: var(--color-text-primary);
   }
 
-  .btn-primary:hover,
-  .btn-ghost:hover {
-    background: var(--color-bg-inverse);
-    border-color: var(--color-border-default);
-    color: var(--color-text-inverse);
+  /* Tablet */
+  @media (max-width: 1023px) {
+    .work__cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .about {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .about__portrait {
+      width: min(480px, 100%);
+    }
   }
 
-  .btn-secondary:hover {
-    background: var(--color-bg-primary);
-    border-color: var(--color-border-primary);
-    color: var(--color-text-on-primary);
-  }
+  /* Phone */
+  @media (max-width: 767px) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+      padding-block: var(--spacing-8) 0;
+    }
 
-  .type {
-    margin: 0;
-    display: grid;
-    gap: var(--spacing-6);
-  }
+    .hero__scroll {
+      display: none;
+    }
 
-  .type-row {
-    display: grid;
-    gap: var(--spacing-2);
-  }
+    .hero__art {
+      margin-inline: calc(-1 * var(--gutter));
+      min-height: 0;
+      aspect-ratio: 390 / 500;
+    }
 
-  .type-row dd {
-    margin: 0;
-    overflow-wrap: anywhere;
+    .hero :global(.hero__patch--bottom),
+    .hero :global(.hero__grid) {
+      display: none;
+    }
+
+    :global(.hero__sticker) {
+      left: 58%;
+      top: 66%;
+      scale: 0.85;
+    }
+
+    .work {
+      padding-block: var(--spacing-16);
+    }
+
+    .section-head__title {
+      font-size: 3rem;
+    }
+
+    .work__cards {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-12);
+    }
+
+    :global(.work__orbit) {
+      left: -20%;
+      top: 30%;
+      width: 120%;
+    }
+
+    .skills {
+      grid-template-columns: minmax(0, 1fr);
+      padding-block: var(--spacing-16) var(--spacing-12);
+    }
+
+    .skills__title {
+      font-size: 3.5rem;
+    }
+
+    .skills__tools {
+      gap: var(--spacing-4);
+    }
+
+    .skills__art {
+      min-height: 190px;
+    }
+
+    :global(.skills__patch) {
+      right: -80px;
+      top: -90px;
+      width: 220px;
+    }
+
+    /* Phone: the earlier collage, a squarer shard above the strip. */
+    :global(.skills__shard) {
+      left: auto;
+      right: 4%;
+      top: 0;
+      width: 34%;
+      aspect-ratio: 400 / 320;
+    }
+
+    .skills__strip {
+      left: 0;
+      top: 30%;
+      width: 100%;
+    }
+
+    .skills :global(.skills__burst) {
+      display: none;
+    }
+
+    .about {
+      padding-block: var(--spacing-16);
+      gap: var(--spacing-8);
+    }
+
+    .about__portrait {
+      height: 420px;
+      order: 1;
+    }
+
+    .about__copy {
+      order: 0;
+    }
+
+    .about__interests {
+      order: 2;
+    }
+
+    :global(.about__slab) {
+      left: 50px;
+      width: 300px;
+    }
+
+    .about__panel {
+      left: 10px;
+      top: 30px;
+      width: 290px;
+      height: 360px;
+    }
+
+    .stats dd {
+      font-size: 2.5rem;
+    }
+
+    .stats div {
+      padding-inline: 14px;
+    }
+
+    /* Section-qualified so it beats the Decor component's own display rule. */
+    .about :global(.about__wedge) {
+      display: none;
+    }
+
+    :global(.about__patch) {
+      left: auto;
+      right: -60px;
+      top: auto;
+      bottom: -80px;
+      width: 260px;
+    }
+
+    .about :global(.about__spark) {
+      display: none;
+    }
+
+    :global(.about__burst) {
+      right: 4px;
+      top: 16px;
+      width: 64px;
+    }
+
+    .contact {
+      padding-block: var(--spacing-16) 240px;
+    }
+
+    .contact__title {
+      font-size: 3.75rem;
+    }
+
+    :global(.contact__city) {
+      width: 372px;
+    }
+
+    :global(.contact__spark) {
+      left: auto;
+      right: var(--gutter);
+      top: var(--spacing-8);
+      width: 48px;
+      height: 48px;
+    }
+
+    :global(.contact__grid) {
+      width: 200%;
+    }
+
+    .footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>

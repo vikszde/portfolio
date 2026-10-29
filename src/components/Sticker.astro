@@ -2,7 +2,7 @@
 // Tilted text sticker from the Figma "Sticker" set. Yellow is the default:
 // stickers are what yellow is for. Use <br /> in the slot for line breaks.
 interface Props {
-  color?: "yellow" | "pink" | "white";
+  color?: "yellow" | "pink" | "aqua" | "white";
   tilt?: number;
   class?: string;
 }
@@ -31,6 +31,10 @@ const { color = "yellow", tilt = -8, class: className } = Astro.props;
 
   .sticker--pink {
     background: var(--color-bg-accent);
+  }
+
+  .sticker--aqua {
+    background: var(--color-bg-secondary);
   }
 
   /* "White" follows the surface colour so its text stays readable in Dark. */

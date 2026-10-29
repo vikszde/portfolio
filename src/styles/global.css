@@ -9,6 +9,8 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* Page side margin, matching the 80px Figma margin on desktop. */
+  --gutter: clamp(var(--spacing-4), 5.5vw, 80px);
 }
 
 body {
@@ -38,6 +40,15 @@ video {
 
 a {
   color: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 :focus-visible {

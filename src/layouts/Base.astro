@@ -26,11 +26,10 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <link rel="icon" href={`${base}favicon.ico`} />
     <title>{title}</title>
-    <!-- Apply a saved theme before first paint so the page never flashes the wrong colours. -->
+    <!-- The site is always Light. Earlier builds saved a theme choice; clear it so nobody gets stuck in Dark. -->
     <script is:inline>
       try {
-        const saved = localStorage.getItem("theme");
-        if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+        localStorage.removeItem("theme");
       } catch {}
     </script>
   </head>
