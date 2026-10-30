@@ -21,8 +21,8 @@ const links = [
 ] as const;
 ---
 
-<header class="nav">
-  <div class="nav__bar">
+<header class="nav" data-nav>
+  <div class="nav__bar theme-dark">
     <a class="nav__home" href={base}>
       <span class="nav__wordmark"><Logo variant="wordmark" height={48} /></span>
       <span class="nav__icon"><Logo variant="icon" height={40} /></span>
@@ -31,17 +31,23 @@ const links = [
 
     <nav class="nav__links" aria-label="Main">
       <ul>
+        <li class="nav__indicator" aria-hidden="true"></li>
         {
           links.map(({ label, href }) => (
             <li>
-              <a class="nav__link text-label-strong" href={href} aria-current={label === current ? "page" : undefined}>
+              <a
+                class="nav__link text-label-strong"
+                href={href}
+                aria-current={label === current ? "page" : undefined}
+                data-section={href.includes("#") ? href.split("#")[1] : undefined}
+              >
                 {label}
               </a>
             </li>
           ))
         }
       </ul>
-      <Sparkle color="ink" size={24} />
+      <Sparkle color="ink" size={24} class="nav__spark" />
     </nav>
 
     <p class="nav__tagline text-label-s">Ideas · Design · Illustration<br />for a brighter tomorrow.</p>
@@ -50,6 +56,8 @@ const links = [
       Menu
       <svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><path d="M0 1.25H18M0 7H18M0 12.75H18" stroke="currentColor" stroke-width="2.5"></path></svg>
     </button>
+
+    <span class="nav__progress" aria-hidden="true"></span>
   </div>
 
   <div class="menu" id="mobile-menu" hidden data-menu>
@@ -82,6 +90,7 @@ const links = [
     <div class="menu__halftone"><Halftone height={140} /></div>
   </div>
 </header>
+<div class="nav-spacer" aria-hidden="true"></div>
 
 <script>
   const menu = document.querySelector<HTMLElement>("[data-menu]");
@@ -109,19 +118,178 @@ const links = [
   window.matchMedia("(min-width: 768px)").addEventListener("change", (event) => {
     if (event.matches && menu && !menu.hidden) setOpen(false);
   });
+
+  /*
+   * Scroll behaviour: the bar sticks to the top and turns compact once the
+   * page scrolls, slides away while scrolling down and comes back on any
+   * scroll up. A pink line along its bottom edge shows reading progress, and
+   * on the home page an ink block slides to the section being read.
+   */
+  const nav = document.querySelector<HTMLElement>("[data-nav]");
+  const indicator = nav?.querySelector<HTMLElement>(".nav__indicator");
+  const navLinks = [...(nav?.querySelectorAll<HTMLAnchorElement>(".nav__link") ?? [])];
+  const sections = navLinks
+    .map((link) => ({ link, section: link.dataset.section ? document.getElementById(link.dataset.section) : null }))
+    .filter((item): item is { link: HTMLAnchorElement; section: HTMLElement } => item.section !== null);
+  const homeLink = navLinks.find((link) => !link.dataset.section && link.getAttribute("aria-current") === "page");
+  let active = navLinks.find((link) => link.getAttribute("aria-current") === "page") ?? null;
+
+  function moveIndicator(link: HTMLAnchorElement | null) {
+    if (!indicator) return;
+    navLinks.forEach((l) => l.classList.toggle("is-active", l === link));
+    if (!link) {
+      indicator.style.opacity = "0";
+      return;
+    }
+    indicator.style.opacity = "1";
+    indicator.style.width = `${link.offsetWidth}px`;
+    indicator.style.translate = `${link.parentElement!.offsetLeft}px 0`;
+  }
+
+  let lastY = window.scrollY;
+  let ticking = false;
+
+  function update() {
+    ticking = false;
+    if (!nav) return;
+    const y = window.scrollY;
+    const menuOpen = document.documentElement.classList.contains("menu-open");
+    // Two thresholds, so hovering around one point can't make it flicker.
+    if (y > 40) nav.classList.add("is-compact");
+    else if (y < 8) nav.classList.remove("is-compact");
+    if (!menuOpen && !nav.contains(document.activeElement)) {
+      if (y > lastY + 4 && y > 240) nav.classList.add("is-hidden");
+      else if (y < lastY - 4 || y <= 240) nav.classList.remove("is-hidden");
+    }
+    lastY = y;
+
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    nav.style.setProperty("--progress", String(max > 0 ? Math.min(1, y / max) : 0));
+
+    if (sections.length) {
+      const probe = window.innerHeight * 0.35;
+      let current: HTMLAnchorElement | null = homeLink ?? null;
+      for (const { link, section } of sections) {
+        if (section.getBoundingClientRect().top <= probe) current = link;
+      }
+      if (current !== active) {
+        active = current;
+        moveIndicator(active);
+      }
+    }
+  }
+
+  // Keep the spacer exactly as tall as the full bar, whatever fonts load.
+  const spacer = document.querySelector<HTMLElement>(".nav-spacer");
+  function sizeSpacer() {
+    if (nav && spacer && !nav.classList.contains("is-compact")) spacer.style.height = `${nav.offsetHeight}px`;
+  }
+
+  if (nav) {
+    nav.classList.add("has-indicator");
+    moveIndicator(active);
+    sizeSpacer();
+    update();
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+    window.addEventListener("resize", () => {
+      moveIndicator(active);
+      sizeSpacer();
+    });
+    document.fonts?.ready.then(() => {
+      moveIndicator(active);
+      sizeSpacer();
+    });
+    // Keyboard users tabbing into a hidden bar get it back.
+    nav.addEventListener("focusin", () => nav.classList.remove("is-hidden"));
+  }
 </script>
 
 <style>
+  /*
+   * Fixed, not sticky: the bar changes height when it turns compact, and a
+   * sticky bar would push the page by that amount right at the top of the
+   * page, which flips it back and makes it jitter. The spacer below holds the
+   * bar's full height in the page flow instead.
+   */
   .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
     padding: var(--spacing-4) clamp(var(--spacing-4), 5.5vw, 80px) 0;
+    /* A black bar, like a manga panel border. Only the bar takes the dark
+       theme; the full-screen phone menu stays light. */
+    background: var(--color-ink-1000);
+    transition:
+      translate var(--motion-duration-slow) var(--motion-ease-out),
+      padding var(--motion-duration-base) var(--motion-ease-out);
+  }
+
+  /* Full (not compact) bar height: 16px top + 48px logo + 16px + 2px rule. */
+  .nav-spacer {
+    height: 82px;
+  }
+
+  /* Scrolling down slides the bar away; scrolling up brings it back. */
+  .nav.is-hidden {
+    translate: 0 -110%;
+  }
+
+  .nav.is-compact {
+    padding-top: var(--spacing-2);
   }
 
   .nav__bar {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--spacing-8);
     padding-bottom: var(--spacing-4);
     border-bottom: var(--border-thin) solid var(--color-border-default);
+    transition: padding var(--motion-duration-base) var(--motion-ease-out);
+  }
+
+  .is-compact .nav__bar {
+    padding-bottom: var(--spacing-2);
+  }
+
+  .nav__wordmark :global(svg) {
+    width: auto;
+    height: 48px;
+    transition: height var(--motion-duration-base) var(--motion-ease-out);
+  }
+
+  .is-compact .nav__wordmark :global(svg) {
+    height: 36px;
+  }
+
+  :global(.nav__spark) {
+    transition: rotate var(--motion-duration-slow) var(--motion-ease-snap);
+  }
+
+  .is-compact :global(.nav__spark) {
+    rotate: 90deg;
+  }
+
+  /* Reading progress along the bottom edge. */
+  .nav__progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(-1 * var(--border-thin));
+    height: var(--border-heavy);
+    background: var(--color-bg-primary);
+    transform-origin: left center;
+    scale: var(--progress, 0) 1;
   }
 
   .nav__home {
@@ -136,6 +304,7 @@ const links = [
   }
 
   .nav__links ul {
+    position: relative;
     display: flex;
     gap: var(--spacing-1);
     margin: 0;
@@ -144,19 +313,41 @@ const links = [
   }
 
   .nav__link {
+    position: relative;
     display: block;
     padding: var(--spacing-2) var(--spacing-3);
     color: var(--color-text-primary);
     text-decoration: none;
+    transition: color var(--motion-duration-fast) var(--motion-ease-out);
   }
 
-  .nav__link[aria-current="page"] {
-    background: var(--color-bg-inverse);
-    color: var(--color-text-inverse);
+  /* The ink block that slides to the active link. Without JS the current
+     page's link gets the same look directly. */
+  .nav__indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: var(--color-bg-primary);
+    opacity: 0;
+    transition:
+      translate var(--motion-duration-slow) var(--motion-ease-snap),
+      width var(--motion-duration-slow) var(--motion-ease-snap),
+      opacity var(--motion-duration-fast) var(--motion-ease-out);
+  }
+
+  .nav__link.is-active {
+    color: var(--color-text-on-primary);
+  }
+
+  .nav:not(.has-indicator) .nav__link[aria-current="page"] {
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
   }
 
   @media (hover: hover) {
-    .nav__link:not([aria-current]):hover {
+    .nav__link:not(.is-active):hover {
       text-decoration: underline;
       text-decoration-thickness: var(--border-thin);
       text-underline-offset: 6px;
@@ -258,7 +449,8 @@ const links = [
   }
 
   @media (max-width: 767px) {
-    .nav {
+    .nav,
+    .nav.is-compact {
       padding: 0;
     }
 
@@ -266,6 +458,19 @@ const links = [
       justify-content: space-between;
       padding: var(--spacing-3) var(--spacing-4);
       border-bottom-width: var(--border-heavy);
+    }
+
+    .is-compact .nav__bar {
+      padding-block: var(--spacing-2);
+    }
+
+    /* 12px + 40px icon + 12px + 4px rule */
+    .nav-spacer {
+      height: 68px;
+    }
+
+    .nav__progress {
+      bottom: calc(-1 * var(--border-heavy));
     }
 
     .nav__wordmark,

@@ -1,0 +1,364 @@
+---
+// Full-screen logo intro for the home page, from the Figma "Logo" page. On a
+// black screen the logo icon spins in and turns into "logo 01 inverse": its
+// orbit becomes the logo's orbit, its sparkle travels onto the V and the
+// letters unfold around it. The extras then peel away, leaving the plain
+// wordmark, which flies into the nav while the black screen shrinks up into
+// the nav bar. On phones, where the nav shows the icon, the wordmark fades
+// out over it instead.
+//
+// It plays once per browser session, never with reduced motion or when the
+// page opens at a #section, and any click, tap, key or wheel skips it.
+// Place it before <Nav /> so the screen is up before the first paint.
+---
+
+<script is:inline>
+  try {
+    if (
+      !sessionStorage.getItem("intro-seen") &&
+      !matchMedia("(prefers-reduced-motion: reduce)").matches &&
+      !location.hash
+    ) {
+      sessionStorage.setItem("intro-seen", "1");
+      // is-intro holds the page; is-intro-logo hides the nav logo until the
+      // flying one has landed on it.
+      document.documentElement.classList.add("is-intro", "is-intro-logo");
+      // Safety net if the intro's script never runs: let the page go.
+      setTimeout(() => {
+        const html = document.documentElement;
+        if (!html.classList.contains("is-intro-logo")) return;
+        html.classList.remove("is-intro", "is-intro-logo");
+        document.dispatchEvent(new CustomEvent("intro:handoff"));
+      }, 8000);
+    }
+  } catch {}
+</script>
+
+<div class="intro-screen" aria-hidden="true" data-intro>
+  <div class="intro__part" data-part="icon">
+    <svg class="intro__spin" viewBox="0 0 301 357" width="84.3" height="100">
+      <g data-part="icon-orbit">
+        <path class="intro__pink" d="M263.029 185.397C263.035 200.675 260.102 215.812 254.39 229.982L259.892 234.332C267.599 215.98 270.86 196.067 269.411 176.216C267.961 156.364 261.842 137.136 251.551 120.099L247.261 126.105C257.609 144.151 263.045 164.595 263.029 185.397Z"></path>
+        <path class="intro__pink" d="M81.165 82.9692C78.2514 82.4248 74.9997 81.8907 71.3895 81.3457C59.9892 89.2368 49.9516 98.9339 41.672 110.055L49.3122 111.17C58.1763 99.9579 68.9614 90.4093 81.165 82.9692Z"></path>
+        <path class="intro__pink" d="M214.078 281.921C198.62 293.308 180.644 300.8 161.674 303.762C142.704 306.724 123.299 305.067 105.106 298.933L99.3649 304.055C119.54 311.525 141.29 313.715 162.55 310.416C183.81 307.116 203.873 298.438 220.836 285.205H218.084L214.078 281.921Z"></path>
+        <path class="intro__pink" d="M23.44 185.397C23.4496 180.691 23.735 175.991 24.295 171.319L18.5914 163.875C14.9167 184.978 16.6799 206.669 23.7146 226.901C30.7493 247.132 42.8234 265.238 58.7974 279.509L62.7164 274.021C50.3424 262.812 40.4543 249.134 33.6894 233.87C26.9246 218.605 23.4331 202.093 23.44 185.397Z"></path>
+        <path class="intro__pink" d="M213.415 88.401L218.553 83.8174C215.178 81.3085 211.677 78.9702 208.049 76.8024L196.961 78.3754C202.706 81.2707 208.208 84.6234 213.415 88.401Z"></path>
+      </g>
+      <!-- The white shapes sit behind the pink slash, as in the Figma icon. -->
+      <g data-part="icon-ink">
+        <path d="M177.921 186.604H148.297L148.295 186.606V210.566C173.151 230.944 198.008 251.322 222.864 271.699H285.563L177.921 186.604Z"></path>
+        <path d="M175.826 124.434H153.535L100.443 187.13L47.623 124.434L0 117.484L90.288 235.313L128.425 181.914L175.826 124.434Z"></path>
+      </g>
+      <path class="intro__pink" data-part="icon-slash" d="M300 29.0623L193.605 123.991C175.334 146.148 157.062 168.305 138.791 190.462L20.1069 356.674L126.502 261.746C144.774 239.589 163.045 217.432 181.317 195.275L300 29.0623Z"></path>
+      <g class="intro__pink" data-part="icon-dots">
+        <circle cx="291.278" cy="226.297" r="8.957"></circle>
+        <circle cx="291.278" cy="193.138" r="8.957"></circle>
+        <circle cx="291.278" cy="159.98" r="8.957"></circle>
+      </g>
+    </svg>
+  </div>
+
+  <div class="intro__part" data-part="logo">
+    <svg viewBox="0 0 581 236" width="246.2" height="100">
+      <defs>
+        <linearGradient id="intro-orbit-top" x1="215.424" y1="23.0155" x2="321.783" y2="129.374" gradientUnits="userSpaceOnUse">
+          <stop class="intro__stop-pink"></stop>
+          <stop offset="0.82479" stop-color="currentColor"></stop>
+        </linearGradient>
+        <linearGradient id="intro-orbit-bottom" x1="169.506" y1="129.795" x2="275.463" y2="235.753" gradientUnits="userSpaceOnUse">
+          <stop class="intro__stop-pink"></stop>
+          <stop offset="0.82479" stop-color="currentColor"></stop>
+        </linearGradient>
+      </defs>
+      <g class="intro__orbit" data-part="logo-orbit">
+        <path fill="url(#intro-orbit-top)" d="M273.978 11.5C294.829 11.5233 315.187 17.8333 332.396 29.6061C349.605 41.3789 362.864 58.0673 370.442 77.4921L373.656 77.5019C365.505 55.837 350.519 37.4173 330.964 25.031C311.41 12.6448 288.353 6.96633 265.283 8.85535C242.213 10.7444 220.386 20.098 203.107 35.5003C185.828 50.9026 174.037 71.5149 169.52 94.217L173.255 91.155C178.653 68.4923 191.527 48.308 209.8 33.8569C228.073 19.4059 250.681 11.5303 273.978 11.5Z"></path>
+        <path fill="url(#intro-orbit-bottom)" d="M273.978 218.5C249.777 218.469 226.35 209.971 207.756 194.481C189.162 178.99 176.573 157.482 172.172 133.685L168.633 130.668C170.711 144.623 175.541 158.027 182.842 170.1C190.143 182.174 199.77 192.676 211.163 200.998C222.557 209.32 235.491 215.296 249.213 218.578C262.935 221.86 277.173 222.383 291.099 220.117L287.542 217.611C283.045 218.203 278.514 218.5 273.978 218.5Z"></path>
+        <path d="M373.91 88.0418L376.345 85.5883C375.944 84.1946 375.514 82.8132 375.057 81.444L372.702 83.9012C373.133 85.269 373.536 86.6492 373.91 88.0418Z"></path>
+        <path d="M374.792 149.352H371.61C370.616 152.171 369.494 154.93 368.267 157.633L371.585 157.565C372.76 154.881 373.837 152.145 374.792 149.352Z"></path>
+        <path d="M298.771 215.491L301.464 217.897C315.509 214.111 328.635 207.5 340.037 198.468C351.44 189.436 360.88 178.173 367.781 165.368L364.391 165.299C357.468 177.708 348.072 188.565 336.785 197.198C325.498 205.831 312.56 212.057 298.771 215.491Z"></path>
+      </g>
+      <!-- Letters, left to right -->
+      <path data-letter d="M123 175L0 64L51 85L104 131V80H123V175Z"></path>
+      <path data-letter d="M144.302 79.947L133.889 93.348V146.851H154.59V79.947H144.302Z"></path>
+      <path data-letter d="M157.59 107.249L190.892 79.9468H218.894L178.792 111.649L318 236L191.492 146.851L157.59 117.949V107.249Z"></path>
+      <path data-letter d="M229.255 146.936L214.021 133.532L264.47 133.45C267.783 133.45 269.681 129.979 269.681 126.979C269.681 123.879 267.704 120.75 264.312 120.75H239.755C226.896 120.75 215.481 113.349 215.481 100.648C215.481 86.8477 226.818 79.9468 241.727 79.9468H287.875L277.383 93.3481H240.465C237.073 93.3481 235.468 96.6741 235.468 99.5745C235.468 102.574 237.073 106.049 240.465 106.049H265.258C278.353 106.049 289.295 112.749 289.295 125.45C289.295 140.151 278.669 146.851 263.996 146.851L229.255 146.936Z"></path>
+      <path data-letter d="M355.666 79.9468L373 80L321.768 133.45H366L356.139 146.851H306.284L284 147L336.339 93.3481H288.739L299.151 79.9468H355.666Z"></path>
+      <path data-letter d="M372.188 146.851V93.3481H392.889V133.45H416.99C429.791 133.45 436.591 123.55 436.591 112.749C436.586 110.186 436.074 107.649 435.085 105.284C434.096 102.92 432.649 100.774 430.827 98.9708C429.005 97.1676 426.845 95.7425 424.47 94.7776C422.095 93.8126 419.553 93.3268 416.99 93.3481H372.188L385.488 79.9468H416.99C440.592 79.9468 457.293 93.5479 457.293 112.749C457.293 132.25 440.092 146.851 416.99 146.851H372.188Z"></path>
+      <path data-letter d="M485.887 105.949H522.791L530.79 120.75H485.887V133.45H542.791L553.59 146.851H465.186V103.78C465.186 103.348 465.175 102.918 465.154 102.488C464.923 98.8479 463.88 95.3056 462.103 92.1204C460.326 88.9352 457.859 86.1878 454.883 84.0792L449.186 79.9468H526.691L537.29 93.3481L482.064 93.5957C485.894 98.0638 485.887 105.949 485.887 105.949Z"></path>
+      <path class="intro__pink intro__underline" data-part="logo-underline" d="M252.678 161.5L447.679 165.499C450.419 165.555 452.678 163.748 452.678 161.5C452.678 159.252 450.419 157.445 447.679 157.501L252.678 161.5Z"></path>
+      <path class="intro__pink" data-part="logo-spark" d="M560.096 108.667C561.093 114.289 561.876 117.29 564.519 119.051C567.161 120.813 571.663 121.335 580.096 122C571.663 122.665 567.161 123.187 564.519 124.949C561.876 126.71 561.093 129.711 560.096 135.333C559.099 129.711 558.316 126.71 555.673 124.949C553.031 123.187 548.529 122.665 540.096 122C548.529 121.335 553.031 120.813 555.673 119.051C558.316 117.29 559.099 114.289 560.096 108.667Z"></path>
+      <circle class="intro__pink" data-dot cx="469" cy="161.5" r="5"></circle>
+      <circle class="intro__pink" data-dot cx="486.5" cy="161.5" r="5"></circle>
+      <circle class="intro__pink" data-dot cx="504" cy="161.5" r="5"></circle>
+    </svg>
+  </div>
+
+  <!-- The sparkle is the one piece that never leaves: it sits on the icon,
+       travels onto the logo's V and rides along into the nav. -->
+  <div class="intro__part" data-part="sparkle">
+    <svg class="intro__spin" viewBox="102.096 0 70 84" width="83.3" height="100">
+      <path class="intro__pink" d="M172.096 42C157.338 44.0937 149.46 45.7388 144.836 51.2879C140.212 56.837 138.841 66.2902 137.096 84C135.351 66.2902 133.98 56.837 129.356 51.2879C124.732 45.7389 116.854 44.0937 102.096 42C116.854 39.9063 124.732 38.2612 129.356 32.7121C133.98 27.163 135.351 17.7098 137.096 0C138.841 17.7098 140.212 27.163 144.836 32.7121C149.46 38.2611 157.338 39.9063 172.096 42Z"></path>
+    </svg>
+  </div>
+</div>
+
+<script>
+  /*
+   * The timeline, in ms. The icon spins in and holds until E, when it starts
+   * turning into logo 01. Logo 01 holds until S, when the extras peel away,
+   * leaving the plain wordmark. F to FE: the wordmark flies into the nav and
+   * the screen shrinks into the nav bar. The page starts its own entrance
+   * (hero text, the character's intro) at F.
+   */
+  const E = 1400;
+  const S = E + 1400;
+  const F = S + 450;
+  const FE = F + 650;
+  const END = FE + 250;
+
+  const ease = {
+    out: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+    back: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+    in: "cubic-bezier(0.6, 0, 0.8, 0.4)",
+    inOut: "cubic-bezier(0.65, 0, 0.35, 1)",
+  };
+
+  type Props = Record<string, string | number>;
+  type Frame = [at: number, props: Props, easing?: string];
+  type Box = { x: number; y: number; h: number };
+
+  const html = document.documentElement;
+
+  function handOff() {
+    if (!html.classList.contains("is-intro")) return;
+    html.classList.remove("is-intro");
+    document.dispatchEvent(new CustomEvent("intro:handoff"));
+  }
+
+  function finish(screen: HTMLElement) {
+    handOff();
+    screen.remove();
+    html.classList.remove("is-intro-logo");
+  }
+
+  // Places a 100px-tall part so it is h px tall with its top left at x, y.
+  const pose = ({ x, y, h }: Box) => ({ transform: `translate(${x}px, ${y}px) scale(${h / 100})` });
+
+  function play(screen: HTMLElement) {
+    const part = (name: string) => screen.querySelector<SVGElement | HTMLElement>(`[data-part="${name}"]`)!;
+    const icon = part("icon");
+    const logo = part("logo");
+    const sparkle = part("sparkle");
+    const letters = [...screen.querySelectorAll<SVGPathElement>("[data-letter]")];
+    const dots = [...screen.querySelectorAll<SVGCircleElement>("[data-dot]")];
+
+    // The nav's wordmark, or on phones the nav's icon.
+    const wordmark = document.querySelector<SVGSVGElement>(".nav__wordmark svg");
+    const navIcon = document.querySelector<SVGSVGElement>(".nav__icon svg");
+    const onPhone = !wordmark?.getClientRects().length;
+    const target = (onPhone ? navIcon : wordmark)?.getBoundingClientRect();
+    const navBottom = document.querySelector("[data-nav]")?.getBoundingClientRect().bottom ?? 0;
+    if (!target) return finish(screen);
+
+    // Logo 01, centred. The icon sits where its orbit matches the logo's
+    // orbit (centre 274, 115 in logo units; 143, 185.4 in icon units, at 0.85
+    // of the size), so the ring seems to stay put while the rest changes.
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const u = Math.min(Math.min(vw * 0.7, 560) / 581, (vh * 0.32) / 236);
+    const iu = u * 0.85;
+    const L = { x: (vw - 581 * u) / 2, y: (vh - 236 * u) / 2, h: 236 * u };
+    const I = { x: L.x + 274 * u - 143 * iu, y: L.y + 115 * u - 185.4 * iu, h: 357 * iu };
+    // In the nav the wordmark's letters line up with logo 01's, unit for unit.
+    const N = { x: target.left, y: target.top, h: target.height };
+    const un = N.h / 236;
+    const sparkleOn = {
+      icon: { x: I.x + 67.79 * iu, y: I.y, h: 134.35 * iu },
+      logo: { x: L.x + 102.1 * u, y: L.y, h: 84 * u },
+      nav: { x: N.x + 102.1 * un, y: N.y, h: 84 * un },
+    };
+
+    // The letters unfold from the middle of the word outwards.
+    const fromCentre = letters
+      .map((el, i) => {
+        const box = el.getBBox();
+        return { i, d: Math.abs(box.x + box.width / 2 - 274) };
+      })
+      .sort((a, b) => a.d - b.d)
+      .map(({ i }) => i);
+
+    const flyOut = onPhone ? { opacity: 0 } : {};
+    const tracks: [Element, Frame[]][] = [
+      [icon, [[0, { ...pose(I), opacity: 1 }], [E + 550, { opacity: 1 }], [E + 600, { opacity: 0 }]]],
+      [icon.firstElementChild!, [[0, { transform: "scale(0) rotate(-270deg)" }, ease.out], [800, { transform: "scale(1) rotate(0deg)" }]]],
+      [part("icon-ink"), [[E, { opacity: 1, transform: "scale(1)" }, ease.in], [E + 400, { opacity: 0, transform: "scale(0.4)" }]]],
+      [part("icon-slash"), [[E, { opacity: 1, transform: "scale(1) rotate(0deg)" }, ease.in], [E + 350, { opacity: 0, transform: "scale(0.2) rotate(40deg)" }]]],
+      [part("icon-dots"), [[E, { opacity: 1 }], [E + 300, { opacity: 0 }]]],
+      [part("icon-orbit"), [[E + 200, { opacity: 1 }], [E + 600, { opacity: 0 }]]],
+
+      [sparkle, [[E, { ...pose(sparkleOn.icon), opacity: 1 }, ease.inOut], [E + 700, pose(sparkleOn.logo)], [F, { ...pose(sparkleOn.logo), opacity: 1 }, ease.inOut], [FE, { ...pose(sparkleOn.nav), ...flyOut }]]],
+      // It spins in with the icon, then turns half a turn on its way to the V.
+      [sparkle.firstElementChild!, [[0, { transform: "scale(0) rotate(-270deg)" }, ease.out], [800, { transform: "scale(1) rotate(0deg)" }], [E, { transform: "scale(1) rotate(0deg)" }, ease.inOut], [E + 700, { transform: "scale(1) rotate(180deg)" }]]],
+
+      [logo, [[F, { ...pose(L), opacity: 1 }, ease.inOut], [FE, { ...pose(N), ...flyOut }]]],
+      [part("logo-orbit"), [[E + 200, { opacity: 0, transform: "rotate(-35deg)" }, ease.out], [E + 650, { opacity: 1, transform: "rotate(0deg)" }], [S, { opacity: 1, transform: "rotate(0deg)" }, ease.in], [S + 400, { opacity: 0, transform: "rotate(70deg)" }]]],
+      ...letters.map((el, i): [Element, Frame[]] => {
+        const at = E + 200 + fromCentre.indexOf(i) * 60;
+        return [el, [[at, { transform: "scaleX(0)" }, ease.back], [at + 420, { transform: "scaleX(1)" }]]];
+      }),
+      [part("logo-underline"), [[E + 500, { transform: "scaleX(0)" }, ease.out], [E + 800, { transform: "scaleX(1)" }], [S, { transform: "scaleX(1)" }, ease.in], [S + 300, { transform: "scaleX(0)" }]]],
+      [part("logo-spark"), [[E + 600, { transform: "scale(0) rotate(0deg)" }, ease.back], [E + 850, { transform: "scale(1) rotate(90deg)" }], [S + 50, { transform: "scale(1) rotate(90deg)" }, ease.in], [S + 330, { transform: "scale(0) rotate(180deg)" }]]],
+      ...dots.map((el, i): [Element, Frame[]] => [
+        el,
+        [[E + 650 + i * 60, { transform: "scale(0)" }, ease.back], [E + 870 + i * 60, { transform: "scale(1)" }], [S + i * 50, { transform: "scale(1)" }, ease.in], [S + 220 + i * 50, { transform: "scale(0)" }]],
+      ]),
+
+      // The black screen shrinks up until it is exactly the nav bar, then
+      // fades so the nav's links show through.
+      [screen, [[F, { clipPath: "inset(0px 0px 0px 0px)", opacity: 1 }, ease.inOut], [FE, { clipPath: `inset(0px 0px ${vh - navBottom}px 0px)` }], [FE + 20, { opacity: 1 }], [END, { opacity: 0 }]]],
+    ];
+
+    const animations = tracks.map(([el, frames]) => run(el, frames));
+    animations.forEach((a) => a.pause());
+    let handOffTimer = 0;
+    animations.at(-1)!.finished.then(() => finish(screen)).catch(() => {});
+
+    // While the page is still loading, frames come late and the icon's spin
+    // would be over before it is ever drawn. The clock starts once two frames
+    // in a row arrive on time (or after a second at most).
+    const begin = () => {
+      if (handOffTimer) return;
+      animations.forEach((a) => a.play());
+      handOffTimer = window.setTimeout(handOff, F);
+    };
+    let last = performance.now();
+    let smooth = 0;
+    const tick = (now: number) => {
+      smooth = now - last < 34 ? smooth + 1 : 0;
+      last = now;
+      if (smooth >= 2) begin();
+      else if (!handOffTimer) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    setTimeout(begin, 1000);
+
+    // Any input skips to the end.
+    const skip = () => {
+      clearTimeout(handOffTimer);
+      handOffTimer = -1;
+      animations.forEach((a) => a.finish());
+      for (const type of ["pointerdown", "keydown", "wheel", "touchstart"]) window.removeEventListener(type, skip);
+    };
+    for (const type of ["pointerdown", "keydown", "wheel", "touchstart"]) window.addEventListener(type, skip, { passive: true });
+  }
+
+  // One animation per element across the whole timeline. Every property
+  // holds its first value until its first frame and its last value after.
+  function run(el: Element, frames: Frame[]) {
+    const first: Props = {};
+    const last: Props = {};
+    for (const [, props] of frames) {
+      for (const key in props) {
+        if (!(key in first)) first[key] = props[key];
+        last[key] = props[key];
+      }
+    }
+    const keyframes: Keyframe[] = [
+      { offset: 0, ...first },
+      ...frames.map(([at, props, easing]) => ({ offset: Math.min(at / END, 1), ...props, ...(easing ? { easing } : {}) })),
+      { offset: 1, ...last },
+    ];
+    return el.animate(keyframes, { duration: END, fill: "both" });
+  }
+
+  // A reload that lands part-way down the page skips the intro, and so does
+  // anything going wrong: the page must never stay held under the screen.
+  const screen = document.querySelector<HTMLElement>("[data-intro]");
+  if (screen && html.classList.contains("is-intro")) {
+    try {
+      if (window.scrollY > 0) finish(screen);
+      else play(screen);
+    } catch {
+      finish(screen);
+    }
+  }
+</script>
+
+<style>
+  /* Shown only while <html> has .is-intro-logo (set by the inline script
+     above), so without JavaScript or on later visits it never appears. */
+  .intro-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    overflow: hidden;
+    background: var(--color-ink-1000);
+    color: var(--color-paper-100);
+    cursor: pointer;
+  }
+
+  :global(.is-intro-logo) .intro-screen {
+    display: block;
+  }
+
+  /* The page holds still under the screen. */
+  :global(html.is-intro) {
+    overflow: hidden;
+  }
+
+  /* The real nav logo waits for the flying one to land on it. */
+  :global(.nav__home) {
+    transition: opacity 200ms ease-out;
+  }
+
+  :global(.is-intro-logo .nav__home) {
+    opacity: 0;
+  }
+
+  /* Hidden until the script places them: before it runs they would sit at
+     full size in the top left corner. Each part's animation sets its own
+     opacity from the first frame. */
+  .intro__part {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    opacity: 0;
+  }
+
+  .intro__part svg {
+    display: block;
+    overflow: visible;
+    fill: currentColor;
+  }
+
+  .intro__spin {
+    transform-origin: 50% 50%;
+  }
+
+  .intro__part path,
+  .intro__part circle,
+  .intro__part g {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+  }
+
+  .intro__pink {
+    fill: var(--color-bg-primary);
+  }
+
+  .intro__stop-pink {
+    stop-color: var(--color-bg-primary);
+  }
+
+  /* The orbit turns around the ring's centre, not its own box. */
+  .intro__part .intro__orbit {
+    transform-box: view-box;
+    transform-origin: 274px 115px;
+  }
+
+  .intro__part .intro__underline {
+    transform-origin: 0% 50%;
+  }
+</style>

@@ -3,12 +3,13 @@
 // square with its name underneath. Brand shapes come from Simple Icons (CC0)
 // and keep their own colours; Rive follows the text colour. The brands are
 // trademarks of their owners.
-interface Props {
-  tool: keyof typeof marks;
-  class?: string;
-}
+import type { HTMLAttributes } from "astro/types";
 
-const { tool, class: className } = Astro.props;
+type Props = {
+  tool: keyof typeof marks;
+} & HTMLAttributes<"li">;
+
+const { tool, class: className, ...rest } = Astro.props;
 
 const marks = {
   figma: {
@@ -77,7 +78,7 @@ const marks = {
 const mark = marks[tool];
 ---
 
-<li class:list={["tool", className]}>
+<li class:list={["tool", className]} {...rest}>
   <span class="tool__box">
     <svg viewBox={mark.viewBox} aria-hidden="true" focusable="false">
       {mark.paths.map(([d, fill]) => <path d={d} fill={fill} />)}

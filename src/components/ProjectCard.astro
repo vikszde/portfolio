@@ -24,22 +24,34 @@ const outlines = {
   B: "0,6 392,0 400,514 8,520",
   C: "6,0 400,16 394,520 0,506",
 };
+
+// The cover is clipped to the same angles as the paper, so the white margin
+// around it stays even. Corners as % of the cover box, in TL TR BR BL order,
+// derived from the outlines above at the card's usual size; `tab` drops the
+// number tab below the cover's sloping top edge.
+const covers = {
+  A: { clip: "1.7% 8%, 99.7% 0, 100% 100%, 0 97%", tab: "40px" },
+  B: { clip: "0 1.8%, 98.7% 0, 100% 98.2%, 1.3% 100%", tab: "20px" },
+  C: { clip: "1% 0, 100% 4.9%, 99% 100%, 0 95.7%", tab: "16px" },
+};
 ---
 
-<a class="card" href={href} style={`--tilt: ${tilt}deg`}>
+<a class="card" href={href} style={`--tilt: ${tilt}deg; --cover-clip: polygon(${covers[shape].clip}); --tab-top: ${covers[shape].tab}`}>
   <svg class="card__paper" viewBox="0 0 400 520" preserveAspectRatio="none" aria-hidden="true" focusable="false">
     <polygon points={outlines[shape]} vector-effect="non-scaling-stroke"></polygon>
   </svg>
   <div class="card__cover">
-    {
-      cover ? (
-        <img src={cover} alt={coverAlt} loading="lazy" decoding="async" />
-      ) : (
-        <div class="card__placeholder" aria-hidden="true">
-          <Halftone height={140} />
-        </div>
-      )
-    }
+    <div class="card__media">
+      {
+        cover ? (
+          <img src={cover} alt={coverAlt} loading="lazy" decoding="async" />
+        ) : (
+          <div class="card__placeholder" aria-hidden="true">
+            <Halftone height={140} />
+          </div>
+        )
+      }
+    </div>
     <span class="card__number">{number}</span>
   </div>
   <div class="card__body">
@@ -59,9 +71,9 @@ const outlines = {
     position: relative;
     display: flex;
     flex-direction: column;
-    /* The paper's top edge slopes down by up to 5% of the card height, so the
-       cover needs this much room to stay inside it. */
-    padding: 42px 20px 20px;
+    /* An even 16px of paper around the cover; the cover's clip follows the
+       paper's slopes, so this margin holds along every edge. */
+    padding: 16px 16px 20px;
     color: var(--color-text-primary);
     text-decoration: none;
     rotate: var(--tilt);
@@ -89,11 +101,17 @@ const outlines = {
   .card__cover {
     position: relative;
     aspect-ratio: 372 / 330;
-    overflow: hidden;
-    background: var(--color-bg-accent-subtle);
   }
 
-  .card__cover img {
+  .card__media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--color-bg-accent-subtle);
+    clip-path: var(--cover-clip);
+  }
+
+  .card__media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -109,8 +127,8 @@ const outlines = {
 
   .card__number {
     position: absolute;
-    top: 14px;
-    left: 14px;
+    top: var(--tab-top);
+    left: 16px;
     padding: 8px 14px;
     background: var(--color-bg-inverse);
     color: var(--color-text-inverse);
@@ -166,6 +184,9 @@ const outlines = {
     color: var(--color-text-accent);
   }
 
+  /* Hover lifts and straightens the card. A page can also set .is-focus on
+     the card's wrapper (the landing page does, on touch screens, while the
+     card is centred). */
   @media (hover: hover) {
     .card:hover {
       rotate: 0deg;
@@ -176,6 +197,31 @@ const outlines = {
       background: var(--color-bg-primary);
       border-color: var(--color-border-primary);
       color: var(--color-text-on-primary);
+    }
+  }
+
+  :global(.is-focus) > .card {
+    rotate: 0deg;
+    translate: 0 -6px;
+  }
+
+  :global(.is-focus) > .card .card__arrow {
+    background: var(--color-bg-primary);
+    border-color: var(--color-border-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  /* Touch screens: a tap squishes the card a little before it opens. */
+  @media (hover: none) {
+    .card {
+      transition:
+        rotate var(--motion-duration-base) var(--motion-ease-snap),
+        translate var(--motion-duration-base) var(--motion-ease-snap),
+        scale 120ms var(--motion-ease-out);
+    }
+
+    .card:active {
+      scale: 0.96;
     }
   }
 
