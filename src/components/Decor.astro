@@ -3,17 +3,19 @@
 // from screen readers and never focusable. Size with `width` (the height
 // follows the shape) and place with a class from the parent section. Pass
 // `stretch` when the parent sets both width and height, like a shard that was
-// squashed in Figma.
+// squashed in Figma. `moving` makes the perspective grid roll towards the
+// viewer like an endless retro floor.
 interface Props {
   name: keyof typeof shapes;
   tone?: "ink" | "pink" | "accent" | "aqua" | "text";
   width?: number;
   stretch?: boolean;
+  moving?: boolean;
   class?: string;
   style?: string;
 }
 
-const { name, tone = "pink", width, stretch = false, class: className, style } = Astro.props;
+const { name, tone = "pink", width, stretch = false, moving = false, class: className, style } = Astro.props;
 
 const f = (n: number) => n.toFixed(1);
 const star = (cx: number, cy: number, r: number, k = 0.14) =>
@@ -41,16 +43,27 @@ for (let y = 5; y < 160; y += 10)
 let grid = "";
 for (let y = 0; y < 6; y++) for (let x = 0; x < 8; x++) grid += dot(8 + x * 16, 8 + y * 16, 2);
 
-let floor = "";
-for (let x = -800; x <= 1600; x += 80) floor += `M${x} 300L${f(x + (400 - x) * 0.6)} 0`;
-for (let k = 1; k <= 10; k++) floor += `M0 ${f(300 * (k / 10) ** 2)}H800`;
+// Perspective floor: rails converge on a vanishing point above the box, and
+// the cross lines ("rungs") get further apart towards the viewer. Each rung
+// knows the gap to the next one, so a moving floor can slide every rung into
+// its neighbour's place and loop without a jump.
+let rails = "";
+for (let x = -800; x <= 1600; x += 80) rails += `M${x} 300L${f(x + (400 - x) * 0.6)} 0`;
+const rungY = (k: number) => 300 * (k / 10) ** 2;
+const rungs = Array.from({ length: 11 }, (_, k) => ({ y: rungY(k), gap: rungY(k + 1) - rungY(k) }));
+const floor = rails + rungs.slice(1).map(({ y }) => `M0 ${f(y)}H800`).join("");
 
-let burst = "";
-for (let i = 0; i < 16; i++) {
-  const a = ((i * 22.5 - 90) * Math.PI) / 180;
-  const r = i % 2 ? 7 : (i / 2) % 2 ? 52 : 100;
-  burst += `${i ? "L" : "M"}${f(100 + Math.cos(a) * r)} ${f(100 + Math.sin(a) * r)}`;
-}
+// Eight-ray sparkle: long and short rays around a narrow waist. The bold
+// version has a wider waist, so its rays are thicker.
+const starburst = (waist: number, short: number) => {
+  let d = "";
+  for (let i = 0; i < 16; i++) {
+    const a = ((i * 22.5 - 90) * Math.PI) / 180;
+    const r = i % 2 ? waist : (i / 2) % 2 ? short : 100;
+    d += `${i ? "L" : "M"}${f(100 + Math.cos(a) * r)} ${f(100 + Math.sin(a) * r)}`;
+  }
+  return d + "Z";
+};
 
 let ruler = "";
 for (let x = 1; x < 300; x += 10) ruler += `M${x} 0V${(x - 1) % 50 === 0 ? 24 : 10}`;
@@ -73,7 +86,8 @@ const shapes = {
   "halftone-patch": { box: [320, 320], fill: patch },
   "halftone-fade": { box: [480, 160], fill: fade },
   "dot-grid": { box: [128, 96], fill: grid },
-  "sparkle-burst": { box: [200, 200], fill: burst + "Z" },
+  "sparkle-burst": { box: [200, 200], fill: starburst(7, 52) },
+  "sparkle-burst-bold": { box: [200, 200], fill: starburst(20, 60) },
   "sparkle-outline": { box: [64, 64], stroke: star(32, 32, 30, 0.18), strokeWidth: 2 },
   "shooting-star": { box: [320, 150], fill: star(30, 30, 26) + "M44 38L318 140L312 146Z" },
   "perspective-grid": { box: [800, 300], stroke: floor, strokeWidth: 1.5 },
@@ -100,7 +114,17 @@ const [w, h] = shape.box;
 >
   {shape.fill && <path d={shape.fill} fill="currentColor" fill-rule={shape.evenOdd ? "evenodd" : undefined} />}
   {
-    shape.stroke && (
+    name === "perspective-grid" && moving && (
+      <g fill="none" stroke="currentColor" stroke-width={shape.strokeWidth}>
+        <path d={rails} vector-effect="non-scaling-stroke" />
+        {rungs.map(({ y, gap }) => (
+          <path class="decor__rung" d={`M0 ${f(y)}H800`} style={`--gap: ${f(gap)}px`} vector-effect="non-scaling-stroke" />
+        ))}
+      </g>
+    )
+  }
+  {
+    shape.stroke && !(name === "perspective-grid" && moving) && (
       <path
         d={shape.stroke}
         fill="none"
@@ -147,6 +171,18 @@ const [w, h] = shape.box;
 
   .decor--text {
     color: var(--color-text-primary);
+  }
+
+  /* Moving floor: each rung slides down into the next one's place, then
+     the loop restarts, which looks like walking forward forever. */
+  .decor__rung {
+    animation: rung var(--rung-dur, 1.6s) linear infinite;
+  }
+
+  @keyframes rung {
+    to {
+      translate: 0 var(--gap);
+    }
   }
 
   /* City: the sun and skyline colours are set by the section using it. */

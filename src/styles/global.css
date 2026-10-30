@@ -9,6 +9,9 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  /* In-page links glide, and stop below the sticky nav. */
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
   /* Page side margin, matching the 80px Figma margin on desktop. */
   --gutter: clamp(var(--spacing-4), 5.5vw, 80px);
 }
@@ -56,13 +59,258 @@ a {
   outline-offset: 2px;
 }
 
+/*
+ * Motion
+ *
+ * Scroll reveal: [data-reveal] starts lowered and transparent (only once JS
+ * is running) and settles when the reveal script adds .is-visible.
+ *   "pop"  lands with a spring, from small
+ *   "slam" big titles hit the page from oversized, manga-panel style
+ *   "card" project cards are tossed onto the table and spin into place
+ */
+.js [data-reveal] {
+  opacity: 0;
+  translate: 0 64px;
+  transition:
+    opacity 500ms var(--motion-ease-out) var(--reveal-delay, 0ms),
+    translate 900ms var(--motion-ease-out) var(--reveal-delay, 0ms),
+    scale 700ms var(--motion-ease-snap) var(--reveal-delay, 0ms),
+    rotate 900ms var(--motion-ease-snap) var(--reveal-delay, 0ms);
+}
+
+.js [data-reveal="pop"] {
+  translate: 0 24px;
+  scale: 0.5;
+}
+
+.js [data-reveal="slam"] {
+  translate: 0 0;
+  scale: 1.5;
+  rotate: -3deg;
+  transform-origin: left center;
+  transition:
+    opacity 260ms var(--motion-ease-out) var(--reveal-delay, 0ms),
+    scale 650ms var(--motion-ease-snap) var(--reveal-delay, 0ms),
+    rotate 650ms var(--motion-ease-snap) var(--reveal-delay, 0ms);
+}
+
+.js [data-reveal="card"] {
+  translate: 0 140px;
+  rotate: 12deg;
+  scale: 0.9;
+  transition:
+    opacity 400ms var(--motion-ease-out) var(--reveal-delay, 0ms),
+    translate 1000ms var(--motion-ease-out) var(--reveal-delay, 0ms),
+    rotate 1000ms var(--motion-ease-snap) var(--reveal-delay, 0ms),
+    scale 800ms var(--motion-ease-snap) var(--reveal-delay, 0ms);
+}
+
+.js [data-reveal="card"]:nth-child(even) {
+  rotate: -12deg;
+}
+
+.js [data-reveal].is-visible {
+  opacity: 1;
+  translate: 0 0;
+  rotate: 0deg;
+  scale: 1;
+}
+
+/*
+ * "hand": a small pile of cards ([data-deal] inside it). The pile is what
+ * scrolls into view; once it is revealed the cards slam onto the page one by
+ * one (--deal-delay): each lands oversized, overshoots a touch and settles
+ * at its own --tilt, which also holds without JavaScript.
+ */
+[data-deal] {
+  rotate: var(--tilt, 0deg);
+}
+
+.js [data-reveal="hand"] {
+  opacity: 1;
+  translate: none;
+}
+
+.js [data-reveal="hand"] [data-deal] {
+  opacity: 0;
+}
+
+.js [data-reveal="hand"].is-visible [data-deal] {
+  opacity: 1;
+  animation: card-slam 520ms cubic-bezier(0.5, 0, 0.6, 1) var(--deal-delay, 0ms) both;
+}
+
+@keyframes card-slam {
+  from {
+    opacity: 0;
+    scale: 1.5;
+    rotate: calc(var(--tilt, 0deg) - 8deg);
+  }
+
+  60% {
+    opacity: 1;
+    scale: 0.94;
+    rotate: calc(var(--tilt, 0deg) + 2deg);
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: var(--tilt, 0deg);
+  }
+}
+
+/*
+ * Ambient loops for background pieces. They animate `transform`, so they
+ * stack with the `rotate`/`translate` a section uses to place a piece.
+ */
+@keyframes float {
+  50% {
+    transform: translateY(var(--float, -18px));
+  }
+}
+
+@keyframes sway {
+  50% {
+    transform: rotate(var(--sway, 7deg));
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+
+  40% {
+    transform: scale(var(--twinkle-min, 0.3)) rotate(var(--twinkle-turn, 90deg));
+    opacity: var(--twinkle-fade, 0.4);
+  }
+
+  60% {
+    transform: scale(var(--twinkle-max, 1.25)) rotate(calc(var(--twinkle-turn, 90deg) * 4 / 3));
+    opacity: 1;
+  }
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(var(--breathe, 1.14));
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slide {
+  50% {
+    transform: translateX(var(--slide, 24px));
+  }
+}
+
+@keyframes beat {
+  0%,
+  60%,
+  100% {
+    transform: scale(1);
+  }
+
+  20% {
+    transform: scale(var(--beat, 1.32));
+  }
+
+  35% {
+    transform: scale(var(--beat-rebound, 0.9));
+  }
+}
+
+/* Hero title: each line rises out of its own mask, one after another. */
+@keyframes line-up {
+  from {
+    transform: translateY(110%) rotate(6deg);
+  }
+}
+
+.anim-float {
+  animation: float var(--dur, 6s) ease-in-out infinite var(--delay, 0s);
+}
+
+.anim-sway {
+  animation: sway var(--dur, 9s) ease-in-out infinite;
+}
+
+.anim-twinkle {
+  animation: twinkle var(--dur, 2.8s) ease-in-out infinite var(--delay, 0s);
+}
+
+.anim-breathe {
+  animation: breathe var(--dur, 7s) ease-in-out infinite var(--delay, 0s);
+}
+
+.anim-spin {
+  animation: spin var(--dur, 24s) linear infinite;
+}
+
+.anim-slide {
+  animation: slide var(--dur, 3s) ease-in-out infinite;
+}
+
+.anim-beat {
+  animation: beat var(--dur, 1.6s) ease-in-out infinite var(--delay, 0s);
+}
+
+/*
+ * Scroll parallax: pieces drift by --parallax as their section scrolls
+ * through the viewport. Uses CSS scroll-driven animations where the browser
+ * supports them (Chrome, Edge); elsewhere the pieces simply stay put.
+ */
+@keyframes parallax-y {
+  from {
+    translate: 0 var(--parallax, 100px);
+  }
+
+  to {
+    translate: 0 calc(var(--parallax, 100px) * -1);
+  }
+}
+
+@keyframes parallax-x {
+  from {
+    translate: var(--parallax, 100px) 0;
+  }
+
+  to {
+    translate: calc(var(--parallax, 100px) * -1) 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .parallax,
+    .parallax-x {
+      animation: parallax-y linear both;
+      animation-timeline: view();
+    }
+
+    .parallax-x {
+      animation-name: parallax-x;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
     scroll-behavior: auto !important;
   }
 }

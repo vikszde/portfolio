@@ -4,15 +4,15 @@
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Button from "../components/Button.astro";
-import Sticker from "../components/Sticker.astro";
 import Sparkle from "../components/Sparkle.astro";
 import Decor from "../components/Decor.astro";
-import Halftone from "../components/Halftone.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import ToolChip from "../components/ToolChip.astro";
 import Logo from "../components/Logo.astro";
+import Intro from "../components/Intro.astro";
 import { site, projects } from "../data/site";
 import charTrace from "../assets/art/char-trace.webp?url";
+import portrait from "../assets/photo/viki-portrait.webp?url";
 import eyeStrip from "../assets/art/eye-strip.webp?url";
 import nearbioCover from "../assets/work/nearbio-cover.webp?url";
 import barterlandCover from "../assets/work/barterland-cover.webp?url";
@@ -21,146 +21,263 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 const covers: Record<string, string | undefined> = { nearbio: nearbioCover, barterland: barterlandCover };
 const shapes = ["A", "B", "C"] as const;
 const tilts = [-1.5, 1, -0.8];
+// About me: the manga burst card, as points on a 100 × 100 box.
+const burst = [[50, 2], [55.7, 17.5], [65, 8.7], [66.5, 21.4], [80.2, 14], [75.3, 28.8], [86.4, 29], [81, 38.7], [97.3, 41.7], [83, 50], [94.3, 57.8], [81, 61.3], [87.2, 71.5], [75.3, 71.2], [80.9, 86.8], [66.5, 78.6], [65, 91.3], [55.7, 82.5], [50, 97], [44.3, 82.5], [35.6, 89.5], [33.5, 78.6], [20.4, 85.2], [24.7, 71.2], [8.4, 74], [19, 61.3], [7.7, 57.5], [17, 50], [3.7, 41.8], [19, 38.7], [11.9, 28], [24.7, 28.8], [19.1, 13.2], [33.5, 21.4], [35.6, 10.5], [44.3, 17.5]];
+const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
 ---
 
 <Base title="Viktória Varga · Product designer & visual creator">
+  <Intro />
   <Nav current="Home" />
 
   <main>
     <!-- Hero -->
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero__copy">
-        <p class="text-label-m accent">Product designer &amp; illustrator</p>
-        <h1 id="hero-title" class="hero__title">Product<br />designer <span class="pink">&amp;</span><br />visual creator</h1>
-        <p class="text-body-l secondary hero__intro">I turn messy problems into clear, playful interfaces — and draw a little anime on the side.</p>
-        <div class="row">
+      <div class="hero__copy" data-stagger="110">
+        <p class="text-label-m accent" data-reveal>Design • Create • Experiment <span aria-hidden="true">✦</span></p>
+        <h1 id="hero-title" class="hero__title">
+          <span class="hero__line"><span>Product</span></span>
+          <span class="hero__line"><span>designer <span class="pink">&amp;</span></span></span>
+          <span class="hero__line"><span>visual creator</span></span>
+        </h1>
+        <p class="text-body-l secondary hero__intro" data-reveal>I turn messy problems into clear, thoughtful digital experiences with personality.</p>
+        <div class="row" data-reveal>
           <Button href="#work" arrow>View my work</Button>
           <Button variant="ghost" href="#about">About me</Button>
         </div>
-        <a class="hero__scroll text-label-m" href="#work">Scroll <span aria-hidden="true">↓</span></a>
+        <a class="hero__scroll text-label-m" href="#work" data-reveal>Scroll <span class="hero__scroll-arrow" aria-hidden="true">↓</span></a>
       </div>
 
       <div class="hero__art">
-        <Decor name="halftone-patch" tone="accent" class="hero__patch hero__patch--top" />
-        <Decor name="orbit" class="hero__orbit" />
+        <Decor name="orbit" class="hero__orbit anim-sway" />
         <span class="hero__circle" aria-hidden="true"></span>
-        <img class="hero__character" src={charTrace} alt="Anime-style character illustration in a black and pink outfit" width="832" height="1216" />
-        <Sparkle color="pink" size={56} class="hero__spark hero__spark--pink" />
-        <Sparkle color="ink" size={28} class="hero__spark hero__spark--ink" />
-        <Sparkle shape="heart" color="pink" size={44} class="hero__spark hero__spark--heart" />
-        <Sticker color="aqua" tilt={8} class="hero__sticker">Good design<br />brighter days</Sticker>
+        <div class="hero__frame">
+          <div class="hero__character" role="img" aria-label="Anime-style character illustration in a black and pink outfit">
+            <img src={charTrace} alt="" width="832" height="1216" />
+          </div>
+        </div>
+        <div class="hero__bubble" data-reveal="pop" aria-hidden="true">
+          <p class="hero__bubble-box"><span data-typing>Hi, I’m Viki.</span><span class="hero__bubble-cursor"></span></p>
+        </div>
+        <svg class="hero__heart anim-beat" viewBox="-12 -12 124 116" aria-hidden="true" focusable="false">
+          <path class="hero__heart-edge" d="M50 90C18 64 2 46 2 26C2 12 13 2 27 2C37 2 45 7 50 15C55 7 63 2 73 2C87 2 98 12 98 26C98 46 82 64 50 90Z" />
+          <path class="hero__heart-cut" d="M50 90C18 64 2 46 2 26C2 12 13 2 27 2C37 2 45 7 50 15C55 7 63 2 73 2C87 2 98 12 98 26C98 46 82 64 50 90Z" />
+          <path class="hero__heart-face" d="M50 90C18 64 2 46 2 26C2 12 13 2 27 2C37 2 45 7 50 15C55 7 63 2 73 2C87 2 98 12 98 26C98 46 82 64 50 90Z" />
+        </svg>
       </div>
 
-      <Decor name="halftone-patch" tone="accent" class="hero__patch hero__patch--bottom" />
-      <Decor name="perspective-grid" tone="accent" class="hero__grid" />
+      <Decor name="perspective-grid" tone="accent" moving stretch class="hero__grid" />
     </section>
 
     <!-- Selected work -->
     <section class="work" id="work" aria-labelledby="work-title">
-      <Decor name="orbit" class="work__orbit" />
-      <header class="section-head">
-        <p class="text-label-m accent">01 / Work</p>
-        <h2 id="work-title" class="text-display-l section-head__title">Selected work <Sparkle color="pink" size={36} /></h2>
-        <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
-        <p class="text-body-m secondary">Case studies on turning messy problems into calm, playful products.</p>
+      <header class="section-head" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>01 / Work</p>
+        <h2 id="work-title" class="text-display-l section-head__title" data-reveal="slam">Selected work <Sparkle color="pink" size={36} class="anim-twinkle" /></h2>
+        <p class="text-katakana" lang="ja" data-reveal>つくる、試す、好きで満たす。</p>
+        <p class="text-body-m secondary" data-reveal>Selected projects from early ideas and research to polished digital experiences.</p>
+        <p class="work__look" lang="ja" aria-hidden="true" data-reveal="look"><span class="work__look-word"><span class="work__look-ch">見</span><span class="work__look-ch">て</span><span class="work__look-ch work__look-bang pink">!</span></span><span class="work__look-note text-label-s">Mite = look</span></p>
       </header>
-      <ul class="work__cards">
-        {
-          projects.map((project, i) => (
-            <li>
-              <ProjectCard
-                number={project.number}
-                title={project.title}
-                summary={project.summary}
-                tags={[...project.tags]}
-                href={`${base}work/${project.slug}/`}
-                cover={covers[project.slug]}
-                shape={shapes[i]}
-                tilt={tilts[i]}
-              />
-            </li>
-          ))
-        }
-      </ul>
-      <div class="work__more">
+      <div class="work__stage">
+        <div class="work__arrow" aria-hidden="true" data-reveal="arrow">
+          <div class="work__arrow-move">
+            <span class="work__arrow-shaft"></span>
+            <svg class="work__arrow-head" viewBox="0 0 72 100" preserveAspectRatio="none">
+              <polygon points="0,0 72,50 0,100" />
+              <path d="M1 22V1L71 50L1 99V78" />
+            </svg>
+          </div>
+        </div>
+        <ul class="work__cards" data-stagger="150">
+          {
+            projects.slice(0, 2).map((project, i) => (
+              <li data-reveal="card" data-focus>
+                <ProjectCard
+                  number={project.number}
+                  title={project.title}
+                  summary={project.summary}
+                  tags={[...project.tags]}
+                  href={`${base}work/${project.slug}/`}
+                  cover={covers[project.slug]}
+                  shape={shapes[i]}
+                  tilt={tilts[i]}
+                />
+                <span class="work__tag">{project.highlight}</span>
+              </li>
+            ))
+          }
+          <!-- The next case study, teased behind the arrow head. -->
+          <li class="work__soon" data-reveal="card">
+            <span class="work__soon-jp" lang="ja">準備中</span>
+            <span class="work__soon-title">Coming soon</span>
+            <span class="work__soon-meta">Next case study</span>
+          </li>
+        </ul>
+      </div>
+      <ol class="work__process" aria-label="How I work" data-stagger="110">
+        <li data-reveal="pop"><span class="work__step"><span class="work__step-num">01</span><span class="work__step-name">Research</span></span></li>
+        <li data-reveal="pop"><span class="work__step"><span class="work__step-num">02</span><span class="work__step-name">Define</span></span></li>
+        <li data-reveal="pop"><span class="work__step"><span class="work__step-num">03</span><span class="work__step-name">Explore</span></span></li>
+        <li data-reveal="pop"><span class="work__step"><span class="work__step-num">04</span><span class="work__step-name">Design</span></span></li>
+        <li data-reveal="pop"><span class="work__step"><span class="work__step-num">05</span><span class="work__step-name">Test</span></span></li>
+        <li data-reveal="pop"><span class="work__step"><span class="work__step-num">06 <span class="work__step-loop" aria-hidden="true">↻</span></span><span class="work__step-name">Iterate</span></span></li>
+      </ol>
+      <div class="work__more" data-reveal>
         <Button variant="ghost" href={`${base}work/`} arrow>All projects</Button>
       </div>
     </section>
 
     <!-- Skills & tools (always dark) -->
     <section class="skills theme-dark" aria-labelledby="skills-title">
-      <Decor name="stripes" class="skills__stripes" />
-      <Decor name="halftone-patch" tone="accent" class="skills__patch" />
-      <div class="skills__copy">
-        <p class="text-label-m accent">02 / Skills</p>
-        <h2 id="skills-title" class="skills__title">Skills &amp; tools</h2>
-        <p class="text-katakana" lang="ja">スキルとツール</p>
-        <p class="text-body-l secondary">A mix of product thinking, visual design and illustration to create cohesive digital experiences.</p>
-        <ul class="skills__tools" aria-label="Tools I use">
-          <ToolChip tool="figma" />
-          <ToolChip tool="illustrator" />
-          <ToolChip tool="photoshop" />
-          <ToolChip tool="claude" />
-          <ToolChip tool="rive" />
+      <Decor name="stripes" class="skills__stripes anim-slide" />
+      <Decor name="halftone-patch" tone="accent" class="skills__patch anim-breathe" />
+      <div class="skills__copy" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>02 / Skills</p>
+        <h2 id="skills-title" class="skills__title" data-reveal="slam">Skills &amp; tools</h2>
+        <p class="text-katakana" lang="ja" data-reveal>スキルとツール</p>
+        <p class="text-body-l secondary" data-reveal>A mix of product thinking, visual design and illustration to create cohesive digital experiences.</p>
+        <ul class="skills__tools" aria-label="Tools I use" data-reveal data-stagger="80">
+          <ToolChip tool="figma" data-reveal="pop" />
+          <ToolChip tool="illustrator" data-reveal="pop" />
+          <ToolChip tool="photoshop" data-reveal="pop" />
+          <ToolChip tool="claude" data-reveal="pop" />
+          <ToolChip tool="rive" data-reveal="pop" />
         </ul>
-        <div><Button variant="ghost" href={`${base}about/`} arrow>See more</Button></div>
+        <div data-reveal><Button variant="ghost" href={`${base}about/`} arrow>See more</Button></div>
       </div>
       <div class="skills__art" aria-hidden="true">
-        <Decor name="halftone-patch" tone="accent" class="skills__burst" />
-        <Decor name="slab" stretch class="skills__shard" />
-        <img class="skills__strip" src={eyeStrip} alt="" width="560" height="160" loading="lazy" />
+        <Decor name="halftone-patch" tone="accent" class="skills__burst anim-breathe" />
+        <Decor name="slab" stretch class="skills__shard anim-sway" />
+        <div class="skills__strip parallax-x">
+          <img src={eyeStrip} alt="" width="560" height="160" loading="lazy" />
+        </div>
       </div>
     </section>
 
     <!-- About -->
     <section class="about" id="about" aria-labelledby="about-title">
-      <Decor name="wedge" tone="ink" class="about__wedge" />
-      <Decor name="halftone-patch" tone="accent" class="about__patch" />
-      <Decor name="sparkle-burst" tone="aqua" class="about__burst" />
-      <Decor name="dot-grid" tone="aqua" class="about__dots" />
-      <Sparkle color="ink" size={40} class="about__spark" />
 
-      <div class="about__portrait" aria-hidden="true">
-        <Decor name="slab" class="about__slab" />
-        <div class="about__panel">
-          <div class="about__halftone"><Halftone height={160} /></div>
-          <img src={charTrace} alt="" width="832" height="1216" loading="lazy" />
+      <div class="about__portrait" data-reveal="hand" data-reveal-at="0.6" data-focus>
+        <div class="about__card about__card--burst" data-deal aria-hidden="true">
+          <div class="about__face">
+            <div class="about__front anim-float">
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points={burstPoints} vector-effect="non-scaling-stroke" /></svg>
+            </div>
+          </div>
+        </div>
+        <div class="about__card about__card--shard" data-deal aria-hidden="true">
+          <div class="about__face">
+            <div class="about__front anim-float"><Decor name="slab" /></div>
+          </div>
+        </div>
+        <div class="about__card about__card--photo" data-deal>
+          <div class="about__face">
+            <div class="about__front about__panel anim-float">
+              <img class="parallax" src={portrait} alt="Viktória smiling, in a black turtleneck and silver chains" width="840" height="1120" loading="lazy" />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="about__copy">
-        <p class="text-label-m accent">03 / About</p>
-        <h2 id="about-title" class="about__title">About <span class="pink">me</span></h2>
-        <p class="text-katakana" lang="ja">私について</p>
-        <p class="text-body-l secondary">I'm Viki, a product designer and visual creator who loves anime, games and creative worlds. I enjoy turning ideas into clean, playful and meaningful experiences.</p>
-        <dl class="stats">
-          <div><dt class="text-label-s">Years<br />experience</dt><dd>3+</dd></div>
-          <div><dt class="text-label-s">Projects</dt><dd>20+</dd></div>
-          <div><dt class="text-label-s">Full-time<br />cat lover</dt><dd>1</dd></div>
+      <div class="about__copy" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>03 / About</p>
+        <h2 id="about-title" class="about__title" data-reveal="slam">About <span class="pink">me</span></h2>
+        <p class="text-katakana" lang="ja" data-reveal>私について</p>
+        <p class="text-body-l secondary" data-reveal>I'm Viki, a product designer and visual creator who loves anime, games and creative worlds. I enjoy turning ideas into clean, playful and meaningful experiences.</p>
+        <dl class="stats" data-reveal data-count>
+          <div><dt class="text-label-s">Years<br />designing</dt><dd data-to="5" data-suffix="+">5+</dd></div>
+          <div><dt class="text-label-s">Screens &amp;<br />components</dt><dd data-to="100" data-suffix="+">100+</dd></div>
+          <div><dt class="text-label-s">Creative<br />universes</dt><dd class="stats__infinity"><svg viewBox="0 0 76 44" role="img" aria-label="Infinite"><path d="M38 22C45 13 50 10 56 10C63 10 68 15 68 22C68 29 63 34 56 34C50 34 45 31 38 22C31 13 26 10 20 10C13 10 8 15 8 22C8 29 13 34 20 34C26 34 31 31 38 22Z" /></svg></dd></div>
         </dl>
-        <div><Button variant="ghost" href={`${base}about/`} arrow>More about me</Button></div>
+        <div data-reveal><Button variant="ghost" href={`${base}about/`} arrow>More about me</Button></div>
       </div>
 
-      <ul class="about__interests text-label-m" aria-label="Interests">
-        <li aria-hidden="true"><Sparkle color="pink" size={28} /></li>
-        <li>Design</li>
-        <li>Illustration</li>
-        <li>Anime</li>
-        <li>Games</li>
-        <li>and more.</li>
-        <li aria-hidden="true"><Decor name="doodle-heart" tone="text" width={44} /></li>
-      </ul>
+      <div class="about__comic" data-reveal>
+        <ul class="visually-hidden" aria-label="Interests"><li>Creativity</li><li>Organizing</li><li>Anime</li><li>Friends</li><li>And more</li></ul>
+        <svg viewBox="-4 -4 248 478" aria-hidden="true" focusable="false">
+          <defs>
+            <clipPath id="comic-p3"><polygon points="0,218 240,204 240,316 0,300" /></clipPath>
+          </defs>
+          <g class="comic__panel" style="--i: 0" data-focus>
+            <g class="comic__pop">
+              <polygon class="comic__fill comic__fill--paper" points="0,0 240,0 240,86 0,110" />
+              <g transform="translate(36 58) scale(1.25)">
+                <g class="comic__wand">
+                  <g transform="rotate(35)">
+                    <rect x="-3.5" y="-6" width="7" height="34" class="comic__ink-fill" />
+                    <rect x="-3.5" y="-6" width="7" height="8" class="comic__wand-tip" />
+                  </g>
+                </g>
+                <path d="M-6 -22L-4 -16L2 -14L-4 -12L-6 -6L-8 -12L-14 -14L-8 -16Z" class="comic__spark" />
+                <circle cx="8" cy="-24" r="3" class="comic__spark-dot comic__spark-dot--aqua" />
+                <circle cx="-20" cy="-26" r="2.5" class="comic__spark-dot comic__spark-dot--yellow" />
+              </g>
+              <text x="70" y="64" class="comic__word comic__word--mid">Creativity</text>
+              <polygon class="comic__frame" points="0,0 240,0 240,86 0,110" />
+            </g>
+          </g>
+          <g class="comic__panel" style="--i: 1" data-focus>
+            <g class="comic__pop">
+              <polygon class="comic__fill comic__fill--aqua" points="0,118 240,94 240,196 0,210" />
+              <g transform="translate(198 150) scale(1.15)">
+                <rect x="-26" y="-22" width="52" height="42" class="comic__board" />
+                <path d="M-9 -22V20M9 -22V20" class="comic__board-line" />
+                <rect x="-23" y="-17" width="11" height="8" class="comic__card comic__card--pink" />
+                <rect x="-23" y="-6" width="11" height="8" class="comic__card comic__card--pink comic__card--moving" />
+                <rect x="-5" y="-17" width="10" height="8" class="comic__card comic__card--yellow" />
+                <rect x="12" y="-17" width="11" height="8" class="comic__card comic__card--ink" />
+                <rect x="12" y="-6" width="11" height="8" class="comic__card comic__card--ink" />
+                <rect x="12" y="5" width="11" height="8" class="comic__card comic__card--ink" />
+                <path d="M14 -13l2.5 2.5 4.5-5" class="comic__tick" />
+                <path d="M14 -2l2.5 2.5 4.5-5" class="comic__tick comic__tick--2" />
+                <path d="M14 9l2.5 2.5 4.5-5" class="comic__tick comic__tick--3" />
+              </g>
+              <text x="14" y="172" class="comic__word comic__word--small">Organizing</text>
+              <polygon class="comic__frame" points="0,118 240,94 240,196 0,210" />
+            </g>
+          </g>
+          <g class="comic__panel" style="--i: 2" data-focus>
+            <g class="comic__pop">
+              <polygon class="comic__fill comic__fill--ink" points="0,218 240,204 240,316 0,300" />
+              <g clip-path="url(#comic-p3)"><path class="comic__speed" d="M356.0 259.2L222.0 258.0L356.0 256.8ZM351.2 298.1L221.1 266.0L352.2 293.6ZM337.7 334.8L218.4 273.6L340.6 328.7ZM318.2 364.9L214.1 280.4L319.7 363.1ZM290.2 392.3L208.4 286.1L293.8 389.5ZM256.7 412.6L201.6 290.4L262.8 409.7ZM222.7 424.0L194.0 293.1L225.0 423.5ZM183.7 428.0L186.0 294.0L188.3 428.0ZM144.9 423.0L178.0 293.1L151.5 424.5ZM111.2 410.6L170.4 290.4L113.3 411.7ZM78.2 389.5L163.6 286.1L81.8 392.3ZM51.0 361.3L157.9 280.4L55.2 366.7ZM32.3 330.7L153.6 273.6L33.4 332.8ZM19.8 293.6L150.9 266.0L20.8 298.1ZM16.0 254.6L150.0 258.0L16.0 261.4ZM20.5 219.0L150.9 250.0L20.0 221.3ZM33.8 182.2L153.6 242.4L31.8 186.3ZM55.2 149.3L157.9 235.6L51.0 154.7ZM80.9 124.3L163.6 229.9L79.1 125.8ZM114.3 103.8L170.4 225.6L110.2 105.8ZM151.5 91.5L178.0 222.9L144.9 93.0ZM187.2 88.0L186.0 222.0L184.8 88.0ZM226.1 92.8L194.0 222.9L221.6 91.8ZM262.8 106.3L201.6 225.6L256.7 103.4ZM292.9 125.8L208.4 229.9L291.1 124.3ZM320.3 153.8L214.1 235.6L317.5 150.2ZM340.6 187.3L218.4 242.4L337.7 181.2ZM352.0 221.3L221.1 250.0L351.5 219.0Z" /></g>
+              <g class="comic__eye" transform="translate(186 258)">
+                <path d="M-28 0C-15 -18 15 -18 28 0C15 15 -15 15 -28 0Z" class="comic__eye-white" />
+                <g class="comic__pupil">
+                  <circle r="10" class="comic__eye-iris" />
+                  <circle r="5" class="comic__ink-fill" />
+                  <circle cx="-3" cy="-4" r="2.6" class="comic__paper-fill" />
+                </g>
+                <path d="M-30 -2C-16 -22 16 -22 30 -2" class="comic__lash" />
+              </g>
+              <text x="16" y="276" class="comic__word comic__word--pink">Anime</text>
+              <polygon class="comic__frame" points="0,218 240,204 240,316 0,300" />
+            </g>
+          </g>
+          <g class="comic__panel" style="--i: 3" data-focus>
+            <g class="comic__pop">
+              <polygon class="comic__fill comic__fill--pink" points="0,308 240,324 240,440 0,440" />
+              <g transform="translate(52 388)">
+                <g class="comic__heart"><path d="M50 90C18 64 2 46 2 26C2 12 13 2 27 2C37 2 45 7 50 15C55 7 63 2 73 2C87 2 98 12 98 26C98 46 82 64 50 90Z" transform="translate(-34 -22) scale(0.42)" class="comic__friend comic__friend--white" /></g>
+                <g class="comic__heart comic__heart--second"><path d="M50 90C18 64 2 46 2 26C2 12 13 2 27 2C37 2 45 7 50 15C55 7 63 2 73 2C87 2 98 12 98 26C98 46 82 64 50 90Z" transform="translate(-6 -16) scale(0.42)" class="comic__friend comic__friend--aqua" /></g>
+              </g>
+              <text x="100" y="402" class="comic__word comic__word--white">Friends</text>
+              <polygon class="comic__frame" points="0,308 240,324 240,440 0,440" />
+            </g>
+          </g>
+          <text x="240" y="466" text-anchor="end" class="comic__more">And more ✦</text>
+        </svg>
+      </div>
     </section>
 
     <!-- Contact (always pink, light tokens) -->
-    <section class="contact theme-light" id="contact" aria-labelledby="contact-title">
-      <Decor name="perspective-grid" tone="ink" class="contact__grid" />
+    <section class="contact theme-light" id="contact" aria-labelledby="contact-title" data-stagger="110">
+      <Decor name="perspective-grid" tone="ink" moving class="contact__grid" />
       <Decor name="city" class="contact__city" />
-      <Sparkle color="ink" size={96} class="contact__spark" />
-      <p class="text-label-m">04 / Contact</p>
-      <h2 id="contact-title" class="contact__title">Let's make<br />something bright</h2>
-      <p class="contact__invite">Have a project in mind? Let's talk.</p>
-      <div class="row">
+      <Sparkle color="ink" size={96} class="contact__spark anim-twinkle" />
+      <p class="text-label-m" data-reveal>04 / Contact</p>
+      <h2 id="contact-title" class="contact__title" data-reveal="slam">Let's make<br />something bright</h2>
+      <p class="contact__invite" data-reveal>Have a project in mind? Let's talk.</p>
+      <div class="row" data-reveal>
         {site.email && <Button variant="secondary" href={`mailto:${site.email}`} arrow>Say hello</Button>}
         {site.linkedin && <Button variant="ghost" href={site.linkedin}>LinkedIn</Button>}
       </div>
@@ -173,6 +290,83 @@ const tilts = [-1.5, 1, -0.8];
     <p class="text-label-m secondary">© 2026 Viktória Varga</p>
   </footer>
 </Base>
+
+<script>
+  import { afterIntro } from "../scripts/after-intro";
+
+  const stillMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Hero speech bubble: types a line, holds it, deletes it, types the next.
+  // With reduced motion it just keeps the first line.
+  const typing = document.querySelector<HTMLElement>("[data-typing]");
+  if (typing && !stillMotion) {
+    const lines = ["Hi, I’m Viki.", "I solve problems.", "I design systems.", "I make them visual."];
+    let line = 0;
+    let shown = lines[0].length;
+    let deleting = false;
+    const step = () => {
+      const text = lines[line];
+      if (!deleting && shown === text.length) {
+        deleting = true;
+        return setTimeout(step, 1600);
+      }
+      if (deleting && shown === 0) {
+        deleting = false;
+        line = (line + 1) % lines.length;
+        return setTimeout(step, 250);
+      }
+      shown += deleting ? -1 : 1;
+      typing.textContent = lines[line].slice(0, shown);
+      setTimeout(step, deleting ? 35 : 75);
+    };
+    afterIntro(() => setTimeout(step, 2500));
+  }
+
+  // Hover effects (project cards, the About photo pile, the comic panels)
+  // hang off .is-focus. With a mouse it follows hover and keyboard focus; on
+  // touch screens, which can't hover, an element gets it while it sits in the
+  // middle band of the screen, so the effect plays as you scroll past.
+  const focusables = document.querySelectorAll<Element>("[data-focus]");
+  const setFocus = (el: Element, on: boolean) => el.classList.toggle("is-focus", on);
+  if (window.matchMedia("(hover: hover)").matches) {
+    focusables.forEach((el) => {
+      el.addEventListener("pointerenter", () => setFocus(el, true));
+      el.addEventListener("pointerleave", () => setFocus(el, false));
+      el.addEventListener("focusin", () => setFocus(el, true));
+      el.addEventListener("focusout", () => setFocus(el, false));
+    });
+  } else {
+    const centre = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => setFocus(entry.target, entry.isIntersecting)),
+      { rootMargin: "-40% 0px -40% 0px" },
+    );
+    focusables.forEach((el) => centre.observe(el));
+  }
+
+  // About stats count up from zero when they scroll into view.
+  const stats = document.querySelector<HTMLElement>("[data-count]");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (stats && !reduced) {
+    const numbers = [...stats.querySelectorAll<HTMLElement>("[data-to]")];
+    stats.addEventListener(
+      "reveal",
+      () => {
+        const start = performance.now();
+        const duration = 1200;
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          for (const el of numbers) {
+            el.textContent = `${Math.round(Number(el.dataset.to) * eased)}${el.dataset.suffix ?? ""}`;
+          }
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      },
+      { once: true },
+    );
+  }
+</script>
 
 <style>
   main {
@@ -233,6 +427,108 @@ const tilts = [-1.5, 1, -0.8];
     text-transform: uppercase;
   }
 
+  /* Each line is its own mask; the words rise out of it in turn on load.
+     The small padding keeps the mask from trimming the glyphs. */
+  .hero__line {
+    display: block;
+    overflow: hidden;
+    padding-block: 0.04em;
+    margin-block: -0.04em;
+  }
+
+  .hero__line > span {
+    display: inline-block;
+    transform-origin: left bottom;
+    animation: line-up 950ms var(--motion-ease-snap) 150ms backwards;
+  }
+
+  /* Under the logo intro the title waits, and rises as the intro hands off. */
+  :global(.is-intro) .hero__line > span {
+    animation-play-state: paused;
+  }
+
+  .hero__line:nth-child(2) > span {
+    animation-delay: 300ms;
+  }
+
+  .hero__line:nth-child(3) > span {
+    animation-delay: 450ms;
+  }
+
+  /* The character drawing, cropped to her upper body. */
+  .hero__character {
+    position: absolute;
+    aspect-ratio: 832 / 880;
+  }
+
+  .hero__character > * {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero__character img {
+    object-fit: cover;
+    object-position: top;
+  }
+
+  .hero__scroll-arrow {
+    display: inline-block;
+    --float: 12px;
+    animation: float 1.1s ease-in-out infinite;
+  }
+
+  /*
+   * Ambient motion settings. The loops themselves live in global.css; these
+   * set each piece's own size, speed and offset so nothing moves in unison.
+   */
+  :global(.hero__orbit) {
+    --sway: 3deg;
+    --dur: 12s;
+  }
+
+  :global(.skills__stripes) {
+    --slide: 8px;
+    --dur: 3.5s;
+  }
+
+  :global(.skills__patch) {
+    --breathe: 1.05;
+    --dur: 8s;
+  }
+
+  :global(.skills__burst) {
+    --breathe: 1.05;
+    --dur: 7s;
+    --delay: 1s;
+  }
+
+  :global(.skills__shard) {
+    --sway: 7deg;
+    --dur: 4s;
+  }
+
+  .skills__strip {
+    --parallax: 100px;
+  }
+
+  .about__panel img {
+    --parallax: 16px;
+  }
+
+  :global(.contact__spark) {
+    --dur: 4s;
+  }
+
+  /* The sun in the skyline glows slowly. */
+  .contact :global(.decor__sun) {
+    transform-box: fill-box;
+    transform-origin: center;
+    --breathe: 1.14;
+    animation: breathe 4s ease-in-out infinite;
+  }
+
   .hero__intro {
     max-width: 560px;
   }
@@ -250,9 +546,11 @@ const tilts = [-1.5, 1, -0.8];
 
   .hero__art {
     position: relative;
+    z-index: 1;
     align-self: stretch;
     margin-right: calc(-1 * var(--gutter));
     min-height: 680px;
+    container-type: inline-size;
   }
 
   .hero__circle {
@@ -265,69 +563,159 @@ const tilts = [-1.5, 1, -0.8];
     background: var(--color-bg-accent-subtle);
   }
 
+  /* The frame is the circle's box. The character overflows it: her head
+     breaks out of the top, and her body runs past the bottom so the cut at
+     her belt is always hidden. Below the circle's centre she is clipped to
+     the inside of the circle; above it she is shown in full. */
+  .hero__frame {
+    left: 12%;
+    top: 12%;
+    width: 78%;
+    aspect-ratio: 1;
+    container-type: inline-size;
+  }
+
+  /* 56.12% is the circle's centre in the character's own box:
+     (50% + 15.3%) / 116.35% of the frame. */
   .hero__character {
-    left: 14%;
-    top: 2%;
-    width: 75%;
-    height: auto;
+    left: -5%;
+    top: -15.3%;
+    width: 110%;
+    -webkit-mask:
+      linear-gradient(#000 0 0) top / 100% 56.12% no-repeat,
+      radial-gradient(circle calc(50cqw - var(--border-heavy)) at 50% 56.12%, #000 99.5%, transparent 100%);
+    mask:
+      linear-gradient(#000 0 0) top / 100% 56.12% no-repeat,
+      radial-gradient(circle calc(50cqw - var(--border-heavy)) at 50% 56.12%, #000 99.5%, transparent 100%);
   }
 
-  :global(.hero__patch--top) {
-    right: -14%;
-    top: -18%;
-    width: 56%;
-  }
-
+  /* The ring is always centred on the circle, behind it. The circle's centre
+     sits 51% across the art and 12% (of the height) + 39cqw down; the ring's
+     box is 108cqw wide and 108 × 180 / 620 = 31.36cqw tall, so its corner is
+     half of that back from the centre. Rotation turns it about that centre. */
   :global(.hero__orbit) {
-    left: 4%;
-    top: 8%;
-    width: 108%;
-    rotate: -18deg;
+    left: -3cqw;
+    top: calc(12% + 39cqw - 15.68cqw);
+    width: 108cqw;
+    rotate: -14deg;
   }
 
-  :global(.hero__spark--pink) {
-    left: 8%;
-    top: 16%;
+  /* The character's speech bubble: pink, in the top right corner with its
+     tail pointing down at her face, typing a few short lines in turn (see
+     the script). */
+  .hero__bubble {
+    right: 4%;
+    top: 3%;
+    z-index: 3;
+    --reveal-delay: 900ms;
   }
 
-  :global(.hero__spark--ink) {
-    left: 83%;
-    top: 20%;
+  .hero__bubble-box {
+    position: relative;
+    /* Room for two lines of the longest text, so the bubble never jumps. */
+    box-sizing: content-box;
+    width: 12ch;
+    height: 2.8em;
+    padding: var(--spacing-3) var(--spacing-4);
+    border: var(--border-heavy) solid var(--color-ink-900);
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+    font: 500 1.05rem / 1.4 var(--font-mono);
+    rotate: 3deg;
   }
 
-  :global(.hero__spark--heart) {
-    left: 77%;
-    top: 36%;
+  .hero__bubble-box::before,
+  .hero__bubble-box::after {
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-color: transparent;
   }
 
-  :global(.hero__sticker) {
+  .hero__bubble-box::before {
+    left: 16px;
+    bottom: -24px;
+    border-width: 24px 22px 0 0;
+    border-top-color: var(--color-ink-900);
+  }
+
+  .hero__bubble-box::after {
+    left: 20px;
+    bottom: -14px;
+    border-width: 15px 13px 0 0;
+    border-top-color: var(--color-bg-primary);
+  }
+
+  /* A pink heart sticker with a white die-cut edge, beating gently. */
+  .hero__heart {
     left: 69%;
     top: 57%;
+    width: 15%;
+    overflow: visible;
+    rotate: -12deg;
+    --beat: 1.1;
+    --beat-rebound: 0.97;
+    --dur: 2.6s;
+    --delay: 0.6s;
   }
 
-  :global(.hero__patch--bottom) {
-    left: 34%;
-    bottom: -22%;
-    width: 31%;
+  .hero__heart path {
+    stroke-linejoin: round;
   }
 
+  .hero__heart-edge {
+    fill: var(--color-ink-900);
+    stroke: var(--color-ink-900);
+    stroke-width: 22;
+  }
+
+  .hero__heart-cut {
+    fill: var(--color-white-1000);
+    stroke: var(--color-white-1000);
+    stroke-width: 16;
+  }
+
+  .hero__heart-face {
+    fill: var(--color-bg-primary);
+    stroke: var(--color-ink-900);
+    stroke-width: 3;
+  }
+
+  .hero__bubble-cursor {
+    display: inline-block;
+    width: 0.6em;
+    height: 1.1em;
+    margin-left: 2px;
+    vertical-align: -0.2em;
+    background: var(--color-bg-secondary);
+    animation: cursor-blink 0.8s steps(1) infinite;
+  }
+
+  @keyframes cursor-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* The floor runs the full width of the hero, behind the art. Stretched
+     sideways (with even line widths) so it keeps a low, wide horizon. */
   :global(.hero__grid) {
     left: 0;
-    bottom: -10%;
-    width: 55%;
+    bottom: 0;
+    z-index: 0;
+    width: 100%;
+    height: 240px;
     opacity: 0.4;
+    --rung-dur: 3s;
   }
 
-  /* Selected work: the quietest background on the page. */
+  /* Selected work: two case studies and one big pink arrow with an ink
+     outline. The arrow runs in from off the left edge behind the cards and
+     its head fills the empty third column. It shoots in from the left when
+     the cards come into view, then keeps nudging right. 見て! ("look!") sits
+     at the end of the section head. */
   .work {
     padding-block: var(--spacing-24);
-  }
-
-  :global(.work__orbit) {
-    left: 71%;
-    top: 34%;
-    width: 54%;
-    rotate: -18deg;
   }
 
   .section-head {
@@ -342,18 +730,363 @@ const tilts = [-1.5, 1, -0.8];
     gap: var(--spacing-4);
   }
 
+  .work__look {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    justify-items: end;
+    margin: 0;
+    font-family: var(--font-jp);
+    font-size: 4.5rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--color-text-primary);
+    rotate: -4deg;
+  }
+
+  .work__look-word {
+    display: flex;
+  }
+
+  .work__look-ch {
+    display: inline-block;
+  }
+
+  /* 見て! slams in a character at a time, manga style, then every few
+     seconds the "!" hops and the word gives a startled jolt. */
+  :global(.js) .work__look[data-reveal] {
+    opacity: 1;
+    translate: none;
+  }
+
+  :global(.js) .work__look:not(.is-visible) .work__look-ch {
+    opacity: 0;
+  }
+
+  .work__look:global(.is-visible) .work__look-ch {
+    animation: look-slam 460ms var(--motion-ease-snap) both;
+  }
+
+  .work__look:global(.is-visible) .work__look-ch:nth-child(2) {
+    animation-delay: 130ms;
+  }
+
+  .work__look:global(.is-visible) .work__look-bang {
+    animation:
+      look-slam 460ms var(--motion-ease-snap) 280ms both,
+      look-hop 2.6s ease-in-out 1.4s infinite;
+  }
+
+  .work__look:global(.is-visible) .work__look-word {
+    animation: look-jolt 2.6s linear 1.4s infinite;
+  }
+
+  @keyframes look-slam {
+    from {
+      opacity: 0;
+      scale: 2.4;
+      rotate: -14deg;
+    }
+
+    60% {
+      opacity: 1;
+      scale: 0.9;
+    }
+
+    to {
+      scale: 1;
+      rotate: 0deg;
+    }
+  }
+
+  @keyframes look-hop {
+    0%,
+    60%,
+    100% {
+      translate: 0 0;
+      rotate: 0deg;
+    }
+
+    68% {
+      translate: 0 -0.25em;
+      rotate: 14deg;
+    }
+
+    76% {
+      translate: 0 0;
+      rotate: -10deg;
+    }
+
+    84% {
+      rotate: 5deg;
+    }
+  }
+
+  @keyframes look-jolt {
+    0%,
+    62%,
+    80%,
+    100% {
+      translate: 0 0;
+    }
+
+    66% {
+      translate: -4px 0;
+    }
+
+    70% {
+      translate: 4px 0;
+    }
+
+    74% {
+      translate: -2px 0;
+    }
+  }
+
+  .work__look-note {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
   .work__more {
     position: relative;
     margin-top: var(--spacing-16);
+  }
+
+  /* Stacking, back to front: the coming soon card, the arrow, the project
+     cards. */
+  .work__stage {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .work__cards > li {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* A small tilted tag on each card with one fact about the project, which
+     wobbles now and then like it was stuck on in a hurry. */
+  .work__tag {
+    position: absolute;
+    top: -14px;
+    right: 12px;
+    z-index: 1;
+    padding: 6px 10px;
+    border: var(--border-regular) solid var(--color-ink-1000);
+    background: var(--color-yellow-500);
+    color: var(--color-ink-1000);
+    font: 700 0.8125rem / 1 var(--font-mono);
+    text-transform: uppercase;
+    transform-origin: 50% 0;
+    animation: tag-wobble 3.2s ease-in-out infinite;
+  }
+
+  .work__cards > li:nth-child(2) .work__tag {
+    background: var(--color-bg-secondary);
+    animation-delay: -1.6s;
+  }
+
+  @keyframes tag-wobble {
+    0%,
+    78%,
+    100% {
+      transform: rotate(6deg);
+    }
+
+    84% {
+      transform: rotate(-2deg);
+    }
+
+    90% {
+      transform: rotate(10deg);
+    }
+
+    95% {
+      transform: rotate(4deg);
+    }
+  }
+
+  /* The next case study: a black card tilted behind the arrow head, its
+     Japanese "in preparation" above the head and the title below it. */
+  .work__cards > .work__soon {
+    z-index: 0;
+    align-self: stretch;
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 82%;
+    margin-block: var(--spacing-6);
+    padding: var(--spacing-4);
+    background: var(--color-ink-1000);
+    color: var(--color-paper-100);
+    transform: rotate(7deg);
+  }
+
+  .work__soon-jp {
+    padding: var(--spacing-3);
+    border: 2px dashed var(--color-yellow-500);
+    color: var(--color-yellow-500);
+    font: 900 clamp(1.5rem, 3vw, 2.5rem) / 1 var(--font-jp);
+    text-align: center;
+  }
+
+  .work__soon-title {
+    margin-top: auto;
+    font: 400 clamp(1.25rem, 2.4vw, 2rem) / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .work__soon-meta {
+    margin-top: var(--spacing-2);
+    color: var(--color-yellow-500);
+    font: 500 0.75rem / 1.2 var(--font-mono);
+    text-transform: uppercase;
+  }
+
+  /* How I work: six heavy boxes joined by pink arrows, centred under the
+     cards. The last one, Iterate, is pink and its loop sign turns slowly,
+     since the process goes round again. */
+  .work__process {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin: var(--spacing-16) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .work__process li {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+  }
+
+  .work__process li:not(:last-child)::after {
+    content: "→";
+    color: var(--color-bg-primary);
+    font: 400 1.75rem / 1 var(--font-display);
+  }
+
+  .work__step {
+    display: grid;
+    gap: 4px;
+    min-width: 104px;
+    padding: var(--spacing-3) var(--spacing-4);
+    border: 2.5px solid var(--color-ink-1000);
+    background: var(--color-bg-surface);
+  }
+
+  .work__step-num {
+    color: var(--color-text-accent);
+    font: 500 0.75rem / 1 var(--font-mono);
+  }
+
+  .work__step-name {
+    font: 400 1.5rem / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .work__process li:last-child .work__step {
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  .work__process li:last-child .work__step-num {
+    display: flex;
+    justify-content: space-between;
+    color: inherit;
+  }
+
+  .work__step-loop {
+    display: inline-block;
+    font-size: 1rem;
+    animation: step-loop 4s linear infinite;
+  }
+
+  @keyframes step-loop {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  /* The tail starts well past the left edge of the page, so the nudge never
+     shows its end. */
+  .work__arrow {
+    --arrow-h: clamp(220px, 22vw, 300px);
+    position: absolute;
+    top: calc(50% - var(--arrow-h) / 2);
+    left: calc(-1 * var(--gutter) - 64px);
+    right: 6%;
+    z-index: 1;
+    height: var(--arrow-h);
+    pointer-events: none;
+  }
+
+  /* Shoots in from off the left edge instead of the usual rise. */
+  :global(.js) .work__arrow[data-reveal]:not(.is-visible) {
+    opacity: 1;
+    translate: -105% 0;
+  }
+
+  .work__arrow-move {
+    display: flex;
+    height: 100%;
+    animation: arrow-nudge 1.2s ease-in-out infinite;
+  }
+
+  @keyframes arrow-nudge {
+    50% {
+      transform: translateX(12px);
+    }
+  }
+
+  @keyframes arrow-nudge-down {
+    50% {
+      transform: translateY(12px);
+    }
+  }
+
+  .work__arrow-shaft {
+    flex: 1;
+    align-self: center;
+    height: 56%;
+    background: var(--color-bg-primary);
+    border-block: 4px solid var(--color-ink-1000);
+  }
+
+  .work__arrow-head {
+    flex: none;
+    width: calc(var(--arrow-h) * 0.72);
+    height: var(--arrow-h);
+    margin-left: -2px;
+    overflow: visible;
+  }
+
+  .work__arrow-head polygon {
+    fill: var(--color-bg-primary);
+  }
+
+  .work__arrow-head path {
+    fill: none;
+    stroke: var(--color-ink-1000);
+    stroke-width: 4px;
+    stroke-linejoin: miter;
+    vector-effect: non-scaling-stroke;
   }
 
   .work__cards {
     position: relative;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--spacing-8);
+    gap: var(--spacing-16);
     margin: var(--spacing-16) 0 0;
-    padding: 0;
+    padding: 0 var(--spacing-6);
     list-style: none;
   }
 
@@ -426,13 +1159,26 @@ const tilts = [-1.5, 1, -0.8];
     rotate: 6deg;
   }
 
+  /* The eye strip: the character drawing cropped to her eyes, in a black
+     frame. */
   .skills__strip {
     left: 1%;
     top: 12%;
     width: 106%;
-    max-width: none;
-    height: auto;
+    aspect-ratio: 560 / 160;
     rotate: -4deg;
+    background: var(--color-ink-900);
+  }
+
+  .skills__strip > * {
+    position: absolute;
+    max-width: none;
+  }
+
+  .skills__strip img {
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
 
   /* About */
@@ -445,73 +1191,110 @@ const tilts = [-1.5, 1, -0.8];
     overflow: clip;
   }
 
-  :global(.about__wedge) {
-    left: -30px;
-    top: -10px;
-    width: 360px;
-    rotate: 180deg;
-  }
-
-  :global(.about__patch) {
-    left: 16%;
-    top: 64%;
-    width: 400px;
-  }
-
-  :global(.about__spark) {
-    position: absolute;
-    left: 81%;
-    top: 78%;
-  }
-
-  :global(.about__burst) {
-    right: 6%;
-    top: 7%;
-    width: 100px;
-  }
-
-  :global(.about__dots) {
-    right: 3%;
-    bottom: 6%;
-    width: 128px;
-  }
-
   .about__portrait {
     position: relative;
     height: 580px;
   }
 
-  :global(.about__slab) {
+  /* The portrait is a loose pile of three playing cards, each its own
+     shape and size, tossed down at its own angle: a black outlined manga
+     burst at the back, the slanted pink shard, and the photo on top. Once the
+     pile is well on screen they slam onto the page one after another, back
+     card first, manga-panel style. Then they drift a little out of step,
+     and on hover they loosen apart.
+     Layers: the card moves for the slam, its face for the hover, and its
+     front for the drift. */
+  .about__card {
     position: absolute;
-    left: 40px;
-    top: 20px;
-    width: 500px;
-    rotate: 7deg;
+    --float: -6px;
+  }
+
+  .about__card--burst {
+    left: 110px;
+    top: -30px;
+    width: 390px;
+    height: 390px;
+    --tilt: 8deg;
+    --deal-delay: 0ms;
+    --dur: 5.5s;
+    --delay: -4s;
+  }
+
+  .about__card--shard {
+    left: -36px;
+    top: 150px;
+    width: 470px;
+    aspect-ratio: 400 / 320;
+    --tilt: -3deg;
+    --deal-delay: 200ms;
+    --dur: 6.5s;
+    --delay: -2s;
+  }
+
+  .about__card--photo {
+    left: 44px;
+    top: 56px;
+    width: 350px;
+    height: 450px;
+    --tilt: -5deg;
+    --deal-delay: 400ms;
+    --dur: 6s;
+  }
+
+  .about__face {
+    height: 100%;
+    transition: transform 550ms var(--motion-ease-snap);
+  }
+
+  .about__front {
+    position: absolute;
+    inset: 0;
+  }
+
+  .about__card--burst svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    fill: none;
+    stroke: var(--color-ink-900);
+    stroke-width: 6;
+    stroke-linejoin: miter;
+  }
+
+  .about__front :global(.decor) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .about__portrait.is-focus .about__card--photo .about__face {
+    transform: translate(-4px, -8px) rotate(-2deg);
+  }
+
+  .about__portrait.is-focus .about__card--shard .about__face {
+    transform: translate(-18px, 12px) rotate(-4deg);
+  }
+
+  .about__portrait.is-focus .about__card--burst .about__face {
+    transform: translate(20px, -10px) rotate(5deg);
   }
 
   .about__panel {
-    position: absolute;
-    left: 20px;
-    top: 40px;
-    width: 420px;
-    height: 520px;
     overflow: hidden;
-    border: 6px solid var(--color-border-default);
+    border: 6px solid var(--color-yellow-500);
     background: var(--color-bg-accent-subtle);
-    rotate: -3deg;
   }
 
+  /* Taller than the panel by twice the parallax, so the drift never shows
+     an edge. The parallax is small so her head sits low enough in the frame. */
   .about__panel img {
     position: absolute;
-    left: -70.5%;
-    top: -12.4%;
-    width: 228%;
+    left: 0;
+    top: -16px;
+    width: 100%;
+    height: calc(100% + 32px);
     max-width: none;
-  }
-
-  .about__halftone {
-    position: absolute;
-    inset: auto 0 0;
+    object-fit: cover;
+    object-position: 50% 0;
   }
 
   .about__copy {
@@ -552,13 +1335,456 @@ const tilts = [-1.5, 1, -0.8];
     font: 400 3.5rem / 1 var(--font-display);
   }
 
-  .about__interests {
+  /* Anton has no ∞, so it is drawn: a heavy loop as tall as the digits. */
+  .stats__infinity svg {
+    height: 1em;
+    width: auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 8;
+    stroke-linejoin: round;
+  }
+
+  /* A comic-strip column fills the right side: four slanted manga panels
+     with angled gutters, one per interest, each with its own fill and icon.
+     They slam in one after another when the section appears, and the anime
+     eye blinks now and then. A visually hidden list carries the words. */
+  .about__comic {
     position: relative;
-    display: grid;
-    gap: 10px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    width: clamp(11rem, 16vw, 15rem);
+    rotate: 2deg;
+  }
+
+  .about__comic svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .comic__panel {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  :global(.js) .about__comic:not(.is-visible) .comic__panel {
+    opacity: 0;
+  }
+
+  .about__comic.is-visible .comic__panel {
+    animation: panel-slam 520ms cubic-bezier(0.5, 0, 0.6, 1) calc(150ms + var(--i) * 160ms) both;
+  }
+
+  @keyframes panel-slam {
+    from {
+      opacity: 0;
+      transform: scale(1.35) rotate(-4deg);
+    }
+
+    60% {
+      opacity: 1;
+      transform: scale(0.96) rotate(1deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .comic__frame {
+    fill: none;
+    stroke: var(--color-ink-900);
+    stroke-width: 3.5;
+    stroke-linejoin: miter;
+  }
+
+  .comic__fill--paper {
+    fill: var(--color-white-1000);
+  }
+
+  .comic__fill--aqua {
+    fill: var(--color-bg-secondary);
+  }
+
+  .comic__fill--ink {
+    fill: var(--color-ink-900);
+  }
+
+  .comic__fill--pink {
+    fill: var(--color-bg-primary);
+  }
+
+  .comic__speed {
+    fill: var(--color-white-1000);
+    opacity: 0.35;
+  }
+
+  .comic__word {
+    font: 400 34px var(--font-display);
+    text-transform: uppercase;
+    fill: var(--color-ink-900);
+  }
+
+  .comic__word--mid {
+    font-size: 30px;
+  }
+
+  .comic__word--small {
+    font-size: 26px;
+  }
+
+  /* A thick black outline behind the letters keeps "Anime" clear of the
+     speed lines. */
+  .comic__word--pink {
+    fill: var(--color-bg-primary);
+    stroke: var(--color-ink-900);
+    stroke-width: 8px;
+    stroke-linejoin: round;
+    paint-order: stroke;
+  }
+
+  .comic__word--white {
+    fill: var(--color-white-1000);
+  }
+
+  .comic__more {
+    font: 500 12px var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    fill: var(--color-ink-900);
+  }
+
+  .comic__ink-fill {
+    fill: var(--color-ink-900);
+  }
+
+  .comic__paper-fill {
+    fill: var(--color-white-1000);
+  }
+
+  .comic__aqua-fill {
+    fill: var(--color-bg-secondary);
+    stroke: var(--color-ink-900);
+    stroke-width: 2;
+  }
+
+  .comic__wand-tip {
+    fill: var(--color-white-1000);
+    stroke: var(--color-ink-900);
+    stroke-width: 1.5;
+  }
+
+  .comic__spark {
+    fill: var(--color-bg-primary);
+  }
+
+  .comic__spark-dot--aqua {
+    fill: var(--color-bg-secondary);
+  }
+
+  .comic__spark-dot--yellow {
+    fill: var(--color-yellow-500);
+    stroke: var(--color-ink-900);
+    stroke-width: 1;
+  }
+
+  .comic__board {
+    fill: var(--color-white-1000);
+    stroke: var(--color-ink-900);
+    stroke-width: 2.5;
+  }
+
+  .comic__board-line {
+    stroke: var(--color-ink-900);
+    stroke-width: 2;
+  }
+
+  .comic__card--pink {
+    fill: var(--color-bg-primary);
+  }
+
+  .comic__card--yellow {
+    fill: var(--color-yellow-500);
+  }
+
+  .comic__card--ink {
+    fill: var(--color-ink-900);
+  }
+
+  /* The hearts are scaled down from the 100-unit heart, so their stroke is
+     set large to come out near 3px. */
+  .comic__friend {
+    stroke: var(--color-ink-900);
+    stroke-width: 7;
+    stroke-linejoin: round;
+  }
+
+  .comic__friend--white {
+    fill: var(--color-white-1000);
+  }
+
+  .comic__friend--aqua {
+    fill: var(--color-bg-secondary);
+  }
+
+  .comic__eye {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: eye-blink 4s 2s infinite;
+  }
+
+  .comic__eye-white {
+    fill: var(--color-white-1000);
+    stroke: var(--color-bg-primary);
+    stroke-width: 3;
+  }
+
+  .comic__eye-iris {
+    fill: var(--color-bg-secondary);
+  }
+
+  .comic__lash {
+    fill: none;
+    stroke: var(--color-bg-primary);
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+
+  /*
+   * Panel motion. At rest the wand's spark twinkles, ticks pop onto the
+   * kanban board's "done" cards one by one, the hearts beat softly and the
+   * eye blinks. On hover a panel pops forward with a little
+   * tilt and its icon acts out the word: the wand waves and its spark
+   * bursts, a kanban card slides across to the next column, the eye looks
+   * around and the speed lines pulse, the hearts hop in turn.
+   */
+  .comic__pop {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 350ms var(--motion-ease-snap);
+  }
+
+  .comic__wand {
+    transform-box: fill-box;
+    transform-origin: 20% 95%;
+  }
+
+  .comic__spark {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: spark-twinkle 2.4s ease-in-out infinite;
+  }
+
+  .comic__spark-dot {
+    animation: dot-twinkle 1.6s ease-in-out infinite alternate;
+  }
+
+  .comic__spark-dot--yellow {
+    animation-delay: 0.8s;
+  }
+
+  .comic__tick {
+    fill: none;
+    stroke: var(--color-bg-secondary);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    animation: tick-pop 3s infinite;
+  }
+
+  .comic__tick--2 {
+    animation-delay: 0.3s;
+  }
+
+  .comic__tick--3 {
+    animation-delay: 0.6s;
+  }
+
+  .comic__pupil {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .comic__speed {
+    transform-box: view-box;
+    transform-origin: 186px 258px;
+  }
+
+  .comic__heart {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: heart-soft 2.4s ease-in-out infinite;
+  }
+
+  .comic__heart--second {
+    animation-delay: 0.3s;
+  }
+
+  .comic__panel.is-focus .comic__pop {
+    transform: scale(1.05) rotate(-2deg);
+  }
+
+  .comic__panel:nth-child(odd).is-focus .comic__pop {
+    transform: scale(1.05) rotate(2deg);
+  }
+
+  .comic__panel.is-focus .comic__wand {
+    animation: wand-wave 0.5s ease-in-out infinite alternate;
+  }
+
+  .comic__panel.is-focus .comic__spark {
+    animation: spark-burst 0.5s ease-in-out infinite alternate;
+  }
+
+  .comic__panel.is-focus .comic__card--moving {
+    animation: card-move 1.4s var(--motion-ease-snap) infinite alternate;
+  }
+
+  .comic__panel.is-focus .comic__pupil {
+    animation: eye-look 1.6s ease-in-out infinite;
+  }
+
+  .comic__panel.is-focus .comic__speed {
+    animation: speed-pulse 0.5s ease-in-out infinite alternate;
+  }
+
+  .comic__panel.is-focus .comic__heart {
+    animation: heart-hop 0.5s ease-in-out infinite alternate;
+  }
+
+  .comic__panel.is-focus .comic__heart--second {
+    animation-delay: 0.25s;
+  }
+
+  @keyframes spark-twinkle {
+    0%,
+    100% {
+      scale: 1;
+      rotate: 0deg;
+    }
+
+    50% {
+      scale: 0.75;
+      rotate: 20deg;
+    }
+  }
+
+  @keyframes dot-twinkle {
+    to {
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes wand-wave {
+    from {
+      rotate: -14deg;
+    }
+
+    to {
+      rotate: 10deg;
+    }
+  }
+
+  @keyframes spark-burst {
+    from {
+      scale: 0.9;
+      rotate: 0deg;
+    }
+
+    to {
+      scale: 1.5;
+      rotate: 45deg;
+    }
+  }
+
+  @keyframes tick-pop {
+    0%,
+    10% {
+      opacity: 0;
+      scale: 0.2;
+    }
+
+    20%,
+    70% {
+      opacity: 1;
+      scale: 1;
+    }
+
+    85%,
+    100% {
+      opacity: 0;
+      scale: 1;
+    }
+  }
+
+  /* The second pink card hops from "to do" into the empty slot under the
+     yellow card in the middle column. */
+  @keyframes card-move {
+    0%,
+    20% {
+      translate: 0 0;
+    }
+
+    80%,
+    100% {
+      translate: 18px 0;
+    }
+  }
+
+  @keyframes eye-look {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+
+    30% {
+      translate: -7px 1px;
+    }
+
+    65% {
+      translate: 7px -1px;
+    }
+  }
+
+  @keyframes speed-pulse {
+    to {
+      scale: 1.15;
+    }
+  }
+
+  @keyframes heart-soft {
+    0%,
+    60%,
+    100% {
+      scale: 1;
+    }
+
+    20% {
+      scale: 1.08;
+    }
+  }
+
+  @keyframes heart-hop {
+    to {
+      translate: 0 -5px;
+      scale: 1.1;
+    }
+  }
+
+  @keyframes eye-blink {
+    0%,
+    90%,
+    100% {
+      scale: 1 1;
+    }
+
+    94% {
+      scale: 1 0.1;
+    }
   }
 
   /* Contact: pink, white text, graphics bottom-right. */
@@ -624,8 +1850,85 @@ const tilts = [-1.5, 1, -0.8];
 
   /* Tablet */
   @media (max-width: 1023px) {
+    /* The hero art keeps its desktop proportions, so the circle, ring,
+       bubble and heart stay together and the hero has no empty floor. */
+    .hero {
+      min-height: 0;
+    }
+
+    .hero__art {
+      min-height: 0;
+      aspect-ratio: 620 / 724;
+      align-self: center;
+    }
+
+    /* The circle is small here, so the bubble shrinks and moves up past the
+       circle's top-right edge, clear of her face. */
+    .hero__bubble {
+      right: -2%;
+      top: -7%;
+    }
+
+    .hero__bubble-box {
+      font-size: 0.8rem;
+    }
+
     .work__cards {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.6fr);
+      gap: var(--spacing-8);
+      padding: 0;
+    }
+
+    /* The teaser fills its narrow column, with 準備中 set vertically. */
+    .work__cards > .work__soon {
+      width: 100%;
+      transform: rotate(4deg);
+    }
+
+    .work__soon-jp {
+      align-self: center;
+      writing-mode: vertical-rl;
+      padding: var(--spacing-2);
+    }
+
+    /* The six steps still share one row, each just as wide as its name. */
+    .work__process {
+      flex-wrap: nowrap;
+      gap: var(--spacing-2);
+    }
+
+    .work__process li {
+      gap: var(--spacing-2);
+    }
+
+    .work__step {
+      min-width: 0;
+      padding: var(--spacing-2) var(--spacing-3);
+      white-space: nowrap;
+    }
+
+    .work__step-name {
+      font-size: 1rem;
+    }
+
+    .work__process li:not(:last-child)::after {
+      font-size: 1.5rem;
+    }
+
+    /* No room beside the title, so 見て! follows the text, on the right. */
+    .work__look {
+      position: static;
+      justify-self: end;
+      font-size: 3.5rem;
+    }
+
+    /* Skills: the art drops below the copy instead of squeezing beside it. */
+    .skills {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .skills__art {
+      min-height: 300px;
     }
 
     .about {
@@ -634,6 +1937,50 @@ const tilts = [-1.5, 1, -0.8];
 
     .about__portrait {
       width: min(480px, 100%);
+    }
+
+    /* Contact: room under the text for the skyline. */
+    .contact {
+      padding-bottom: 260px;
+    }
+
+    /* Footer: the Japanese line and the copyright each stay on one line. */
+    .footer {
+      flex-wrap: wrap;
+    }
+
+    .footer p {
+      white-space: nowrap;
+    }
+
+    .footer .text-katakana {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* About below 1200px: the photo pile and the comic strip together are too
+     much, so only the photo pile stays. Landscape tablets and small laptops
+     show it beside the text; portrait tablets put the text first and centre
+     the pile under it. */
+  @media (max-width: 1199px) {
+    .about__comic {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-width: 1199px) {
+    .about {
+      grid-template-columns: 480px minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .about__copy {
+      order: -1;
+    }
+
+    .about__portrait {
+      justify-self: center;
     }
   }
 
@@ -655,15 +2002,23 @@ const tilts = [-1.5, 1, -0.8];
       aspect-ratio: 390 / 500;
     }
 
-    .hero :global(.hero__patch--bottom),
-    .hero :global(.hero__grid) {
-      display: none;
+    :global(.hero__grid) {
+      height: 140px;
     }
 
-    :global(.hero__sticker) {
-      left: 58%;
-      top: 66%;
-      scale: 0.85;
+    .hero__bubble {
+      right: 8px;
+      top: 2%;
+    }
+
+    .hero__heart {
+      left: 60%;
+      top: 64%;
+      width: 20%;
+    }
+
+    .hero__bubble-box {
+      font-size: 0.8rem;
     }
 
     .work {
@@ -676,13 +2031,84 @@ const tilts = [-1.5, 1, -0.8];
 
     .work__cards {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--spacing-12);
+      gap: var(--spacing-16);
+      padding: 0 var(--spacing-3);
     }
 
-    :global(.work__orbit) {
-      left: -20%;
-      top: 30%;
-      width: 120%;
+    /* The cards stack, so the arrow stands up and points down them. Its
+       tail starts behind the first card, so its end never shows. */
+    .work__arrow {
+      --arrow-h: 140px;
+      top: var(--spacing-24);
+      left: calc(50% - var(--arrow-h) / 2);
+      right: auto;
+      width: var(--arrow-h);
+      height: auto;
+    }
+
+    :global(.js) .work__arrow[data-reveal]:not(.is-visible) {
+      translate: 0 -40%;
+      opacity: 0;
+    }
+
+    .work__arrow-move {
+      flex-direction: column;
+      animation-name: arrow-nudge-down;
+    }
+
+    .work__arrow-shaft {
+      align-self: center;
+      width: 56%;
+      height: auto;
+      border-block: 0;
+      border-inline: 4px solid var(--color-ink-1000);
+    }
+
+    .work__arrow-head {
+      align-self: center;
+      width: calc(var(--arrow-h) * 0.72);
+      height: var(--arrow-h);
+      margin: calc(var(--arrow-h) * -0.14 - 2px) 0 calc(var(--arrow-h) * -0.14);
+      rotate: 90deg;
+    }
+
+    .work__look {
+      font-size: 2.5rem;
+    }
+
+    /* Under the stacked cards the arrow would cover the teaser, so it stops
+       just above it and points down at it instead. */
+    .work__cards > .work__soon {
+      --soon-h: 240px;
+      align-self: center;
+      width: 64%;
+      height: var(--soon-h);
+      margin: var(--spacing-8) 0 0;
+      transform: rotate(5deg);
+    }
+
+    .work__arrow {
+      bottom: calc(240px + var(--spacing-3));
+    }
+
+    .work__soon-jp {
+      align-self: stretch;
+      writing-mode: horizontal-tb;
+    }
+
+    .work__process {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .work__process li::after {
+      display: none;
+    }
+
+
+    .work__step {
+      flex: 1;
+      min-width: 0;
     }
 
     .skills {
@@ -698,33 +2124,16 @@ const tilts = [-1.5, 1, -0.8];
       gap: var(--spacing-4);
     }
 
+    /* Phones: the eye strip and its shard are too cramped to read well, so
+       the section is just the copy and the tool chips. */
     .skills__art {
-      min-height: 190px;
+      display: none;
     }
 
     :global(.skills__patch) {
       right: -80px;
       top: -90px;
       width: 220px;
-    }
-
-    /* Phone: the earlier collage, a squarer shard above the strip. */
-    :global(.skills__shard) {
-      left: auto;
-      right: 4%;
-      top: 0;
-      width: 34%;
-      aspect-ratio: 400 / 320;
-    }
-
-    .skills__strip {
-      left: 0;
-      top: 30%;
-      width: 100%;
-    }
-
-    .skills :global(.skills__burst) {
-      display: none;
     }
 
     .about {
@@ -741,20 +2150,24 @@ const tilts = [-1.5, 1, -0.8];
       order: 0;
     }
 
-    .about__interests {
-      order: 2;
+    .about__card--burst {
+      left: 84px;
+      top: -20px;
+      width: 260px;
+      height: 260px;
     }
 
-    :global(.about__slab) {
-      left: 50px;
+    .about__card--shard {
+      left: -20px;
+      top: 140px;
       width: 300px;
     }
 
-    .about__panel {
-      left: 10px;
-      top: 30px;
-      width: 290px;
-      height: 360px;
+    .about__card--photo {
+      left: 26px;
+      top: 48px;
+      width: 240px;
+      height: 310px;
     }
 
     .stats dd {
@@ -763,29 +2176,6 @@ const tilts = [-1.5, 1, -0.8];
 
     .stats div {
       padding-inline: 14px;
-    }
-
-    /* Section-qualified so it beats the Decor component's own display rule. */
-    .about :global(.about__wedge) {
-      display: none;
-    }
-
-    :global(.about__patch) {
-      left: auto;
-      right: -60px;
-      top: auto;
-      bottom: -80px;
-      width: 260px;
-    }
-
-    .about :global(.about__spark) {
-      display: none;
-    }
-
-    :global(.about__burst) {
-      right: 4px;
-      top: 16px;
-      width: 64px;
     }
 
     .contact {

@@ -3,7 +3,7 @@
 // Hidden from screen readers; scale it with `size`.
 interface Props {
   shape?: "sparkle" | "heart";
-  color?: "pink" | "ink" | "aqua";
+  color?: "pink" | "ink" | "aqua" | "yellow";
   size?: number;
   class?: string;
 }
@@ -44,5 +44,9 @@ const paths = {
 
   .sparkle--aqua {
     color: var(--color-bg-secondary);
+  }
+
+  .sparkle--yellow {
+    color: var(--color-yellow-500);
   }
 </style>

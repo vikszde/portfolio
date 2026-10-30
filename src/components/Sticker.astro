@@ -22,7 +22,8 @@ const { color = "yellow", tilt = -8, class: className } = Astro.props;
     border-radius: var(--radius-none);
     color: var(--color-text-on-accent);
     text-align: center;
-    transform: rotate(var(--tilt));
+    /* `rotate` rather than `transform`, so ambient motion can stack on it. */
+    rotate: var(--tilt);
   }
 
   .sticker--yellow {
