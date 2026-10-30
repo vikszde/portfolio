@@ -35,6 +35,7 @@
 </script>
 
 <div class="intro-screen" aria-hidden="true" data-intro>
+  <div class="intro__bg" data-part="bg"></div>
   <div class="intro__part" data-part="icon">
     <svg class="intro__spin" viewBox="0 0 301 357" width="84.3" height="100">
       <g data-part="icon-orbit">
@@ -141,8 +142,19 @@
     html.classList.remove("is-intro-logo");
   }
 
-  // Places a 100px-tall part so it is h px tall with its top left at x, y.
-  const pose = ({ x, y, h }: Box) => ({ transform: `translate(${x}px, ${y}px) scale(${h / 100})` });
+  // Places a part drawn `base` px tall so it is h px tall with its top left
+  // at x, y.
+  const pose = ({ x, y, h }: Box, base: number) => ({ transform: `translate(${x}px, ${y}px) scale(${h / base})` });
+
+  // Draws a part's SVG at `base` px tall. Each part is drawn at the largest
+  // size it reaches and only ever scaled down, so it stays sharp while the
+  // browser moves it as a ready-made picture.
+  function drawAt(part: Element, base: number) {
+    const svg = part.querySelector("svg")!;
+    const [, , w, h] = svg.getAttribute("viewBox")!.split(" ").map(Number);
+    svg.setAttribute("height", String(base));
+    svg.setAttribute("width", String((base * w) / h));
+  }
 
   function play(screen: HTMLElement) {
     const part = (name: string) => screen.querySelector<SVGElement | HTMLElement>(`[data-part="${name}"]`)!;
@@ -187,20 +199,27 @@
       .sort((a, b) => a.d - b.d)
       .map(({ i }) => i);
 
+    drawAt(icon, I.h);
+    drawAt(logo, L.h);
+    drawAt(sparkle, sparkleOn.icon.h);
+    const iconAt = (b: Box) => pose(b, I.h);
+    const logoAt = (b: Box) => pose(b, L.h);
+    const sparkleAt = (b: Box) => pose(b, sparkleOn.icon.h);
+
     const flyOut = onPhone ? { opacity: 0 } : {};
     const tracks: [Element, Frame[]][] = [
-      [icon, [[0, { ...pose(I), opacity: 1 }], [E + 550, { opacity: 1 }], [E + 600, { opacity: 0 }]]],
+      [icon, [[0, { ...iconAt(I), opacity: 1 }], [E + 550, { opacity: 1 }], [E + 600, { opacity: 0 }]]],
       [icon.firstElementChild!, [[0, { transform: "scale(0) rotate(-270deg)" }, ease.out], [800, { transform: "scale(1) rotate(0deg)" }]]],
       [part("icon-ink"), [[E, { opacity: 1, transform: "scale(1)" }, ease.in], [E + 400, { opacity: 0, transform: "scale(0.4)" }]]],
       [part("icon-slash"), [[E, { opacity: 1, transform: "scale(1) rotate(0deg)" }, ease.in], [E + 350, { opacity: 0, transform: "scale(0.2) rotate(40deg)" }]]],
       [part("icon-dots"), [[E, { opacity: 1 }], [E + 300, { opacity: 0 }]]],
       [part("icon-orbit"), [[E + 200, { opacity: 1 }], [E + 600, { opacity: 0 }]]],
 
-      [sparkle, [[E, { ...pose(sparkleOn.icon), opacity: 1 }, ease.inOut], [E + 700, pose(sparkleOn.logo)], [F, { ...pose(sparkleOn.logo), opacity: 1 }, ease.inOut], [FE, { ...pose(sparkleOn.nav), ...flyOut }]]],
+      [sparkle, [[E, { ...sparkleAt(sparkleOn.icon), opacity: 1 }, ease.inOut], [E + 700, sparkleAt(sparkleOn.logo)], [F, { ...sparkleAt(sparkleOn.logo), opacity: 1 }, ease.inOut], [FE, { ...sparkleAt(sparkleOn.nav), ...flyOut }]]],
       // It spins in with the icon, then turns half a turn on its way to the V.
       [sparkle.firstElementChild!, [[0, { transform: "scale(0) rotate(-270deg)" }, ease.out], [800, { transform: "scale(1) rotate(0deg)" }], [E, { transform: "scale(1) rotate(0deg)" }, ease.inOut], [E + 700, { transform: "scale(1) rotate(180deg)" }]]],
 
-      [logo, [[F, { ...pose(L), opacity: 1 }, ease.inOut], [FE, { ...pose(N), ...flyOut }]]],
+      [logo, [[F, { ...logoAt(L), opacity: 1 }, ease.inOut], [FE, { ...logoAt(N), ...flyOut }]]],
       [part("logo-orbit"), [[E + 200, { opacity: 0, transform: "rotate(-35deg)" }, ease.out], [E + 650, { opacity: 1, transform: "rotate(0deg)" }], [S, { opacity: 1, transform: "rotate(0deg)" }, ease.in], [S + 400, { opacity: 0, transform: "rotate(70deg)" }]]],
       ...letters.map((el, i): [Element, Frame[]] => {
         const at = E + 200 + fromCentre.indexOf(i) * 60;
@@ -213,9 +232,11 @@
         [[E + 650 + i * 60, { transform: "scale(0)" }, ease.back], [E + 870 + i * 60, { transform: "scale(1)" }], [S + i * 50, { transform: "scale(1)" }, ease.in], [S + 220 + i * 50, { transform: "scale(0)" }]],
       ]),
 
-      // The black screen shrinks up until it is exactly the nav bar, then
-      // fades so the nav's links show through.
-      [screen, [[F, { clipPath: "inset(0px 0px 0px 0px)", opacity: 1 }, ease.inOut], [FE, { clipPath: `inset(0px 0px ${vh - navBottom}px 0px)` }], [FE + 20, { opacity: 1 }], [END, { opacity: 0 }]]],
+      // The black shrinks up until it is exactly the nav bar, then the
+      // screen fades so the nav's links show through. Kept last: when it
+      // ends, the intro is over.
+      [part("bg"), [[F, { transform: "scaleY(1)" }, ease.inOut], [FE, { transform: `scaleY(${navBottom / vh})` }]]],
+      [screen, [[FE + 20, { opacity: 1 }], [END, { opacity: 0 }]]],
     ];
 
     const animations = tracks.map(([el, frames]) => run(el, frames));
@@ -252,9 +273,13 @@
     for (const type of ["pointerdown", "keydown", "wheel", "touchstart"]) window.addEventListener(type, skip, { passive: true });
   }
 
-  // One animation per element across the whole timeline. Every property
-  // holds its first value until its first frame and its last value after.
+  // One animation per element, running only between its first and last
+  // frame, so parts that have settled stop costing the browser anything.
+  // Every property holds its first value until its first frame and its last
+  // value after.
   function run(el: Element, frames: Frame[]) {
+    const from = frames[0][0];
+    const span = frames[frames.length - 1][0] - from || 1;
     const first: Props = {};
     const last: Props = {};
     for (const [, props] of frames) {
@@ -265,10 +290,10 @@
     }
     const keyframes: Keyframe[] = [
       { offset: 0, ...first },
-      ...frames.map(([at, props, easing]) => ({ offset: Math.min(at / END, 1), ...props, ...(easing ? { easing } : {}) })),
+      ...frames.map(([at, props, easing]) => ({ offset: (at - from) / span, ...props, ...(easing ? { easing } : {}) })),
       { offset: 1, ...last },
     ];
-    return el.animate(keyframes, { duration: END, fill: "both" });
+    return el.animate(keyframes, { delay: from, duration: span, fill: "both" });
   }
 
   // A reload that lands part-way down the page skips the intro, and so does
@@ -293,18 +318,35 @@
     inset: 0;
     z-index: 200;
     overflow: hidden;
-    background: var(--color-ink-1000);
     color: var(--color-paper-100);
     cursor: pointer;
+  }
+
+  .intro__bg {
+    position: absolute;
+    inset: 0;
+    background: var(--color-ink-1000);
+    transform-origin: 50% 0;
+    will-change: transform;
   }
 
   :global(.is-intro-logo) .intro-screen {
     display: block;
   }
 
-  /* The page holds still under the screen. */
+  /* The page holds still under the screen: no scrolling, and it isn't drawn
+     or animated, so the browser spends every frame on the intro. */
   :global(html.is-intro) {
     overflow: hidden;
+  }
+
+  :global(html.is-intro main),
+  :global(html.is-intro footer) {
+    visibility: hidden;
+  }
+
+  :global(html.is-intro main *) {
+    animation-play-state: paused !important;
   }
 
   /* The real nav logo waits for the flying one to land on it. */
@@ -325,6 +367,7 @@
     left: 0;
     transform-origin: 0 0;
     opacity: 0;
+    will-change: transform, opacity;
   }
 
   .intro__part svg {
