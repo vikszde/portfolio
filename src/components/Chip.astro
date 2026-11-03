@@ -1,0 +1,117 @@
+---
+// Square chip from the Figma "Chip" set, for filters and project categories.
+// As a static label it renders a <span>; with `as="button"` it becomes a
+// toggle whose state lives in aria-pressed, so scripts only need to flip that
+// attribute. Button chips wipe to ink on hover and "stamp" when selected.
+import type { HTMLAttributes } from "astro/types";
+
+type Props = {
+  selected?: boolean;
+  as?: "span" | "button";
+} & HTMLAttributes<"button">;
+
+const { selected = false, as = "span", class: className, ...rest } = Astro.props;
+const isButton = as === "button";
+const Tag = isButton ? "button" : "span";
+---
+
+<Tag
+  class:list={["chip", { "chip--selected": selected && !isButton, "chip--button": isButton }, "text-label-s", className]}
+  type={isButton ? "button" : undefined}
+  aria-pressed={isButton ? String(selected) : undefined}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<script>
+  // Play the stamp only when a chip becomes selected, not on page load.
+  const observer = new MutationObserver((records) => {
+    for (const { target } of records) {
+      const chip = target as HTMLElement;
+      if (chip.getAttribute("aria-pressed") !== "true") continue;
+      chip.classList.remove("chip--stamp");
+      void chip.offsetWidth; // restart the animation if it is already running
+      chip.classList.add("chip--stamp");
+    }
+  });
+  document.querySelectorAll(".chip--button").forEach((chip) => {
+    observer.observe(chip, { attributes: true, attributeFilter: ["aria-pressed"] });
+    chip.addEventListener("animationend", () => chip.classList.remove("chip--stamp"));
+  });
+</script>
+
+<style>
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-1) var(--spacing-2);
+    border: var(--border-thin) solid var(--color-border-default);
+    border-radius: var(--radius-none);
+    background: var(--color-bg-surface);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+  }
+
+  .chip--selected,
+  .chip--button[aria-pressed="true"] {
+    border-color: var(--color-border-primary);
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  .chip--button {
+    position: relative;
+    isolation: isolate;
+    cursor: pointer;
+    transition:
+      /* Flip the label when the wipe passes the middle (~10% of ease-out). */
+      color calc(var(--motion-duration-base) * 0.1) var(--motion-ease-cut),
+      translate var(--motion-duration-fast) var(--motion-ease-snap);
+  }
+
+  /* Hover wipe for unselected chips, same as Button. */
+  .chip--button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-bg-inverse);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--motion-duration-base) var(--motion-ease-out);
+  }
+
+  @media (hover: hover) {
+    .chip--button:not([aria-pressed="true"]):hover {
+      color: var(--color-text-inverse);
+    }
+
+    .chip--button:not([aria-pressed="true"]):hover::before {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  .chip--button[aria-pressed="true"]::before {
+    transition: none;
+  }
+
+  .chip--button:active {
+    translate: 0 1px;
+  }
+
+  /* Stamp: the chip lands a touch small and springs back as it turns pink. */
+  .chip--stamp {
+    animation: chip-stamp var(--motion-duration-slow) var(--motion-ease-snap);
+  }
+
+  @keyframes chip-stamp {
+    from {
+      scale: 0.85;
+    }
+    to {
+      scale: 1;
+    }
+  }
+</style>

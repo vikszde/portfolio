@@ -1,0 +1,36 @@
+---
+// Screentone band from the Figma "Halftone" component. The dot pattern is an
+// SVG used as a CSS mask, so the colour comes from the tokens and follows
+// Light/Dark. It fills its container's width; set the band height with
+// `height`, and `flip` to fade from the bottom instead.
+import halftone from "../assets/halftone.svg?url";
+
+interface Props {
+  height?: number;
+  flip?: boolean;
+  class?: string;
+}
+
+const { height = 160, flip = false, class: className } = Astro.props;
+---
+
+<span
+  class:list={["halftone", { "halftone--flip": flip }, className]}
+  style={`--halftone: url("${halftone}"); --halftone-height: ${height}px`}
+  aria-hidden="true"></span>
+
+<style>
+  .halftone {
+    display: block;
+    width: 100%;
+    height: var(--halftone-height);
+    background: var(--color-bg-accent);
+    -webkit-mask: var(--halftone) left bottom / auto 100% repeat-x;
+    mask: var(--halftone) left bottom / auto 100% repeat-x;
+    pointer-events: none;
+  }
+
+  .halftone--flip {
+    transform: rotate(180deg);
+  }
+</style>
