@@ -12,7 +12,6 @@ import Logo from "../components/Logo.astro";
 import Intro from "../components/Intro.astro";
 import { site, projects } from "../data/site";
 import charTrace from "../assets/art/char-trace.webp?url";
-import characterRiv from "../assets/art/character.riv?url";
 import portrait from "../assets/photo/viki-portrait.webp?url";
 import eyeStrip from "../assets/art/eye-strip.webp?url";
 import nearbioCover from "../assets/work/nearbio-cover.webp?url";
@@ -53,8 +52,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
         <Decor name="orbit" class="hero__orbit anim-sway" />
         <span class="hero__circle" aria-hidden="true"></span>
         <div class="hero__frame">
-          <div class="hero__character" role="img" aria-label="Anime-style character illustration in a black and pink outfit" data-rive data-src={characterRiv}>
-            <canvas width="832" height="880" aria-hidden="true"></canvas>
+          <div class="hero__character" role="img" aria-label="Anime-style character illustration in a black and pink outfit">
             <img src={charTrace} alt="" width="832" height="1216" />
           </div>
         </div>
@@ -150,8 +148,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       <div class="skills__art" aria-hidden="true">
         <Decor name="halftone-patch" tone="accent" class="skills__burst anim-breathe" />
         <Decor name="slab" stretch class="skills__shard anim-sway" />
-        <div class="skills__strip parallax-x" data-rive-eyes data-src={characterRiv}>
-          <canvas></canvas>
+        <div class="skills__strip parallax-x">
           <img src={eyeStrip} alt="" width="560" height="160" loading="lazy" />
         </div>
       </div>
@@ -295,98 +292,9 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
 </Base>
 
 <script>
-  import { Rive, Layout, Fit, Alignment, RuntimeLoader } from "@rive-app/canvas";
-  import riveWasm from "@rive-app/canvas/rive.wasm?url";
   import { afterIntro } from "../scripts/after-intro";
 
-  type Mount = { intro: boolean; layout: (canvas: HTMLCanvasElement) => Layout; eyeLine: number };
-
-  // The Rive character. In the hero it plays its intro, then idles and
-  // blinks on its own; in the Skills eye strip it starts straight in the idle
-  // (reducedMotion set before the first frame skips the intro). Over the
-  // canvas the file's own hit zones steer the eyes; elsewhere on the page the
-  // eyes follow the pointer from here. Off-screen canvases stop drawing.
   const stillMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const clamp = (n: number) => Math.max(-100, Math.min(100, n));
-  const visibility = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      const character = drawn.get(entry.target);
-      if (!character) continue;
-      if (entry.isIntersecting) character.startRendering();
-      else character.stopRendering();
-    }
-  });
-  const drawn = new Map<Element, Rive>();
-  RuntimeLoader.setWasmUrl(riveWasm);
-
-  const mount = (host: HTMLElement, { intro, layout, eyeLine }: Mount) => {
-    const canvas = host.querySelector("canvas")!;
-    const fit = () => {
-      character.resizeDrawingSurfaceToCanvas();
-      character.layout = layout(canvas);
-    };
-    const character: Rive = new Rive({
-      src: host.dataset.src!,
-      canvas,
-      layout: layout(canvas),
-      stateMachines: "Main",
-      autoplay: false,
-      isTouchScrollEnabled: true,
-      onLoad: () => {
-        fit();
-        const inputs = character.stateMachineInputs("Main");
-        const input = (name: string) => inputs.find((i) => i.name === name)!;
-        if (stillMotion || !intro) input("reducedMotion").value = true;
-        // The hero's intro waits for the logo intro to hand off, so it plays
-        // as the black screen lifts rather than behind it.
-        const start = () => {
-          character.play();
-          host.classList.add("is-live");
-          drawn.set(canvas, character);
-          visibility.observe(canvas);
-        };
-        if (intro) afterIntro(start);
-        else start();
-        if (stillMotion) return;
-        const lookX = input("lookX");
-        const lookY = input("lookY");
-        window.addEventListener(
-          "pointermove",
-          (event) => {
-            const box = canvas.getBoundingClientRect();
-            const inside = event.clientX > box.left && event.clientX < box.right && event.clientY > box.top && event.clientY < box.bottom;
-            if (inside) return;
-            lookX.value = clamp(((event.clientX - (box.left + box.width / 2)) / (window.innerWidth / 2)) * 100);
-            lookY.value = clamp(((event.clientY - (box.top + box.height * eyeLine)) / (window.innerHeight / 2)) * 100);
-          },
-          { passive: true },
-        );
-      },
-      onLoadError: () => host.classList.add("is-fallback"),
-    });
-    window.addEventListener("resize", fit);
-  };
-
-  const hero = document.querySelector<HTMLElement>("[data-rive]");
-  if (hero) mount(hero, { intro: true, eyeLine: 0.3, layout: () => new Layout({ fit: Fit.Contain, alignment: Alignment.TopCenter }) });
-
-  // The strip shows only her eyes, the box x 319–559, y 168–233.5 of the
-  // 832 × 880 artboard. The whole artboard is drawn into a frame much larger
-  // than the canvas, placed so just that box lands on it.
-  const eyes = document.querySelector<HTMLElement>("[data-rive-eyes]");
-  // Hidden on phones; getClientRects() is empty when an ancestor is display: none.
-  if (eyes && eyes.getClientRects().length)
-    mount(eyes, {
-      intro: false,
-      eyeLine: 0.5,
-      layout: (canvas) => {
-        const k = canvas.width / 240;
-        return new Layout({ fit: Fit.Fill, minX: -319 * k, minY: -168 * k, maxX: (832 - 319) * k, maxY: (880 - 168) * k });
-      },
-    });
-  // If the page was opened on a phone and later turned or widened, the strip
-  // shows its still image instead.
-  else if (eyes) eyes.classList.add("is-fallback");
 
   // Hero speech bubble: types a line, holds it, deletes it, types the next.
   // With reduced motion it just keeps the first line.
@@ -547,9 +455,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     animation-delay: 450ms;
   }
 
-  /* The character is a Rive animation with its own entrance, idle and
-     eye-follow. Until it is running (or if it can't run) the still drawing
-     stands in, cropped to the same frame. */
+  /* The character drawing, cropped to her upper body. */
   .hero__character {
     position: absolute;
     aspect-ratio: 832 / 880;
@@ -565,15 +471,6 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
   .hero__character img {
     object-fit: cover;
     object-position: top;
-  }
-
-  :global(.js) .hero__character img,
-  .hero__character:not(.is-live) canvas {
-    visibility: hidden;
-  }
-
-  :global(.js) .hero__character.is-fallback img {
-    visibility: visible;
   }
 
   .hero__scroll-arrow {
@@ -1262,8 +1159,8 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     rotate: 6deg;
   }
 
-  /* The eye strip is the live character, cropped to her eyes, in the same
-     black frame as the still image that stands in until it runs. */
+  /* The eye strip: the character drawing cropped to her eyes, in a black
+     frame. */
   .skills__strip {
     left: 1%;
     top: 12%;
@@ -1278,25 +1175,10 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     max-width: none;
   }
 
-  .skills__strip canvas {
-    inset: 3.125% 0.9%;
-    width: 98.2%;
-    height: 93.75%;
-  }
-
   .skills__strip img {
     inset: 0;
     width: 100%;
     height: 100%;
-  }
-
-  :global(.js) .skills__strip img,
-  .skills__strip:not(.is-live) canvas {
-    visibility: hidden;
-  }
-
-  :global(.js) .skills__strip.is-fallback img {
-    visibility: visible;
   }
 
   /* About */
