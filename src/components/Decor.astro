@@ -1,0 +1,200 @@
+---
+// Background pieces from the Figma "Decor" section. Purely decorative: hidden
+// from screen readers and never focusable. Size with `width` (the height
+// follows the shape) and place with a class from the parent section. Pass
+// `stretch` when the parent sets both width and height, like a shard that was
+// squashed in Figma. `moving` makes the perspective grid roll towards the
+// viewer like an endless retro floor.
+interface Props {
+  name: keyof typeof shapes;
+  tone?: "ink" | "pink" | "accent" | "aqua" | "text";
+  width?: number;
+  stretch?: boolean;
+  moving?: boolean;
+  class?: string;
+  style?: string;
+}
+
+const { name, tone = "pink", width, stretch = false, moving = false, class: className, style } = Astro.props;
+
+const f = (n: number) => n.toFixed(1);
+const star = (cx: number, cy: number, r: number, k = 0.14) =>
+  `M${f(cx)} ${f(cy - r)}Q${f(cx + r * k)} ${f(cy - r * k)} ${f(cx + r)} ${f(cy)}Q${f(cx + r * k)} ${f(cy + r * k)} ${f(cx)} ${f(cy + r)}Q${f(cx - r * k)} ${f(cy + r * k)} ${f(cx - r)} ${f(cy)}Q${f(cx - r * k)} ${f(cy - r * k)} ${f(cx)} ${f(cy - r)}Z`;
+const ellipse = (cx: number, cy: number, rx: number, ry: number) =>
+  `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
+const dot = (cx: number, cy: number, r: number) => `M${f(cx - r)} ${f(cy)}a${f(r)} ${f(r)} 0 1 0 ${f(2 * r)} 0a${f(r)} ${f(r)} 0 1 0 ${f(-2 * r)} 0`;
+
+// Round halftone burst: dots shrink towards the edge.
+let patch = "";
+for (let y = 6; y < 320; y += 12)
+  for (let x = Math.round(y / 12) % 2 ? 12 : 6; x < 320; x += 12) {
+    const r = 5.2 * (1 - Math.hypot(x - 160, y - 160) / 160);
+    if (r > 0.6) patch += dot(x, y, r);
+  }
+
+// Halftone fade: dots grow from nothing to solid across the width.
+let fade = "";
+for (let y = 5; y < 160; y += 10)
+  for (let x = (y / 10) % 2 < 1 ? 5 : 10; x < 480; x += 10) {
+    const r = 4.8 * Math.pow(x / 480, 1.2);
+    if (r > 0.5) fade += dot(x, y, r);
+  }
+
+let grid = "";
+for (let y = 0; y < 6; y++) for (let x = 0; x < 8; x++) grid += dot(8 + x * 16, 8 + y * 16, 2);
+
+// Perspective floor: rails converge on a vanishing point above the box, and
+// the cross lines ("rungs") get further apart towards the viewer. Each rung
+// knows the gap to the next one, so a moving floor can slide every rung into
+// its neighbour's place and loop without a jump.
+let rails = "";
+for (let x = -800; x <= 1600; x += 80) rails += `M${x} 300L${f(x + (400 - x) * 0.6)} 0`;
+const rungY = (k: number) => 300 * (k / 10) ** 2;
+const rungs = Array.from({ length: 11 }, (_, k) => ({ y: rungY(k), gap: rungY(k + 1) - rungY(k) }));
+const floor = rails + rungs.slice(1).map(({ y }) => `M0 ${f(y)}H800`).join("");
+
+// Eight-ray sparkle: long and short rays around a narrow waist. The bold
+// version has a wider waist, so its rays are thicker.
+const starburst = (waist: number, short: number) => {
+  let d = "";
+  for (let i = 0; i < 16; i++) {
+    const a = ((i * 22.5 - 90) * Math.PI) / 180;
+    const r = i % 2 ? waist : (i / 2) % 2 ? short : 100;
+    d += `${i ? "L" : "M"}${f(100 + Math.cos(a) * r)} ${f(100 + Math.sin(a) * r)}`;
+  }
+  return d + "Z";
+};
+
+let ruler = "";
+for (let x = 1; x < 300; x += 10) ruler += `M${x} 0V${(x - 1) % 50 === 0 ? 24 : 10}`;
+
+const buildings = [
+  [0, 250, 70, 150], [60, 200, 60, 200], [130, 280, 80, 120], [200, 160, 50, 240],
+  [260, 230, 90, 170], [360, 270, 70, 130], [440, 190, 60, 210], [510, 240, 90, 160],
+].map(([x, y, w, h]) => `M${x} ${y}H${x + w}V${y + h}H${x}Z`).join("");
+const pylon =
+  "M104 400L122 60H132L150 400M110 300H144M114 220H140M118 140H136M110 300L140 220M114 220L136 140M144 300L114 220M140 220L118 140M122 60H170M84 60H132M170 60C300 120 450 110 600 70M84 60C60 80 30 90 0 96";
+
+type Shape = { box: [number, number]; fill?: string; stroke?: string; strokeWidth?: number; evenOdd?: boolean; extra?: string };
+const shapes = {
+  wedge: { box: [400, 300], fill: "M0 300L400 0L290 300Z" },
+  blade: { box: [600, 90], fill: "M0 70L600 0L572 30L14 90Z" },
+  slab: { box: [400, 320], fill: "M46 0L400 34L352 320L0 272Z" },
+  orbit: { box: [620, 180], fill: ellipse(310, 90, 300, 80) + ellipse(318, 98, 292, 68), evenOdd: true },
+  slash: { box: [640, 220], fill: "M0 214C140 150 340 70 640 0C470 66 300 138 150 196C110 210 50 220 0 214Z" },
+  stripes: { box: [96, 40], fill: "M14 0H26L12 40H0ZM38 0H50L36 40H24ZM62 0H74L60 40H48ZM86 0H98L84 40H72Z" },
+  "halftone-patch": { box: [320, 320], fill: patch },
+  "halftone-fade": { box: [480, 160], fill: fade },
+  "dot-grid": { box: [128, 96], fill: grid },
+  "sparkle-burst": { box: [200, 200], fill: starburst(7, 52) },
+  "sparkle-burst-bold": { box: [200, 200], fill: starburst(20, 60) },
+  "sparkle-outline": { box: [64, 64], stroke: star(32, 32, 30, 0.18), strokeWidth: 2 },
+  "shooting-star": { box: [320, 150], fill: star(30, 30, 26) + "M44 38L318 140L312 146Z" },
+  "perspective-grid": { box: [800, 300], stroke: floor, strokeWidth: 1.5 },
+  "corner-brackets": { box: [120, 120], stroke: "M2 26V2H26M118 26V2H94M2 94V118H26M118 94V118H94", strokeWidth: 3 },
+  ruler: { box: [302, 24], stroke: ruler, strokeWidth: 1.5 },
+  "doodle-heart": { box: [200, 190], stroke: "M100 172C22 112 4 64 42 36C72 14 96 40 100 62C108 36 142 10 172 36C206 70 172 122 100 172ZM92 164C34 116 16 70 46 44", strokeWidth: 6 },
+  "doodle-crown": { box: [150, 92], stroke: "M10 84L20 22L50 58L75 10L100 58L130 22L140 84Z", strokeWidth: 6 },
+  city: { box: [600, 400], extra: "city" },
+} satisfies Record<string, Shape>;
+
+const shape: Shape = shapes[name];
+const [w, h] = shape.box;
+---
+
+<svg
+  class:list={["decor", `decor--${tone}`, className]}
+  viewBox={`0 0 ${w} ${h}`}
+  width={width}
+  height={width ? Math.round((width * h) / w) : undefined}
+  preserveAspectRatio={stretch ? "none" : undefined}
+  style={style}
+  aria-hidden="true"
+  focusable="false"
+>
+  {shape.fill && <path d={shape.fill} fill="currentColor" fill-rule={shape.evenOdd ? "evenodd" : undefined} />}
+  {
+    name === "perspective-grid" && moving && (
+      <g fill="none" stroke="currentColor" stroke-width={shape.strokeWidth}>
+        <path d={rails} vector-effect="non-scaling-stroke" />
+        {rungs.map(({ y, gap }) => (
+          <path class="decor__rung" d={`M0 ${f(y)}H800`} style={`--gap: ${f(gap)}px`} vector-effect="non-scaling-stroke" />
+        ))}
+      </g>
+    )
+  }
+  {
+    shape.stroke && !(name === "perspective-grid" && moving) && (
+      <path
+        d={shape.stroke}
+        fill="none"
+        stroke="currentColor"
+        stroke-width={shape.strokeWidth}
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    )
+  }
+  {
+    shape.extra === "city" && (
+      <>
+        <circle class="decor__sun" cx="400" cy="180" r="140" />
+        <path class="decor__skyline" d={buildings} />
+        <path class="decor__pylon" d={pylon} fill="none" stroke-width="5" />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .decor {
+    display: block;
+    pointer-events: none;
+    max-width: none;
+  }
+
+  .decor--ink {
+    color: var(--color-bg-inverse);
+  }
+
+  .decor--pink {
+    color: var(--color-bg-primary);
+  }
+
+  .decor--accent {
+    color: var(--color-bg-accent);
+  }
+
+  .decor--aqua {
+    color: var(--color-bg-secondary);
+  }
+
+  .decor--text {
+    color: var(--color-text-primary);
+  }
+
+  /* Moving floor: each rung slides down into the next one's place, then
+     the loop restarts, which looks like walking forward forever. */
+  .decor__rung {
+    animation: rung var(--rung-dur, 1.6s) linear infinite;
+  }
+
+  @keyframes rung {
+    to {
+      translate: 0 var(--gap);
+    }
+  }
+
+  /* City: the sun and skyline colours are set by the section using it. */
+  .decor__sun {
+    fill: var(--decor-sun, var(--color-bg-highlight));
+  }
+
+  .decor__skyline {
+    fill: var(--decor-skyline, var(--color-ink-900));
+  }
+
+  .decor__pylon {
+    stroke: var(--decor-skyline, var(--color-ink-900));
+  }
+</style>

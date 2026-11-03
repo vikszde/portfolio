@@ -1,0 +1,38 @@
+---
+// Temporary case study pages so the project cards don't lead to a 404.
+// Replace with the real case study template next.
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import Button from "../../components/Button.astro";
+import { projects } from "../../data/site";
+
+export function getStaticPaths() {
+  return projects.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+---
+
+<Base title={`${project.title} · Viktória Varga`}>
+  <Nav current="Work" />
+  <main class="soon">
+    <p class="text-label-m accent">Case study {project.number}</p>
+    <h1 class="text-display-l">{project.title}</h1>
+    <p class="text-body-l">This case study is on its way.</p>
+    <Button variant="ghost" href={`${base}#work`}>← All work</Button>
+  </main>
+</Base>
+
+<style>
+  .soon {
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-6);
+    padding: var(--spacing-24) clamp(var(--spacing-4), 5.5vw, 80px);
+  }
+
+  .accent {
+    color: var(--color-text-accent);
+  }
+</style>

@@ -26,15 +26,87 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <link rel="icon" href={`${base}favicon.ico`} />
     <title>{title}</title>
-    <!-- Apply a saved theme before first paint so the page never flashes the wrong colours. -->
+    <!-- The site is always Light. Earlier builds saved a theme choice; clear it so nobody gets stuck in Dark. -->
     <script is:inline>
       try {
-        const saved = localStorage.getItem("theme");
-        if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+        localStorage.removeItem("theme");
       } catch {}
+      // Scroll reveals start hidden only when JavaScript can show them again.
+      document.documentElement.classList.add("js");
     </script>
   </head>
   <body>
     <slot />
+    <script>
+      import { afterIntro } from "../scripts/after-intro";
+
+      // Scroll reveal: anything marked data-reveal fades and slides in the
+      // first time it enters the viewport. Children of a [data-stagger]
+      // parent follow each other in order.
+      document.querySelectorAll<HTMLElement>("[data-stagger]").forEach((group) => {
+        const step = Number(group.dataset.stagger) || 90;
+        group.querySelectorAll<HTMLElement>(":scope > [data-reveal]").forEach((item, i) => {
+          item.style.setProperty("--reveal-delay", `${i * step}ms`);
+        });
+      });
+
+      const reveal = (el: Element) => {
+        el.classList.add("is-visible");
+        el.dispatchEvent(new CustomEvent("reveal"));
+      };
+
+      // Whatever is already on screen at load shows straight away, without
+      // waiting for the observer's first callback. data-reveal-at="0.6" holds
+      // an element back until its top has passed 60% of the viewport height;
+      // those are left to the scroll check below rather than the observer.
+      const onScreen = (el: HTMLElement) => {
+        const box = el.getBoundingClientRect();
+        const at = Number(el.dataset.revealAt) || 0.95;
+        return box.top < window.innerHeight * at && box.bottom > 0;
+      };
+
+      // On the home page a logo intro may be covering the page; the first
+      // reveals wait for it to hand off so they play where they can be seen.
+      afterIntro(() => {
+        if ("IntersectionObserver" in window) {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (!entry.isIntersecting) continue;
+                reveal(entry.target);
+                observer.unobserve(entry.target);
+              }
+            },
+            { rootMargin: "0px 0px -10% 0px", threshold: 0.15 },
+          );
+          document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
+            if (onScreen(el)) reveal(el);
+            else if (!el.dataset.revealAt) observer.observe(el);
+          });
+
+          // Safety net: a fast scroll can outrun the observer, so also check on
+          // scroll and reveal anything that has reached the screen.
+          let queued = false;
+          window.addEventListener(
+            "scroll",
+            () => {
+              if (queued) return;
+              queued = true;
+              setTimeout(() => {
+                queued = false;
+                document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-visible)").forEach((el) => {
+                  if (!onScreen(el)) return;
+                  reveal(el);
+                  observer.unobserve(el);
+                });
+              }, 120);
+            },
+            { passive: true },
+          );
+        } else {
+          document.querySelectorAll("[data-reveal]").forEach(reveal);
+        }
+      });
+    </script>
   </body>
 </html>

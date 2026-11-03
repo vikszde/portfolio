@@ -1,0 +1,52 @@
+---
+// Decorative four-point sparkle or heart from the Figma "Sparkle" set.
+// Hidden from screen readers; scale it with `size`.
+interface Props {
+  shape?: "sparkle" | "heart";
+  color?: "pink" | "ink" | "aqua" | "yellow";
+  size?: number;
+  class?: string;
+}
+
+const { shape = "sparkle", color = "pink", size = 32, class: className } = Astro.props;
+
+const paths = {
+  sparkle: "M12 0C12.8 6.6 17.4 11.2 24 12C17.4 12.8 12.8 17.4 12 24C11.2 17.4 6.6 12.8 0 12C6.6 11.2 11.2 6.6 12 0Z",
+  heart:
+    "M12 22L10.3 20.4C4.2 14.9 0 11.1 0 7C0 3.6 2.6 1 6 1C7.9 1 9.8 1.9 12 4C14.2 1.9 16.1 1 18 1C21.4 1 24 3.6 24 7C24 11.1 19.8 14.9 13.7 20.4Z",
+};
+---
+
+<svg
+  class:list={["sparkle", `sparkle--${color}`, className]}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={paths[shape]} fill="currentColor"></path>
+</svg>
+
+<style>
+  .sparkle {
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  .sparkle--pink {
+    color: var(--color-bg-accent);
+  }
+
+  .sparkle--ink {
+    color: var(--color-text-primary);
+  }
+
+  .sparkle--aqua {
+    color: var(--color-bg-secondary);
+  }
+
+  .sparkle--yellow {
+    color: var(--color-yellow-500);
+  }
+</style>

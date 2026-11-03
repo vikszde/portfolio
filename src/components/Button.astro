@@ -1,0 +1,138 @@
+---
+// Flat brutalist button from the Figma "Button" set. Renders a link when
+// `href` is given, otherwise a <button>. There are no shadows; on hover the
+// hover colour wipes in from the left and the arrow nudges right, and
+// pressing sinks the button 2px.
+import type { HTMLAttributes } from "astro/types";
+
+type Props = {
+  variant?: "primary" | "secondary" | "ghost";
+  href?: string;
+  arrow?: boolean;
+  type?: "button" | "submit" | "reset";
+} & Omit<HTMLAttributes<"a"> & HTMLAttributes<"button">, "type">;
+
+const { variant = "primary", href, arrow = false, type = "button", class: className, ...rest } = Astro.props;
+const Tag = href ? "a" : "button";
+---
+
+<Tag
+  class:list={["button", `button--${variant}`, "text-label-strong", className]}
+  href={href}
+  type={href ? undefined : type}
+  {...rest}
+>
+  <slot />
+  {arrow && <span class="arrow" aria-hidden="true">→</span>}
+</Tag>
+
+<style>
+  .button {
+    /* Resting colours */
+    --bg: var(--color-bg-primary);
+    --fg: var(--color-text-on-primary);
+    --line: var(--color-border-primary);
+    /* Colours the wipe brings in */
+    --bg-on: var(--color-bg-inverse);
+    --fg-on: var(--color-text-inverse);
+    --line-on: var(--color-border-default);
+    /* Border while pressed */
+    --line-press: var(--color-border-accent);
+
+    --wipe: var(--motion-duration-base);
+
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-6);
+    border: var(--border-regular) solid var(--line);
+    border-radius: var(--radius-none);
+    background: var(--bg);
+    color: var(--fg);
+    text-decoration: none;
+    cursor: pointer;
+    /* Text and border flip as a hard cut when the wipe passes the middle.
+       ease-out reaches 50% coverage at about 10% of its duration. */
+    transition:
+      color calc(var(--wipe) * 0.1) var(--motion-ease-cut),
+      border-color calc(var(--wipe) * 0.1) var(--motion-ease-cut),
+      translate var(--motion-duration-fast) var(--motion-ease-snap);
+  }
+
+  /* The wipe: a panel of the hover colour that grows from the left and
+     leaves to the right. */
+  .button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg-on);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--wipe) var(--motion-ease-out);
+  }
+
+  .arrow {
+    display: inline-block;
+    transition: translate var(--motion-duration-base) var(--motion-ease-snap);
+  }
+
+  /* Hover only on devices that really hover, so taps don't leave it stuck. */
+  @media (hover: hover) {
+    .button:hover {
+      color: var(--fg-on);
+      border-color: var(--line-on);
+    }
+
+    .button:hover::before {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .button:hover .arrow {
+      translate: var(--spacing-1) 0;
+    }
+  }
+
+  .button:focus-visible,
+  .button:active {
+    color: var(--fg-on);
+    border-color: var(--line-on);
+  }
+
+  .button:focus-visible::before,
+  .button:active::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .button:focus-visible .arrow {
+    translate: var(--spacing-1) 0;
+  }
+
+  .button:active {
+    border-color: var(--line-press);
+    translate: 0 2px;
+  }
+
+  /* Secondary: ink, wipes to pink. */
+  .button--secondary {
+    --bg: var(--color-bg-inverse);
+    --fg: var(--color-text-inverse);
+    --line: var(--color-border-default);
+    --bg-on: var(--color-bg-primary);
+    --fg-on: var(--color-text-on-primary);
+    --line-on: var(--color-border-primary);
+    --line-press: var(--color-border-default);
+  }
+
+  /* Ghost: outlined, wipes to ink. */
+  .button--ghost {
+    --bg: var(--color-bg-surface);
+    --fg: var(--color-text-primary);
+    --line: var(--color-border-default);
+  }
+</style>

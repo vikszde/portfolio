@@ -1,0 +1,46 @@
+---
+// Tilted text sticker from the Figma "Sticker" set. Yellow is the default:
+// stickers are what yellow is for. Use <br /> in the slot for line breaks.
+interface Props {
+  color?: "yellow" | "pink" | "aqua" | "white";
+  tilt?: number;
+  class?: string;
+}
+
+const { color = "yellow", tilt = -8, class: className } = Astro.props;
+---
+
+<span class:list={["sticker", `sticker--${color}`, "text-label-m", className]} style={`--tilt: ${tilt}deg`}>
+  <slot />
+</span>
+
+<style>
+  .sticker {
+    display: inline-block;
+    padding: var(--spacing-2) var(--spacing-3);
+    border: var(--border-regular) solid var(--color-border-default);
+    border-radius: var(--radius-none);
+    color: var(--color-text-on-accent);
+    text-align: center;
+    /* `rotate` rather than `transform`, so ambient motion can stack on it. */
+    rotate: var(--tilt);
+  }
+
+  .sticker--yellow {
+    background: var(--color-bg-highlight);
+  }
+
+  .sticker--pink {
+    background: var(--color-bg-accent);
+  }
+
+  .sticker--aqua {
+    background: var(--color-bg-secondary);
+  }
+
+  /* "White" follows the surface colour so its text stays readable in Dark. */
+  .sticker--white {
+    background: var(--color-bg-surface);
+    color: var(--color-text-primary);
+  }
+</style>
