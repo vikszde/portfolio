@@ -631,7 +631,11 @@ const nextSteps = [
     gap: var(--spacing-6);
   }
 
+  /* Above the title: it slams in from 150% size and its box would otherwise
+     cover the All work link until the animation ends. */
   .hero__eyebrow {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     gap: var(--spacing-4);
