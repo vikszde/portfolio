@@ -1,0 +1,389 @@
+---
+// Page transitions between the site's own pages. Leaving a page, the screen
+// closes on the clicked link in an anime "iris out" shaped like the site's
+// sparkle, a pink sparkle flashes, and the next page opens from the same
+// spot. Opening a case study gets the panel shutter instead: slanted black
+// manga panels slam shut from alternating sides, the logo icon spins in at
+// the centre, and on the case study the panels fly open. With reduced motion
+// both are a short fade.
+//
+// The site stays a normal multi-page site: the outgoing page plays its half,
+// then the browser loads the next page as usual. The inline script in
+// Base.astro's <head> reads which transition is arriving and covers the new
+// page from its first paint; the script below opens it.
+//
+// Links opt out with data-no-transition. New tabs, downloads, modifier
+// clicks, other sites and links within the same page are left alone.
+import Logo from "./Logo.astro";
+---
+
+<div class="pt" aria-hidden="true" data-page-transition>
+  <svg class="pt__iris" width="100%" height="100%" focusable="false">
+    <defs>
+      <mask id="pt-hole" maskUnits="userSpaceOnUse" x="0" y="0" width="100%" height="100%">
+        <rect width="100%" height="100%" fill="#fff"></rect>
+        <path data-pt-hole d="M0,-1Q0,0 1,0Q0,0 0,1Q0,0 -1,0Q0,0 0,-1Z" fill="#000" transform="scale(0)"></path>
+      </mask>
+    </defs>
+    <rect class="pt__ink" width="100%" height="100%" mask="url(#pt-hole)"></rect>
+    <path class="pt__pink" data-pt-spark d="M0,-1Q0,0 1,0Q0,0 0,1Q0,0 -1,0Q0,0 0,-1Z" transform="scale(0)"></path>
+  </svg>
+  <div class="pt__shutter">
+    <div class="pt__panels">
+      <span class="pt__band" data-pt-band></span>
+      <span class="pt__band" data-pt-band></span>
+      <span class="pt__band" data-pt-band></span>
+      <span class="pt__band" data-pt-band></span>
+    </div>
+    <div class="pt__mark" data-pt-mark><Logo variant="icon" height={160} /></div>
+  </div>
+  <div class="pt__fade"></div>
+</div>
+
+<script>
+  type Kind = "iris" | "shutter" | "fade";
+  type Point = { x: number; y: number };
+
+  const html = document.documentElement;
+  // Not [data-pt]: <html> carries data-pt while a page is arriving.
+  const root = document.querySelector<HTMLElement>("[data-page-transition]")!;
+  const hole = root.querySelector<SVGPathElement>("[data-pt-hole]")!;
+  const spark = root.querySelector<SVGPathElement>("[data-pt-spark]")!;
+  const bands = [...root.querySelectorAll<HTMLElement>("[data-pt-band]")];
+  const mark = root.querySelector<HTMLElement>("[data-pt-mark]")!;
+  const fade = root.querySelector<HTMLElement>(".pt__fade")!;
+  const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+  const stillMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+  const easeIn = (p: number) => p * p * p;
+  const easeOut = (p: number) => 1 - (1 - p) ** 3;
+
+  // SVG mask shapes can't be moved with CSS reliably in every browser, so the
+  // sparkle hole is tweened frame by frame through its transform attribute.
+  function tween(ms: number, step: (p: number) => void, ease: (p: number) => number) {
+    return new Promise<void>((resolve) => {
+      const start = performance.now();
+      const frame = (now: number) => {
+        const p = Math.min(1, (now - start) / ms);
+        step(ease(p));
+        if (p < 1) requestAnimationFrame(frame);
+        else resolve();
+      };
+      requestAnimationFrame(frame);
+    });
+  }
+
+  const place = (el: SVGElement, { x, y }: Point, turn: number, size: number) =>
+    el.setAttribute("transform", `translate(${x} ${y}) rotate(${turn}) scale(${size})`);
+
+  // How big the sparkle hole must be to clear the whole screen from point p.
+  // The sparkle's narrowest reach (between its points) is about 0.35 of its
+  // size, whichever way it is turned.
+  function fullSize({ x, y }: Point) {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    return Math.hypot(Math.max(x, w - x), Math.max(y, h - y)) / 0.33;
+  }
+
+  // Panels come in from alternating sides: even ones from the left.
+  const side = (i: number, sign: 1 | -1) => `translateX(${(i % 2 ? 102 : -102) * sign}%)`;
+  const snap = "cubic-bezier(0.8, 0, 0.2, 1)";
+
+  function show(kind: Kind | "") {
+    root.dataset.kind = kind;
+    root.classList.toggle("is-active", kind !== "");
+  }
+
+  // ---- Leaving a page ----
+
+  async function cover(kind: Kind, at: Point) {
+    // The hole rests closed (all black), so open it before showing the iris.
+    const size = fullSize(at);
+    place(hole, at, 0, size);
+    show(kind);
+    if (kind === "fade") {
+      await fade.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, fill: "forwards" }).finished;
+    } else if (kind === "iris") {
+      await tween(420, (p) => place(hole, at, p * 90, (1 - p) * size), easeIn);
+      await tween(200, (p) => place(spark, at, p * 45, 34 * easeOut(p)), (p) => p);
+    } else {
+      await Promise.all(
+        bands.map(
+          (band, i) =>
+            band.animate([{ transform: side(i, 1) }, { transform: "translateX(0)" }], {
+              duration: 300,
+              delay: i * 60,
+              easing: snap,
+              fill: "forwards",
+            }).finished,
+        ),
+      );
+      // The icon spins in over the closed panels, overshooting a touch.
+      await mark.animate(
+        [
+          { opacity: 0, transform: "scale(0) rotate(-180deg)" },
+          { opacity: 1, transform: "scale(1) rotate(0deg)" },
+        ],
+        { duration: 300, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "forwards" },
+      ).finished;
+      await wait(140);
+    }
+  }
+
+  // ---- Arriving on a page ----
+
+  async function open(kind: Kind, at: Point) {
+    show(kind);
+    if (kind === "fade") {
+      await fade.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, fill: "forwards" }).finished;
+    } else if (kind === "iris") {
+      const size = fullSize(at);
+      place(spark, at, 45, 34);
+      place(hole, at, 90, 0);
+      tween(220, (p) => place(spark, at, 45 + p * 90, 34 * (1 - p)), easeIn);
+      await tween(560, (p) => place(hole, at, 90 + p * 90, p * size), easeOut);
+    } else {
+      // The icon spins away, then the panels fly on out the far side.
+      mark.animate(
+        [
+          { opacity: 1, transform: "scale(1) rotate(0deg)" },
+          { opacity: 0, transform: "scale(0) rotate(180deg)" },
+        ],
+        { duration: 220, easing: "cubic-bezier(0.6, 0, 0.8, 0.4)", fill: "forwards" },
+      );
+      await Promise.all(
+        bands.map(
+          (band, i) =>
+            band.animate([{ transform: "translateX(0)" }, { transform: side(i, -1) }], {
+              duration: 320,
+              delay: 80 + i * 50,
+              easing: "cubic-bezier(0.6, 0, 0.2, 1)",
+              fill: "forwards",
+            }).finished,
+        ),
+      );
+    }
+    reset();
+  }
+
+  function reset() {
+    show("");
+    delete html.dataset.pt;
+    delete html.dataset.ptX;
+    delete html.dataset.ptY;
+    place(hole, { x: 0, y: 0 }, 0, 0);
+    place(spark, { x: 0, y: 0 }, 0, 0);
+    [...bands, mark, fade].forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+    busy = false;
+  }
+
+  // ---- Which links, and which transition ----
+
+  let busy = false;
+  let last: { kind: Kind; at: Point } | null = null;
+
+  function kindFor(url: URL): Kind {
+    if (stillMotion()) return "fade";
+    const path = url.pathname.startsWith(base) ? url.pathname.slice(base.length) : url.pathname;
+    // A case study (work/<slug>/), not the All work page itself.
+    return /^work\/[^/]+\/?$/.test(path) ? "shutter" : "iris";
+  }
+
+  document.addEventListener("click", (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>("a[href]");
+    if (!link || (link.target && link.target !== "_self") || link.hasAttribute("download") || "noTransition" in link.dataset) return;
+    const url = new URL(link.href, location.href);
+    if (url.origin !== location.origin) return;
+    // Same page: a jump to a #section, or a reload. Let the browser do it.
+    if (url.pathname === location.pathname && url.search === location.search) return;
+
+    event.preventDefault();
+    if (busy) return;
+    busy = true;
+
+    // A mouse or tap closes on the pointer; a keyboard Enter on the link.
+    let at: Point = { x: event.clientX, y: event.clientY };
+    if (event.detail === 0) {
+      const box = link.getBoundingClientRect();
+      at = { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+    }
+    const kind = kindFor(url);
+    last = { kind, at };
+
+    // Start fetching the next page while this one closes.
+    const hint = document.createElement("link");
+    hint.rel = "prefetch";
+    hint.href = url.href;
+    document.head.append(hint);
+
+    cover(kind, at)
+      .catch(() => {})
+      .then(() => {
+        try {
+          sessionStorage.setItem(
+            "pt",
+            JSON.stringify({ k: kind, x: at.x / window.innerWidth, y: at.y / window.innerHeight, t: Date.now() }),
+          );
+        } catch {}
+        location.assign(url.href);
+        // If the browser doesn't leave after all (a slow or failed load the
+        // visitor stopped), don't leave the page covered.
+        stuck = window.setTimeout(() => open(kind, at), 6000);
+      });
+  });
+
+  // Leaving worked: drop the fallback, or it would fire on a page restored
+  // from the back/forward cache.
+  let stuck = 0;
+  window.addEventListener("pagehide", () => clearTimeout(stuck));
+
+  // Back to a page kept in the back/forward cache: it was frozen covered, so
+  // open it the way it closed.
+  window.addEventListener("pageshow", (event) => {
+    if (!event.persisted || !root.classList.contains("is-active")) return;
+    try {
+      sessionStorage.removeItem("pt");
+    } catch {}
+    if (last) open(last.kind, last.at);
+    else reset();
+  });
+
+  // Arriving through a transition: Base.astro's head script has already
+  // covered the page. Open it on the next frame, once it has painted.
+  const arriving = html.dataset.pt as Kind | undefined;
+  if (arriving === "iris" || arriving === "shutter" || arriving === "fade") {
+    const at = {
+      x: Number(html.dataset.ptX ?? 0.5) * window.innerWidth,
+      y: Number(html.dataset.ptY ?? 0.5) * window.innerHeight,
+    };
+    busy = true;
+    requestAnimationFrame(() => open(stillMotion() ? "fade" : arriving, at));
+  }
+</script>
+
+<style>
+  .pt {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* While a transition runs, the overlay also swallows clicks, so a second
+     click can't start another one. */
+  .pt.is-active,
+  :global(html[data-pt]) .pt {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .pt__iris,
+  .pt__shutter,
+  .pt__fade {
+    display: none;
+    position: absolute;
+    inset: 0;
+  }
+
+  .pt__ink {
+    fill: var(--color-ink-1000);
+  }
+
+  .pt__pink {
+    fill: var(--color-bg-primary);
+  }
+
+  /* Four black panels on a slant, like cut manga panels. The slanted stack
+     reaches past the top and bottom of the screen (by more than the slant
+     lifts its corners: tan 6° × half the width is about 5.3vw), and each
+     panel overlaps the next by a few pixels so no seam shows through. The
+     panels' ends are cut on the diagonal too. Even panels wait off the left
+     edge, odd ones off the right, and slide in along their own slant. */
+  .pt__shutter {
+    overflow: hidden;
+  }
+
+  .pt__panels {
+    position: absolute;
+    top: calc(-6vw - 2vh);
+    bottom: calc(-6vw - 2vh);
+    left: 0;
+    right: 0;
+    transform: skewY(-6deg);
+  }
+
+  .pt__band {
+    position: absolute;
+    left: -8%;
+    width: 116%;
+    height: calc(25% + 3px);
+    background: var(--color-ink-1000);
+    clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%);
+    transform: translateX(-102%);
+  }
+
+  .pt__band:nth-child(2) {
+    top: 25%;
+    transform: translateX(102%);
+  }
+
+  .pt__band:nth-child(3) {
+    top: 50%;
+  }
+
+  .pt__band:nth-child(4) {
+    top: 75%;
+    transform: translateX(102%);
+  }
+
+  /* The logo icon, white and pink on the closed panels. */
+  .pt__mark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: calc(clamp(96px, 22vmin, 180px) / -2) 0 0 calc(clamp(96px, 22vmin, 180px) * -0.42);
+    opacity: 0;
+  }
+
+  .pt__mark :global(.logo) {
+    width: auto;
+    height: clamp(96px, 22vmin, 180px);
+    color: var(--color-paper-100);
+  }
+
+  .pt__fade {
+    background: var(--color-ink-1000);
+    opacity: 0;
+  }
+
+  .pt[data-kind="iris"] .pt__iris,
+  .pt[data-kind="shutter"] .pt__shutter,
+  .pt[data-kind="fade"] .pt__fade {
+    display: block;
+  }
+
+  /* Arriving: from the first paint until the script opens the page, the new
+     page sits under the closed transition: the iris shut (its sparkle hole
+     starts closed), the panels shut with the icon, or the fade's black. */
+  :global(html[data-pt="iris"]) .pt__iris,
+  :global(html[data-pt="shutter"]) .pt__shutter,
+  :global(html[data-pt="fade"]) .pt__fade {
+    display: block;
+    opacity: 1;
+  }
+
+  :global(html[data-pt="shutter"]) .pt__band {
+    transform: none;
+  }
+
+  :global(html[data-pt="shutter"]) .pt__mark {
+    opacity: 1;
+  }
+
+  :global(html[data-pt]) {
+    background: var(--color-ink-1000);
+  }
+</style>

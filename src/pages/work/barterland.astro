@@ -1,0 +1,1626 @@
+---
+// Barterland case study, built from the Figma "Barterland / Desktop" and
+// "Barterland / Mobile" frames on the Case study page. Screens come from the
+// Barterland prototype file; the persona sheets and logo are the originals
+// placed in Figma. Facts and figures follow the original research write-up.
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import Button from "../../components/Button.astro";
+import Tag from "../../components/Tag.astro";
+import Chip from "../../components/Chip.astro";
+import Sparkle from "../../components/Sparkle.astro";
+import Decor from "../../components/Decor.astro";
+import ToolChip from "../../components/ToolChip.astro";
+import Logo from "../../components/Logo.astro";
+import SectionHead from "../../components/case-study/SectionHead.astro";
+import Shot from "../../components/case-study/Shot.astro";
+import CaseIcon from "../../components/case-study/CaseIcon.astro";
+import Prototype from "../../components/case-study/Prototype.astro";
+import { Image } from "astro:assets";
+import eyeStrip from "../../assets/art/eye-strip.webp?url";
+
+import home from "../../assets/work/barterland/home.webp";
+import itemDetail from "../../assets/work/barterland/item-detail.webp";
+import uploadCategory from "../../assets/work/barterland/upload-category.webp";
+import uploadImages from "../../assets/work/barterland/upload-images.webp";
+import uploadLocation from "../../assets/work/barterland/upload-location.webp";
+import originalAccordion from "../../assets/work/barterland/original-accordion.webp";
+import personaGabor from "../../assets/work/barterland/persona-gabor.webp";
+import personaAnna from "../../assets/work/barterland/persona-anna.webp";
+import logo from "../../assets/work/barterland/logo.webp";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+
+const phone = "(min-width: 1100px) 277px, (min-width: 768px) 28vw, 80vw";
+
+const details = [
+  ["Role", "UX/UI design and research"],
+  ["Project", "Logo, UX research and interface redesign"],
+  ["Collaboration", "Developers, marketing"],
+];
+
+const scope = ["UX research", "Usability testing", "Prototyping", "UI design", "Visual identity"];
+
+const questions = [
+  "Where do people encounter difficulties while completing key tasks?",
+  "Which interface behaviours contribute to those difficulties?",
+  "What changes could address them within the existing product?",
+];
+
+const methods = [
+  { icon: "users", title: "Audience research", body: "Interviews and existing website information helped inform the understanding of users and their motivations." },
+  { icon: "search", title: "Competitor and SWOT analysis", body: "I examined Listia, Miutcánk.hu, and Jófogás alongside Barterland to compare their features and interaction patterns. The SWOT analysis considered Barterland’s position and constraints." },
+  { icon: "checklist", title: "Usability testing", body: "Moderated think-aloud sessions with six participants on their own phones, each followed by a short questionnaire." },
+  { icon: "compare", title: "A/B test", body: "An unmoderated test on Maze compared the original upload flow with a stepped prototype." },
+  { icon: "stack", title: "Issue documentation and recommendations", body: "I documented usability problems and software issues and proposed improvements to the existing experience." },
+] as const;
+
+const personas = [
+  {
+    id: "gabor",
+    icon: "search",
+    name: "Gábor, 52 · Teacher",
+    title: "Clarity and considered choices",
+    body: "Values structured information, straightforward interactions, and enough detail to judge an exchange.",
+    image: personaGabor,
+    alt: "Persona sheet for Gábor, 52, a teacher who prefers mobile. Background: he enjoys finding good deals, compares offers carefully, and prefers platforms that let him filter listings efficiently; he values clarity and straightforward transactions. Motivations: browsing and comparing offers, structured and logical platforms, functionality over aesthetics. Pain points: modern interface trends can feel overwhelming, some platforms are too chat-heavy, and it is hard to judge whether a trade is fair without clear value indicators.",
+    tilt: -1,
+  },
+  {
+    id: "anna",
+    icon: "refresh",
+    name: "Anna, 35 · Marketing specialist",
+    title: "Convenience and guidance",
+    body: "Needs an exchange process that fits into short browsing sessions and makes the next action easy to identify.",
+    image: personaAnna,
+    alt: "Persona sheet for Anna, 35, a marketing specialist who prefers mobile. Background: she works full time, has little time for complicated processes, and browses on her phone during short breaks or in the evening; she appreciates guidance and a smooth experience. Motivations: a quick, hassle-free way to exchange items, simple guided processes, and bartering without a large time commitment. Pain points: unclear navigation and many steps, difficulty finding the best matches for her items, and wanting fair trades without much negotiation.",
+    tilt: 1,
+  },
+] as const;
+
+const studies = [
+  { title: "Study 01", sub: "6 participants", body: "Moderated usability test of key tasks." },
+  { title: "Iteration", sub: "Analyse and revise", body: "Use the findings to revise the affected interactions.", accent: true },
+  { title: "Study 02", sub: "30 started · 20 completed", body: "Unmoderated A/B test of the upload flow." },
+];
+
+const problemToSolution = [
+  ["Observed issue", "Participants had difficulty navigating between sections of the upload form."],
+  ["Evidence", "Observed in moderated think-aloud sessions with six participants, run in two groups of three."],
+  ["Design change", "I replaced accordion-based navigation with separate steps, a progress indicator, and an explicit Next button."],
+  ["Intended effect", "Make the current stage and the action required to continue easier to identify."],
+];
+
+// Markers sit on the two screenshots, placed in percent of the 330 × 714
+// Figma frame.
+const original = [
+  { n: 1, title: "Original — Accordion navigation", body: "The form used expandable sections to organise the upload process.", y: 15.8 },
+  { n: 2, title: "Observed difficulty", body: "Moving between sections caused confusion during testing.", y: 81.2 },
+];
+const revised = [
+  { n: 3, title: "Revised — Visible progress", body: "A progress indicator shows the current step within the upload sequence.", y: 16.8 },
+  { n: 4, title: "Revised — Explicit next action", body: "A Next button provides a clear action for continuing.", y: 93.2 },
+];
+
+const outcome = [
+  ["What I produced", "An analysis of the existing platform, documented usability findings and software issues, revised interface designs in a high-fidelity Figma prototype, and recommendations for improvement."],
+  ["What testing showed", "In the A/B test, 10 of 12 people who started the stepped upload flow completed it, compared with 10 of 18 on the original. The difference was significant at the 90% level only."],
+  ["What was not measured", "Behaviour on the live platform after any implementation, such as task completion or abandonment, was not measured as part of this work."],
+];
+
+const nextSteps = [
+  { title: "Measure task completion", body: "If the revised flow is implemented, measure completion and abandonment to understand its performance in use." },
+  { title: "Broaden evaluation", body: "Test with additional participants to investigate difficulties that may not have appeared in the original sessions." },
+  { title: "Review the exchange journey", body: "Evaluate how listing, finding an item, and arranging an exchange connect, and use the findings to prioritise further work." },
+];
+---
+
+<Base
+  title="Barterland case study · Viktória Varga"
+  description="How Viktória Varga researched and tested Barterland’s item-upload flow, revised it into a stepped interaction, and compared both versions in an A/B test."
+>
+  <Nav current="Work" />
+
+  <main class="case">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__copy" data-stagger="90">
+        <div class="hero__eyebrow" data-reveal>
+          <Tag>Case study 02</Tag>
+          <a class="text-label-m hero__back" href={`${base}work/`}>← All work</a>
+        </div>
+        <h1 id="hero-title" class="hero__title" data-reveal="slam">Barterland</h1>
+        <p class="hero__subtitle" data-reveal>Investigating and improving the item-exchange experience.</p>
+        <p class="text-body-l secondary" data-reveal>Barterland is a web platform where people can list unwanted items and exchange them with others. I first created its logo, then investigated the platform’s usability problems and developed design recommendations through research, prototyping, and testing.</p>
+      </div>
+
+      <div class="hero__art" aria-hidden="true">
+        <div class="hero__strip anim-sway"><img src={eyeStrip} alt="" width="560" height="160" /></div>
+        <p class="text-label-s hero__note">Give unused things<br />a second life.</p>
+        <Shot class="hero__phone hero__phone--home anim-float" reveal={false} src={home} alt="" sizes="(min-width: 768px) 260px, 40vw" eager />
+        <Shot class="hero__phone hero__phone--upload anim-float" reveal={false} src={uploadCategory} alt="" sizes="(min-width: 768px) 260px, 40vw" eager />
+        <Sparkle color="ink" size={52} class="hero__spark hero__spark--1 anim-twinkle" />
+        <Sparkle color="pink" size={36} class="hero__spark hero__spark--2 anim-twinkle" />
+        <Sparkle color="aqua" size={28} class="hero__spark hero__spark--3 anim-twinkle" />
+      </div>
+
+      <div class="hero__meta" data-stagger="90">
+        <dl class="hero__details" data-reveal>
+          {
+            details.map(([term, value]) => (
+              <div>
+                <dt class="text-label-m accent">{term}</dt>
+                <dd class="text-body-m secondary">{value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="hero__tools" data-reveal>
+          <p class="text-label-m accent">Tools</p>
+          <ul aria-label="Tools">
+            <ToolChip tool="figma" />
+            <ToolChip tool="illustrator" />
+          </ul>
+        </div>
+        <div class="hero__scope" data-reveal>
+          <p class="text-label-m accent">Scope</p>
+          <ul class="row" aria-label="Scope">
+            {scope.map((item) => <li><Chip>{item}</Chip></li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 The challenge -->
+    <section class="split" aria-labelledby="challenge-title">
+      <div class="split__head">
+        <SectionHead number="01" label="The challenge" id="challenge-title">Making item exchange easier to navigate.</SectionHead>
+        <Decor name="city" width={270} class="challenge__city parallax" />
+      </div>
+      <div class="stack" data-stagger="90">
+        <p class="text-body-l secondary" data-reveal>Barterland’s central idea was simple: give unused items a second life through exchange. My task was to investigate where the existing experience made important actions difficult and propose improvements.</p>
+        <p class="text-body-l secondary" data-reveal>I examined the platform’s users, structure, interactions, and usability, then combined this analysis with testing to identify problems and translate them into concrete design and development recommendations.</p>
+        <div class="questions" data-reveal>
+          <p class="text-label-m accent">Questions guiding the research</p>
+          <ul>
+            {questions.map((q) => <li class="text-body-l"><span aria-hidden="true">→</span>{q}</li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 Research -->
+    <section class="band band--pink" aria-labelledby="research-title">
+      <div class="split">
+        <SectionHead number="02" label="Research" id="research-title">Understanding the product, its users, and its constraints.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>The research combined analysis of the existing platform and its audience with usability evaluation and prototype testing. I also examined competing services and used SWOT analysis to assess the product’s strengths, weaknesses, opportunities, and threats.</p>
+      </div>
+      <ul class="methods" data-stagger="90">
+        {
+          methods.map((method) => (
+            <li data-reveal>
+              <CaseIcon name={method.icon} />
+              <h3 class="text-label-strong">{method.title}</h3>
+              <p class="text-body-m secondary">{method.body}</p>
+            </li>
+          ))
+        }
+        <li class="methods__finding" data-reveal>
+          <CaseIcon name="chart" />
+          <h3 class="text-label-strong">What testing revealed</h3>
+          <p class="text-body-m">Testing identified difficulties navigating the item-upload flow. <a href="#testing-title">Section 04</a> shows the observed problem and the revised interaction.</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 03 Users & personas -->
+    <section class="band" aria-labelledby="personas-title">
+      <Sparkle color="aqua" size={48} class="band__spark anim-twinkle" />
+      <div class="split">
+        <SectionHead number="03" label="Users & personas" id="personas-title">Designing for different types of users.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>The research informed two personas, Gábor and Anna, representing different motivations and expectations around exchanging items. They provided reference points for reviewing the experience from more than one user perspective.</p>
+      </div>
+      <ul class="personas" data-stagger="110">
+        {
+          personas.map((persona) => (
+            <li class="persona" style={`--tilt: ${persona.tilt}deg`} data-reveal="pop">
+              <button class="persona__thumb" type="button" tabindex="-1" aria-hidden="true" data-persona-open={persona.id}>
+                <Image src={persona.image} alt="" widths={[480, 800]} sizes="(min-width: 1440px) 580px, (min-width: 768px) 42vw, 30vw" format="webp" loading="lazy" />
+              </button>
+              <div class="persona__copy">
+                <p class="text-label-m accent persona__name">
+                  <CaseIcon name={persona.icon} size={24} />
+                  {persona.name}
+                </p>
+                <h3 class="persona__title">{persona.title}</h3>
+                <p class="text-body-m secondary">{persona.body}</p>
+              </div>
+              <Button variant="secondary" class="persona__open" aria-haspopup="dialog" data-persona-open={persona.id}>
+                View full persona <span aria-hidden="true">⤢</span>
+              </Button>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        personas.map((persona) => (
+          <dialog class="persona-dialog theme-dark" id={`persona-${persona.id}`} aria-labelledby={`persona-${persona.id}-title`}>
+            <div class="persona-dialog__head">
+              <h3 id={`persona-${persona.id}-title`} class="text-label-m accent">Persona · {persona.name.split(",")[0]}</h3>
+              <button class="persona-dialog__close text-label-m" type="button" data-persona-close>Close <span aria-hidden="true">✕</span></button>
+            </div>
+            <div class="persona-dialog__sheet" tabindex="0" role="region" aria-label={`${persona.name.split(",")[0]}’s persona sheet. Scrollable.`}>
+              <Image src={persona.image} alt={persona.alt} widths={[800, 1600]} sizes="(min-width: 900px) 800px, 800px" format="webp" loading="lazy" />
+            </div>
+            <p class="text-body-m secondary persona-dialog__hint">Scroll sideways to read the full persona sheet.</p>
+          </dialog>
+        ))
+      }
+      <div class="implications" data-reveal>
+        <p class="text-label-m accent">Design implications</p>
+        <p class="implications__text">Clear information supports considered decisions; visible next steps support completing a task with less uncertainty. These needs provided useful reference points when reviewing the item-upload experience.</p>
+        <Sparkle color="ink" size={44} class="implications__spark anim-twinkle" />
+      </div>
+    </section>
+
+    <!-- 04 Usability testing -->
+    <section class="band" aria-labelledby="testing-title">
+      <div class="split">
+        <SectionHead number="04" label="Usability testing" id="testing-title">Finding and revising the upload interaction.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>The usability study involved six participants in two groups of three, who completed set tasks on their own phones while thinking aloud. Its findings shaped a stepped upload prototype, which I then compared with the original flow in an A/B test.</p>
+      </div>
+
+      <ol class="studies" data-stagger="110">
+        {
+          studies.map((study) => (
+            <li class:list={["study", { "study--accent": study.accent }]} data-reveal>
+              <h3 class="study__title">{study.title}</h3>
+              <p class="text-label-m accent">{study.sub}</p>
+              <p class="text-body-m secondary">{study.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="finding">
+        <div class="finding__stat" data-reveal>
+          <Tag>Key finding</Tag>
+          <p class="finding__headline">4 of 6 participants needed assistance to complete item upload.</p>
+          <ul class="finding__people" aria-hidden="true">
+            {Array.from({ length: 6 }, (_, i) => <li class:list={{ "is-hit": i < 4 }}><CaseIcon name="users" size={44} /></li>)}
+          </ul>
+        </div>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>The usability study identified difficulty navigating the upload interaction. The original design grouped the form into accordion sections. The revision separated the process into steps and introduced a visible progress indicator and an explicit Next action.</p>
+          <p class="text-body-l secondary" data-reveal>In an unmoderated A/B test on Maze, 10 of the 18 people who started the original flow completed it, compared with 10 of 12 on the stepped flow. Those who finished the stepped flow were faster on average (98.2&nbsp;s vs 114.7&nbsp;s). The completion difference was significant at the 90% level but not at 95%, and one participant still went back to fill in a missed field.</p>
+        </div>
+      </div>
+
+      <ol class="ruled ruled--4" data-stagger="90">
+        {
+          problemToSolution.map(([title, body], i) => (
+            <li data-reveal>
+              <h3 class="text-label-m accent">0{i + 1} · {title}</h3>
+              <p class="text-body-m">{body}</p>
+            </li>
+          ))
+        }
+      </ol>
+
+      <figure class="compare">
+        <div class="compare__grid">
+          <ol class="compare__notes compare__notes--left" data-stagger="120">
+            {
+              original.map((note) => (
+                <li class="note" data-reveal>
+                  <p class="note__title text-label-m accent"><b class="marker">{note.n}</b>{note.title}</p>
+                  <p class="text-body-m">{note.body}</p>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="compare__screen" data-reveal="from-left">
+            <p class="text-label-m accent">Original</p>
+            <div class="compare__frame">
+              <Image src={originalAccordion} alt="Original upload form: New Item with expandable sections for Basic data, Category, Image upload, Location, and Finish. The Category section is open, showing product category and status menus, a price slider, and tags." widths={[390]} sizes="330px" format="webp" loading="lazy" />
+              {original.map((note) => <span class="marker marker--left" style={`top: ${note.y}%`} aria-hidden="true">{note.n}</span>)}
+            </div>
+          </div>
+          <div class="compare__screen" data-reveal="from-right">
+            <p class="text-label-m accent">Revised prototype</p>
+            <div class="compare__frame">
+              <Image src={uploadCategory} alt="Revised upload form: Upload New Item with a four-step progress indicator on step two, the Category step with product status, category, price category, and tags, and a Next button at the bottom." widths={[390]} sizes="330px" format="webp" loading="lazy" />
+              {revised.map((note) => <span class="marker marker--right" style={`top: ${note.y}%`} aria-hidden="true">{note.n}</span>)}
+            </div>
+          </div>
+          <ol class="compare__notes compare__notes--right" start="3" data-stagger="120">
+            {
+              revised.map((note) => (
+                <li class="note" data-reveal>
+                  <p class="note__title text-label-m accent"><b class="marker">{note.n}</b>{note.title}</p>
+                  <p class="text-body-m">{note.body}</p>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <figcaption class="text-body-m secondary">Original accordion-based upload form and revised step-by-step prototype. The revision makes progression explicit through a progress indicator and Next action.</figcaption>
+      </figure>
+
+      <p class="text-body-l secondary closing" data-reveal>The upload redesign was one part of my recommendations. I also documented usability problems and software issues and proposed changes to address them.</p>
+    </section>
+
+    <!-- 05 UI redesign (always dark) -->
+    <section class="band theme-dark redesign" aria-labelledby="redesign-title">
+      <Sparkle color="aqua" size={56} class="band__spark anim-twinkle" />
+      <div class="split">
+        <SectionHead number="05" label="UI redesign" id="redesign-title">A revised interface for the core tasks.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>I developed the revised interactions into mobile-first interface designs and a high-fidelity Figma prototype. The following screens show the upload sequence alongside the home page and item-detail view.</p>
+      </div>
+
+      <div class="tryit">
+        <div class="stack stack--tight" data-reveal>
+          <p class="text-label-m accent">Interactive prototype</p>
+          <h3 class="tryit__title">Try the revised flow.</h3>
+          <p class="text-body-l secondary">The prototype opens on the first upload step. Use Next to move through the category, image, and location steps. Tap anywhere to highlight the interactive areas.</p>
+        </div>
+        <Prototype fileKey="Su4SkGO9BVx5wmDcIKDmsa" fileName="Barterland" pageId="301:1477" nodeId="348:3756" title="Interactive Barterland prototype in Figma, starting on the first upload step" />
+      </div>
+
+      <div class="screens screens--upload">
+        <div class="screens__caption" data-reveal>
+          <h3 class="text-label-m accent">Upload — Move through defined stages</h3>
+          <p class="text-body-m secondary">The category, image, and location screens use consistent progress indicators and actions to connect the sequence.</p>
+        </div>
+        <Shot class="screen" src={uploadCategory} alt="Upload step two, Category: product status, category and price menus, tags, and a Next button, under a four-step progress indicator." caption="Upload · category" sizes={phone} />
+        <Shot class="screen" src={uploadImages} alt="Upload step three, Image upload: one uploaded photo of a yellow knitted hat and empty slots for more images, with a Next button." caption="Upload · images" sizes={phone} />
+        <Shot class="screen" src={uploadLocation} alt="Upload step four, Location: a note that others only see the distance to the item, a location menu, a map, and a Finish button." caption="Upload · location" sizes={phone} />
+      </div>
+
+      <div class="screens screens--support">
+        <div class="support">
+          <Shot class="screen screen--small" src={home} alt="Barterland home page on mobile: a hero photo with Ready to barter? and an Upload item button, then a Hot deals grid of item cards." sizes="(min-width: 768px) 220px, 60vw" />
+          <div class="screens__caption" data-reveal>
+            <h3 class="text-label-m accent">Home — Entry into browsing and listing</h3>
+            <p class="text-body-m secondary">Item cards support browsing, while the Upload item action provides an entry point for creating a listing.</p>
+          </div>
+        </div>
+        <div class="support">
+          <Shot class="screen screen--small" src={itemDetail} alt="Item detail page on mobile: a large photo of a backpack, the owner, a description, item details, and buttons to pass, swap, or save." sizes="(min-width: 768px) 220px, 60vw" />
+          <div class="screens__caption" data-reveal>
+            <h3 class="text-label-m accent">Item detail — Inspect an item</h3>
+            <p class="text-body-m secondary">Images, description, and item details bring the listing information together.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="identity" data-reveal>
+        <div class="identity__logo"><Image src={logo} alt="The Barterland logo: a pink B mark made of two arrows pointing in opposite directions, next to the lowercase wordmark barterland." widths={[500, 996]} sizes="(min-width: 768px) 280px, 70vw" format="webp" loading="lazy" /></div>
+        <div class="stack stack--tight">
+          <h3 class="text-label-m accent">Visual identity</h3>
+          <p class="text-body-l">My involvement began with the Barterland logo. The later interface designs retained the brand’s pink identity.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 Outcome & reflection -->
+    <section class="band" aria-labelledby="outcome-title">
+      <Sparkle color="pink" size={44} class="band__spark anim-twinkle" />
+      <div class="split">
+        <SectionHead number="06" label="Outcome & reflection" id="outcome-title">Research findings, revised designs, and recommendations.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>The project produced a documented analysis of Barterland, usability findings, revised interface designs, and recommendations for improvement. Two rounds of testing supported iteration on the upload experience.</p>
+      </div>
+      <ul class="ruled ruled--3" data-stagger="90">
+        {
+          outcome.map(([title, body]) => (
+            <li data-reveal>
+              <h3 class="text-label-m accent">{title}</h3>
+              <p class="text-body-m">{body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="learned" data-reveal>
+        <p class="text-label-m accent">What I learned</p>
+        <p class="learned__text">The upload study showed me how a small interaction detail can become a barrier during a real task. It reinforced the importance of observing how people navigate an interface and checking a proposed change through testing.</p>
+      </div>
+      <div class="stack">
+        <div class="next-steps__head">
+          <Tag color="aqua">Next steps</Tag>
+          <p class="text-body-m secondary">If the work continued, the next steps would be:</p>
+        </div>
+        <ol class="ruled ruled--3" data-stagger="90">
+          {
+            nextSteps.map((step, i) => (
+              <li data-reveal>
+                <span class="step__n" aria-hidden="true">0{i + 1}</span>
+                <h3 class="text-label-strong">{step.title}</h3>
+                <p class="text-body-m secondary">{step.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <!-- Keep exploring (always dark) -->
+    <section class="next theme-dark" aria-labelledby="next-title">
+      <Decor name="perspective-grid" tone="text" moving stretch class="next__grid" />
+      <Decor name="city" class="next__city" />
+      <Sparkle color="ink" size={88} class="next__star anim-twinkle" />
+      <div class="next__copy" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>Keep exploring →</p>
+        <h2 id="next-title" class="next__title" data-reveal="slam">All work</h2>
+        <p class="text-body-l" data-reveal>Browse the other case studies and projects.</p>
+        <div class="row" data-reveal>
+          <Button variant="secondary" href={`${base}work/`} arrow>View all work</Button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to action (always pink) -->
+    <section class="cta theme-light" aria-label="Get in touch">
+      <a class="cta__link" href={`${base}#contact`}>Let's create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
+      <div class="cta__strip anim-float" aria-hidden="true"><img src={eyeStrip} alt="" width="560" height="160" loading="lazy" /></div>
+      <Sparkle color="ink" size={40} class="cta__spark anim-twinkle" />
+    </section>
+
+    <nav class="pager text-label-m" aria-label="Case studies">
+      <a href={`${base}work/`}>← Back to work</a>
+    </nav>
+  </main>
+
+  <footer class="footer theme-dark">
+    <Logo variant="wordmark" height={40} label="VIKSZDE" />
+    <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
+    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+  </footer>
+</Base>
+
+<script>
+  // Persona sheets open in a modal <dialog>: the browser traps focus inside
+  // it and closes it on Escape. Focus goes back to whichever control opened
+  // it, so keyboard users land where they were.
+  let opener: HTMLElement | null = null;
+
+  document.querySelectorAll<HTMLElement>("[data-persona-open]").forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      const dialog = document.getElementById(`persona-${trigger.dataset.personaOpen}`) as HTMLDialogElement | null;
+      if (!dialog) return;
+      // The thumbnail is pointer-only, so return focus to its visible button.
+      opener = trigger.matches("button[tabindex='-1']")
+        ? trigger.closest(".persona")?.querySelector<HTMLElement>(".persona__open") ?? trigger
+        : trigger;
+      dialog.showModal();
+      dialog.querySelector<HTMLElement>("[data-persona-close]")?.focus();
+    });
+  });
+
+  document.querySelectorAll<HTMLDialogElement>(".persona-dialog").forEach((dialog) => {
+    dialog.querySelector("[data-persona-close]")?.addEventListener("click", () => dialog.close());
+    // A click on the backdrop (the dialog box itself, outside its content) closes it.
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("close", () => {
+      opener?.focus();
+      opener = null;
+    });
+  });
+</script>
+
+<style>
+  /* Titles slam in from 150% size; clip so they never widen the page. */
+  .case {
+    overflow-x: clip;
+  }
+
+  .case > section {
+    position: relative;
+    padding: var(--spacing-24) var(--gutter);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  .accent {
+    color: var(--color-text-accent);
+  }
+
+  .secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stack {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-4);
+  }
+
+  .stack--tight {
+    gap: var(--spacing-2);
+  }
+
+  /* Two columns: heading on the left, copy on the right, like the Figma
+     "intro row". */
+  .split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 600px));
+    justify-content: space-between;
+    gap: var(--spacing-8) var(--spacing-16);
+    align-items: start;
+  }
+
+  .split__head {
+    display: grid;
+    gap: var(--spacing-16);
+  }
+
+  .band {
+    display: grid;
+    gap: var(--spacing-12);
+  }
+
+  .band--pink {
+    --color-bg-page: var(--color-bg-accent-subtle);
+  }
+
+  :global(.band__spark) {
+    position: absolute;
+    top: var(--spacing-8);
+    right: var(--gutter);
+  }
+
+  /* Hero */
+  .case > .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 600px) minmax(0, 640px);
+    grid-template-areas:
+      "copy art"
+      "meta art";
+    justify-content: space-between;
+    gap: var(--spacing-6) var(--spacing-12);
+    padding-block: var(--spacing-12) var(--spacing-16);
+  }
+
+  .hero__copy {
+    grid-area: copy;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  /* Above the title: it slams in from 150% size and its box would otherwise
+     cover the All work link until the animation ends. */
+  .hero__eyebrow {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .hero__back {
+    text-decoration: none;
+  }
+
+  .hero__back:hover {
+    color: var(--color-text-accent);
+  }
+
+  .hero__title {
+    font: 400 clamp(4.5rem, 10vw, 9rem) / 1 var(--font-display);
+  }
+
+  .hero__subtitle {
+    font: 400 clamp(2.125rem, 3.1vw, 2.75rem) / 1.1 var(--font-display);
+    text-wrap: balance;
+  }
+
+  .hero__meta {
+    grid-area: meta;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .hero__details {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    gap: var(--spacing-4) var(--spacing-8);
+    margin: 0;
+  }
+
+  .hero__details dd {
+    margin: var(--spacing-1) 0 0;
+  }
+
+  .hero__tools,
+  .hero__scope {
+    display: grid;
+    gap: 10px;
+  }
+
+  .hero__tools ul {
+    display: flex;
+    gap: var(--spacing-4);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Two phones on the 640 × 700 Figma frame, in percent. */
+  .hero__art {
+    grid-area: art;
+    position: relative;
+    align-self: center;
+    aspect-ratio: 640 / 700;
+  }
+
+  .hero__art > :global(*) {
+    position: absolute;
+  }
+
+  .hero__strip {
+    left: 52%;
+    top: -1.5%;
+    width: 54%;
+    aspect-ratio: 347 / 99;
+    overflow: hidden;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-page);
+    rotate: -3deg;
+  }
+
+  .hero__strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__note {
+    left: 2%;
+    top: 4%;
+  }
+
+  :global(.hero__phone) {
+    width: 41%;
+  }
+
+  :global(.hero__phone--home) {
+    left: 6%;
+    top: 16%;
+    rotate: -4deg;
+  }
+
+  :global(.hero__phone--upload) {
+    left: 52%;
+    top: 22%;
+    rotate: 3deg;
+  }
+
+  :global(.hero__spark--1) {
+    left: 44%;
+    top: 10%;
+  }
+
+  :global(.hero__spark--2) {
+    left: 0;
+    top: 70%;
+  }
+
+  :global(.hero__spark--3) {
+    left: 95%;
+    top: 92%;
+  }
+
+  /* 01 Challenge */
+  :global(.challenge__city) {
+    --decor-sun: var(--color-bg-primary);
+    --decor-skyline: var(--color-ink-900);
+    max-width: 100%;
+    height: auto;
+  }
+
+  .questions {
+    display: grid;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-4);
+    padding-left: var(--spacing-6);
+    border-left: 6px solid var(--color-bg-primary);
+  }
+
+  .questions ul {
+    display: grid;
+    gap: var(--spacing-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .questions li {
+    display: flex;
+    gap: var(--spacing-3);
+  }
+
+  .questions li span {
+    color: var(--color-text-accent);
+  }
+
+  /* 02 Research: two rows of three; the last card carries the finding. */
+  .methods {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .methods li {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  .methods .methods__finding {
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  .methods__finding a {
+    color: inherit;
+  }
+
+  /* 03 Personas */
+  .personas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .persona {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--spacing-4);
+    padding: var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    /* `transform`, not `rotate`: the scroll reveal settles `rotate` at 0. */
+    transform: rotate(var(--tilt));
+  }
+
+  .persona__thumb {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: var(--border-heavy) solid var(--color-border-default);
+    background: none;
+    cursor: zoom-in;
+  }
+
+  .persona__thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .persona__copy {
+    display: grid;
+    gap: var(--spacing-2);
+  }
+
+  .persona__name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .persona__name :global(svg) {
+    color: var(--color-text-primary);
+  }
+
+  .persona__title {
+    font: 500 1.5rem / 1.3 var(--font-sans);
+  }
+
+  .persona-dialog {
+    width: min(880px, calc(100vw - 2 * var(--spacing-4)));
+    max-height: calc(100dvh - 2 * var(--spacing-4));
+    padding: var(--spacing-8) 40px;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  .persona-dialog::backdrop {
+    background: rgb(10 10 10 / 0.72);
+  }
+
+  .persona-dialog__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    margin-bottom: 20px;
+  }
+
+  .persona-dialog__close {
+    padding: 10px var(--spacing-4);
+    border: var(--border-regular) solid var(--color-bg-accent);
+    background: none;
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
+
+  .persona-dialog__close:hover {
+    background: var(--color-bg-accent);
+    color: var(--color-text-on-accent);
+  }
+
+  .persona-dialog__close:focus-visible,
+  .persona-dialog__sheet:focus-visible {
+    outline: 3px solid var(--color-bg-secondary);
+    outline-offset: 3px;
+  }
+
+  /* On narrow screens the sheet keeps a readable size and scrolls sideways. */
+  .persona-dialog__sheet {
+    overflow-x: auto;
+  }
+
+  /* Only phones crop the sheet, so only phones need the hint. */
+  .persona-dialog__hint {
+    display: none;
+    margin-top: var(--spacing-3);
+  }
+
+  .persona-dialog__sheet img {
+    display: block;
+    width: 100%;
+    min-width: 640px;
+    height: auto;
+  }
+
+  .implications {
+    position: relative;
+    display: grid;
+    gap: var(--spacing-2);
+    padding: 28px var(--spacing-8);
+    padding-right: 96px;
+    border: var(--border-regular) solid var(--color-bg-primary);
+    background: var(--color-bg-accent-subtle);
+  }
+
+  .implications__text {
+    font: 400 1.875rem / 1.18 var(--font-display);
+  }
+
+  :global(.implications__spark) {
+    position: absolute;
+    right: var(--spacing-8);
+    top: 50%;
+    translate: 0 -50%;
+  }
+
+  /* 04 Usability testing */
+  .studies {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-12);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .study {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-2);
+    padding: var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  /* Arrows between the steps. */
+  .study + .study::before {
+    content: "→";
+    position: absolute;
+    left: calc(var(--spacing-12) * -0.5);
+    top: 50%;
+    translate: -50% -50%;
+    color: var(--color-text-accent);
+    font: 400 2rem / 1 var(--font-display);
+  }
+
+  .study--accent {
+    border-color: var(--color-bg-primary);
+    background: var(--color-bg-accent-subtle);
+  }
+
+  .study__title {
+    font: 400 2.25rem / 1 var(--font-display);
+  }
+
+  .study--accent .study__title {
+    color: var(--color-text-accent);
+  }
+
+  .finding {
+    display: grid;
+    grid-template-columns: minmax(0, 560px) minmax(0, 640px);
+    justify-content: space-between;
+    gap: var(--spacing-8) var(--spacing-16);
+    align-items: start;
+  }
+
+  .finding__stat {
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-4);
+  }
+
+  .finding__headline {
+    font: 400 clamp(2.75rem, 4.5vw, 4rem) / 1 var(--font-display);
+    color: var(--color-text-accent);
+    text-wrap: balance;
+  }
+
+  .finding__people {
+    display: flex;
+    gap: var(--spacing-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--color-text-primary);
+  }
+
+  .finding__people .is-hit {
+    color: var(--color-text-accent);
+  }
+
+  .ruled {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ruled--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ruled--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .ruled li {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding: 0 var(--spacing-8);
+  }
+
+  .ruled li:first-child {
+    padding-left: 0;
+  }
+
+  .ruled li + li {
+    border-left: var(--border-thin) solid var(--color-border-default);
+  }
+
+  /* Before and after: notes either side of the two screens, the first
+     beside the top marker and the second at the foot, as in Figma. */
+  .compare {
+    display: grid;
+    gap: var(--spacing-4);
+    margin: 0;
+  }
+
+  .compare__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px 330px minmax(0, 1fr);
+    gap: var(--spacing-8);
+    align-items: end;
+  }
+
+  .compare__notes {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--spacing-8);
+    align-self: stretch;
+    margin: 0;
+    padding: 64px 0 0;
+    list-style: none;
+  }
+
+  .note {
+    display: grid;
+    gap: var(--spacing-2);
+    padding: var(--spacing-4);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  .note__title {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+  }
+
+  .compare__screen {
+    display: grid;
+    gap: var(--spacing-2);
+  }
+
+  .compare__frame {
+    position: relative;
+    border: var(--border-heavy) solid var(--color-border-default);
+    background: var(--color-white-1000);
+  }
+
+  .compare__frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .marker {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border: var(--border-thin) solid var(--color-ink-1000);
+    border-radius: 50%;
+    background: var(--color-bg-primary);
+    color: var(--color-white-1000);
+    font: 700 0.875rem / 1 var(--font-sans);
+  }
+
+  .compare__frame .marker {
+    position: absolute;
+    translate: 0 -50%;
+  }
+
+  .marker--left {
+    left: -16px;
+  }
+
+  .marker--right {
+    right: -16px;
+  }
+
+  .closing {
+    max-width: 760px;
+  }
+
+  /* 05 UI redesign */
+  .redesign {
+    --color-bg-page: var(--color-ink-1000);
+  }
+
+  /* Copy and the live prototype sit together in the middle. */
+  .tryit {
+    display: grid;
+    grid-template-columns: minmax(0, 480px) minmax(0, 440px);
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-8) var(--spacing-16);
+  }
+
+  .tryit__title {
+    font: 400 2.75rem / 1 var(--font-display);
+  }
+
+  .screens {
+    display: grid;
+    gap: var(--spacing-8);
+    align-items: start;
+  }
+
+  .screens--upload {
+    grid-template-columns: minmax(0, 1fr) repeat(3, minmax(0, 277px));
+    justify-content: space-between;
+  }
+
+  .screens__caption {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-2);
+    max-width: 320px;
+  }
+
+  :global(.screen figcaption) {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-primary);
+  }
+
+  .screens--support {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-12);
+  }
+
+  .support {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: var(--spacing-6);
+    align-items: center;
+  }
+
+  .identity {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacing-8);
+  }
+
+  .identity__logo {
+    padding: var(--spacing-2);
+    border: var(--border-heavy) solid var(--color-border-default);
+    background: var(--color-white-1000);
+  }
+
+  .identity__logo img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* 06 Outcome */
+  .learned {
+    display: grid;
+    gap: var(--spacing-3);
+    max-width: 900px;
+    padding-left: var(--spacing-6);
+    border-left: 6px solid var(--color-bg-primary);
+  }
+
+  .learned__text {
+    font: 400 clamp(1.5rem, 2.4vw, 2rem) / 1.15 var(--font-display);
+    text-wrap: pretty;
+  }
+
+  .next-steps__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .step__n {
+    font: 400 2.5rem / 1 var(--font-display);
+    color: var(--color-bg-primary);
+  }
+
+  /* Keep exploring */
+  .next {
+    display: grid;
+    align-items: center;
+    min-height: 546px;
+    overflow: hidden;
+  }
+
+  .next__copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-6);
+    max-width: 600px;
+  }
+
+  .next__title {
+    font: 400 clamp(3.5rem, 7vw, 6.25rem) / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  :global(.next__grid) {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 240px;
+    opacity: 0.3;
+    --rung-dur: 3s;
+  }
+
+  :global(.next__city) {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 360px;
+    --decor-sun: var(--color-yellow-500);
+    --decor-skyline: var(--color-ink-700);
+  }
+
+  :global(.next__star) {
+    position: absolute;
+    left: 77%;
+    top: 13%;
+  }
+
+  /* Call to action */
+  .case > .cta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    padding-block: var(--spacing-12);
+    background: var(--color-bg-primary);
+  }
+
+  .cta__link {
+    flex: 1;
+    color: var(--color-white-1000);
+    font: 400 clamp(2.5rem, 5vw, 4.5rem) / 1 var(--font-display);
+    text-decoration: none;
+  }
+
+  .cta__arrow {
+    display: inline-block;
+    animation: slide 1.8s ease-in-out infinite;
+    --slide: 14px;
+  }
+
+  .cta__strip:global(.anim-float) {
+    --float: -10px;
+    --dur: 5s;
+  }
+
+  .cta__strip {
+    width: 308px;
+    aspect-ratio: 308 / 88;
+    overflow: hidden;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-paper-100);
+    rotate: -3deg;
+  }
+
+  .cta__strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  :global(.cta__spark) {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--gutter);
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding: 28px var(--gutter);
+  }
+
+  .pager a {
+    text-decoration: none;
+  }
+
+  .pager a:hover {
+    color: var(--color-text-accent);
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) var(--gutter);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  /* Motion */
+  :global(.hero__phone.anim-float) {
+    --float: -12px;
+    --dur: 7s;
+  }
+
+  :global(.hero__phone--upload.anim-float) {
+    --dur: 6s;
+    --delay: -2s;
+  }
+
+  :global(.hero__strip.anim-sway) {
+    --sway: 2deg;
+    --dur: 6s;
+  }
+
+  :global(.hero__phone picture) {
+    display: block;
+    animation: hero-drop 900ms var(--motion-ease-snap) 200ms both;
+  }
+
+  :global(.hero__phone--upload picture) {
+    animation-delay: 450ms;
+  }
+
+  @keyframes hero-drop {
+    from {
+      opacity: 0;
+      transform: translateY(120px) rotate(10deg) scale(0.85);
+    }
+  }
+
+  /* The original and revised screens slide in from opposite sides. */
+  :global(.js [data-reveal="from-left"]) {
+    translate: -96px 0;
+    rotate: -4deg;
+  }
+
+  :global(.js [data-reveal="from-right"]) {
+    translate: 96px 0;
+    rotate: 4deg;
+  }
+
+  :global(.challenge__city.parallax) {
+    --parallax: 40px;
+  }
+
+  /* Tablet */
+  @media (max-width: 1023px) {
+    .case > .hero,
+    .split,
+    .finding,
+    .tryit {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tryit {
+      justify-items: center;
+    }
+
+    .case > .hero {
+      grid-template-areas:
+        "copy"
+        "art"
+        "meta";
+    }
+
+    .hero__art {
+      width: min(100%, 640px);
+    }
+
+    .methods {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ruled--4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--spacing-8);
+    }
+
+    .ruled--4 li:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    /* Notes move under the screens and stack in marker order. */
+    .compare__grid {
+      grid-template-columns: repeat(2, minmax(0, 330px));
+      grid-template-areas:
+        "a b"
+        "l r";
+      justify-content: center;
+      align-items: start;
+    }
+
+    .compare__screen:nth-of-type(1) {
+      grid-area: a;
+    }
+
+    .compare__screen:nth-of-type(2) {
+      grid-area: b;
+    }
+
+    .compare__notes--left {
+      grid-area: l;
+    }
+
+    .compare__notes--right {
+      grid-area: r;
+    }
+
+    .compare__notes {
+      justify-content: start;
+      gap: var(--spacing-4);
+      padding-top: 0;
+    }
+
+    .screens--upload {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .screens--upload .screens__caption {
+      grid-column: 1 / -1;
+      max-width: 600px;
+    }
+
+    .screens--support {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cta__strip {
+      display: none;
+    }
+
+    .footer {
+      flex-wrap: wrap;
+    }
+
+    .footer p {
+      white-space: nowrap;
+    }
+
+    .footer .text-katakana {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Phone */
+  @media (max-width: 767px) {
+    .case > section {
+      padding-block: var(--spacing-16);
+    }
+
+    .case > .hero {
+      padding-block: 28px var(--spacing-12);
+    }
+
+    .hero__strip,
+    .hero__note {
+      display: none;
+    }
+
+    .hero__details {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .methods,
+    .studies,
+    .ruled--3,
+    .ruled--4,
+    .personas {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ruled li,
+    .ruled li + li,
+    .ruled--4 li:nth-child(3) {
+      padding: var(--spacing-4) 0 0;
+      border-left: 0;
+      border-top: var(--border-thin) solid var(--color-border-default);
+    }
+
+    .studies {
+      gap: 40px;
+    }
+
+    .study + .study::before {
+      content: "↓";
+      left: 50%;
+      top: calc(40px * -0.5);
+    }
+
+    /* A small thumbnail next to the name keeps the cards short; the full
+       sheet is one tap away. */
+    .persona {
+      grid-template-columns: 136px minmax(0, 1fr);
+      align-items: center;
+      gap: var(--spacing-3) var(--spacing-4);
+    }
+
+    .persona__copy {
+      display: contents;
+    }
+
+    .persona__name {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: center;
+      flex-wrap: wrap;
+    }
+
+    .persona__title,
+    .persona__copy > p:last-child,
+    :global(.persona__open) {
+      grid-column: 1 / -1;
+    }
+
+    .persona__title {
+      font-size: 1.25rem;
+    }
+
+    .persona-dialog {
+      padding: var(--spacing-6) var(--spacing-4);
+    }
+
+    .persona-dialog__hint {
+      display: block;
+    }
+
+    .implications {
+      padding: var(--spacing-6) var(--spacing-4);
+    }
+
+    .implications__text {
+      font-size: 1.375rem;
+    }
+
+    :global(.implications__spark) {
+      display: none;
+    }
+
+    .finding__people :global(svg) {
+      width: 36px;
+      height: 36px;
+    }
+
+    .compare__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "a"
+        "l"
+        "b"
+        "r";
+      gap: var(--spacing-6);
+      padding-inline: 16px;
+    }
+
+    .screens--upload,
+    .support,
+    .identity {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .screens--upload :global(.screen),
+    .support :global(.screen) {
+      width: min(100%, 300px);
+      justify-self: center;
+    }
+
+    .identity__logo {
+      width: min(100%, 240px);
+    }
+
+    .case > .next {
+      min-height: 0;
+      padding-bottom: 260px;
+    }
+
+    :global(.next__city) {
+      width: 300px;
+    }
+
+    .pager {
+      flex-direction: column;
+    }
+
+    .footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
