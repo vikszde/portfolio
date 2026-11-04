@@ -12,13 +12,16 @@ interface Props {
 
 const { current = "Home" } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-const links = [
+// `section` is the home page section a link stands for, so the indicator can
+// follow it while the home page scrolls. Work goes to the All work page but
+// still lights up over the home page's work section.
+const links: { label: NonNullable<Props["current"]>; href: string; section?: string }[] = [
   { label: "Home", href: base },
-  { label: "Work", href: `${base}#work` },
-  { label: "About", href: `${base}#about` },
+  { label: "Work", href: `${base}work/`, section: "work" },
+  { label: "About", href: `${base}#about`, section: "about" },
   { label: "Playground", href: `${base}playground/` },
-  { label: "Contact", href: `${base}#contact` },
-] as const;
+  { label: "Contact", href: `${base}#contact`, section: "contact" },
+];
 ---
 
 <header class="nav" data-nav>
@@ -33,13 +36,13 @@ const links = [
       <ul>
         <li class="nav__indicator" aria-hidden="true"></li>
         {
-          links.map(({ label, href }) => (
+          links.map(({ label, href, section }) => (
             <li>
               <a
                 class="nav__link text-label-strong"
                 href={href}
                 aria-current={label === current ? "page" : undefined}
-                data-section={href.includes("#") ? href.split("#")[1] : undefined}
+                data-section={section}
               >
                 {label}
               </a>
@@ -61,6 +64,7 @@ const links = [
   </div>
 
   <div class="menu" id="mobile-menu" hidden data-menu>
+    <span class="menu__ink" aria-hidden="true" data-menu-ink></span>
     <div class="menu__bar">
       <a href={base} class="nav__home"><Logo variant="icon" height={40} /><span class="visually-hidden">Home</span></a>
       <button class="menu__close text-label-strong" type="button" data-menu-close>
@@ -97,26 +101,123 @@ const links = [
   const openButton = document.querySelector<HTMLButtonElement>("[data-menu-open]");
   const closeButton = document.querySelector<HTMLButtonElement>("[data-menu-close]");
 
-  function setOpen(open: boolean) {
+  /*
+   * Opening, the menu sweeps in from the right behind a slanted black ink
+   * stripe (the same slant as the page transitions' panels), then the links
+   * slide in one after another, the close button pops and the footer rises.
+   * Closing sweeps it back out. With reduced motion it just appears.
+   */
+  const ink = menu?.querySelector<HTMLElement>("[data-menu-ink]");
+  const stillMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sweepEase = "cubic-bezier(0.8, 0, 0.2, 1)";
+  const settle = "cubic-bezier(0.16, 1, 0.3, 1)";
+  // The menu shows everything right of a "/" edge whose bottom sits at a%;
+  // the ink stripe rides just inside that edge. At a = 100 nothing shows; at
+  // a = -34 the menu covers the screen and the stripe has left it.
+  const sweep = (a: number) => `polygon(${a + 20}% 0%, 100% 0%, 100% 100%, ${a}% 100%)`;
+  const stripe = (a: number) => `polygon(${a + 20}% 0%, ${a + 34}% 0%, ${a + 14}% 100%, ${a}% 100%)`;
+
+  function stopMotion() {
+    menu?.getAnimations({ subtree: true }).forEach((a) => a.cancel());
+  }
+
+  function playOpen(menu: HTMLElement) {
+    menu.animate([{ clipPath: sweep(100) }, { clipPath: sweep(-34) }], { duration: 460, easing: sweepEase });
+    ink?.animate([{ clipPath: stripe(100) }, { clipPath: stripe(-34) }], { duration: 460, easing: sweepEase });
+    menu.querySelectorAll<HTMLElement>(".menu__link").forEach((link, i) => {
+      link.animate(
+        [
+          { opacity: 0, transform: "translateX(-48px) skewX(-14deg)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: 520, delay: 200 + i * 55, easing: settle, fill: "backwards" },
+      );
+    });
+    menu.querySelector<HTMLElement>(".menu__link[aria-current] svg")?.animate(
+      [
+        { transform: "scale(0) rotate(-180deg)" },
+        { transform: "scale(1) rotate(0deg)" },
+      ],
+      { duration: 500, delay: 520, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "backwards" },
+    );
+    closeButton?.animate(
+      [
+        { opacity: 0, transform: "scale(0.6) rotate(-8deg)" },
+        { opacity: 1, transform: "none" },
+      ],
+      { duration: 420, delay: 160, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)", fill: "backwards" },
+    );
+    menu.querySelectorAll<HTMLElement>(".menu__footer, .menu__halftone").forEach((part, i) => {
+      part.animate(
+        [
+          { opacity: 0, transform: "translateY(24px)" },
+          { opacity: 1, transform: "none" },
+        ],
+        { duration: 520, delay: 460 + i * 90, easing: settle, fill: "backwards" },
+      );
+    });
+  }
+
+  async function playClose(menu: HTMLElement) {
+    menu.querySelectorAll<HTMLElement>(".menu__links, .menu__footer, .menu__halftone").forEach((part) => {
+      part.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, fill: "forwards" });
+    });
+    ink?.animate([{ clipPath: stripe(-34) }, { clipPath: stripe(100) }], { duration: 380, delay: 60, easing: sweepEase });
+    await menu.animate([{ clipPath: sweep(-34) }, { clipPath: sweep(100) }], {
+      duration: 380,
+      delay: 60,
+      easing: sweepEase,
+      fill: "forwards",
+    }).finished;
+  }
+
+  async function setOpen(open: boolean, animate = true) {
     if (!menu || !openButton) return;
-    menu.hidden = !open;
+    stopMotion();
     openButton.setAttribute("aria-expanded", String(open));
-    document.documentElement.classList.toggle("menu-open", open);
-    if (open) menu.querySelector<HTMLAnchorElement>(".menu__link")?.focus();
-    else openButton.focus();
+    if (open) {
+      menu.hidden = false;
+      menu.scrollTop = 0;
+      document.documentElement.classList.add("menu-open");
+      if (animate && !stillMotion()) playOpen(menu);
+      menu.querySelector<HTMLAnchorElement>(".menu__link")?.focus();
+      return;
+    }
+    openButton.focus();
+    if (animate && !stillMotion() && !menu.hidden) {
+      try {
+        await playClose(menu);
+      } catch {
+        // Cancelled: the menu was opened again mid-close.
+        return;
+      }
+    }
+    menu.hidden = true;
+    document.documentElement.classList.remove("menu-open");
+    stopMotion();
   }
 
   openButton?.addEventListener("click", () => setOpen(true));
   closeButton?.addEventListener("click", () => setOpen(false));
   menu?.addEventListener("click", (event) => {
-    if ((event.target as HTMLElement).closest("a")) setOpen(false);
+    const link = (event.target as HTMLElement).closest("a");
+    if (!link) return;
+    const url = new URL(link.href, location.href);
+    if (url.pathname === location.pathname && url.search === location.search) {
+      // A section on this page: sweep the menu away to show it.
+      setOpen(false);
+    } else {
+      // Another page: its page transition covers the menu on the way out.
+      // Close it then, without animation, so Back doesn't return to it open.
+      window.addEventListener("pagehide", () => setOpen(false, false), { once: true });
+    }
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && menu && !menu.hidden) setOpen(false);
   });
   // Leaving the mobile breakpoint with the menu open would strand it.
   window.matchMedia("(min-width: 768px)").addEventListener("change", (event) => {
-    if (event.matches && menu && !menu.hidden) setOpen(false);
+    if (event.matches && menu && !menu.hidden) setOpen(false, false);
   });
 
   /*
@@ -397,6 +498,17 @@ const links = [
 
   .menu[hidden] {
     display: none;
+  }
+
+  /* The slanted black stripe that leads the menu's sweep. Clipped to nothing
+     except while the menu opens or closes. */
+  .menu__ink {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: var(--color-ink-1000);
+    clip-path: polygon(0 0, 0 0, 0 0, 0 0);
+    pointer-events: none;
   }
 
   .menu__bar {
