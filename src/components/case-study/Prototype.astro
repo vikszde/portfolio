@@ -1,0 +1,126 @@
+---
+// A live Figma prototype in its phone frame, so visitors can tap through the
+// design on the page. The prototype must be shared as "Anyone with the link
+// can view" or the frame shows a Figma sign-in instead.
+//
+// The frame loads once it nears the viewport (Figma's player is heavy), and a
+// link under the phone opens the same prototype full screen in a new tab.
+interface Props {
+  fileKey: string;
+  fileName: string;
+  /** Page of the starting frame, as "301:1477". */
+  pageId: string;
+  /** Starting frame, as "348:3756". */
+  nodeId: string;
+  /** Accessible name for the frame. */
+  title: string;
+  class?: string;
+}
+
+const { fileKey, fileName, pageId, nodeId, title, class: className } = Astro.props;
+
+// `contain` grows the phone to fill the frame; `bg-color` matches the
+// ink-1000 page colour so the frame has no visible edge on a dark section.
+const params = new URLSearchParams({
+  "page-id": pageId,
+  "node-id": nodeId.replace(":", "-"),
+  "starting-point-node-id": nodeId,
+  scaling: "contain",
+  "content-scaling": "fixed",
+  "hide-ui": "1",
+  footer: "false",
+  "hotspot-hints": "1",
+  "bg-color": "0a0a0a",
+  "embed-host": "share",
+});
+const embed = `https://embed.figma.com/proto/${fileKey}/${fileName}?${params}`;
+const open = `https://www.figma.com/proto/${fileKey}/${fileName}?${new URLSearchParams({
+  "page-id": pageId,
+  "node-id": nodeId.replace(":", "-"),
+  "starting-point-node-id": nodeId,
+  scaling: "scale-down",
+  "content-scaling": "fixed",
+})}`;
+---
+
+<figure class:list={["prototype", className]} data-reveal="pop">
+  <div class="prototype__body">
+    <iframe class="prototype__screen" src={embed} {title} loading="lazy" allowfullscreen></iframe>
+  </div>
+  <figcaption class="prototype__caption">
+    <a class="text-label-m" href={open} target="_blank" rel="noopener">Open full screen in Figma <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+  </figcaption>
+</figure>
+
+<script>
+  // The iframe's load event fires once Figma's player document is in; give
+  // it a moment more to paint the first screen before fading it in.
+  document.querySelectorAll<HTMLIFrameElement>(".prototype__screen").forEach((frame) => {
+    frame.addEventListener("load", () => setTimeout(() => frame.classList.add("is-loaded"), 1500), { once: true });
+  });
+</script>
+
+<style>
+  .prototype {
+    display: grid;
+    justify-items: center;
+    gap: var(--spacing-2);
+    width: 100%;
+    max-width: 440px;
+    margin: 0;
+  }
+
+  /* Figma draws the phone itself (the prototype's device setting) on the
+     prototype's dark background and pads it generously, so the frame is
+     wider than the phone it shows. Figma's player can take a while to start:
+     until it paints, the note behind the frame shows through. */
+  .prototype__body {
+    position: relative;
+    width: 100%;
+  }
+
+  .prototype__body::before {
+    content: "Loading prototype…";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--color-text-secondary);
+    font: 500 0.875rem / 1 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .prototype__screen {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 7;
+    border: 0;
+    background: transparent;
+  }
+
+  /* Figma opens on a white loading screen; keep the frame hidden until the
+     player has loaded so the dark section doesn't flash. */
+  :global(.js) .prototype__screen:not(.is-loaded) {
+    opacity: 0;
+  }
+
+  .prototype__screen.is-loaded {
+    transition: opacity 400ms var(--motion-ease-out);
+  }
+
+  .prototype__screen:focus-visible {
+    outline: var(--border-regular) solid var(--color-border-primary);
+    outline-offset: 2px;
+  }
+
+  .prototype__caption a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+
+  .prototype__caption a:hover {
+    color: var(--color-text-accent);
+  }
+</style>
