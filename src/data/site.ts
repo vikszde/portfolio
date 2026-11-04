@@ -8,29 +8,25 @@ export const site = {
 // `highlight` is the short tag pinned to the project's card on the home
 // page. Swap these for a real result or fact once there is one, e.g.
 // "+38% sign-ups" or "6 week sprint"; keep it to a few words.
+// `role` is shown on the All projects page; keep it the same as the Role in
+// the project's case study.
 export const projects = [
   {
     slug: "nearbio",
     number: "01",
     title: "nearb.io",
-    summary: "A location-based community app for finding nearby events and people.",
+    summary: "A web app for exploring and comparing locations. My work: product design, visual identity and AI-assisted frontend work.",
+    role: "Product design, visual identity, and AI-assisted frontend implementation.",
     tags: ["UI/UX", "Product design"],
-    highlight: "Community app",
+    highlight: "Location app",
   },
   {
     slug: "barterland",
     number: "02",
     title: "Barterland",
-    summary: "A creative trading marketplace for makers, artists and gamers.",
+    summary: "A web platform for swapping items. My work: usability research, testing and a revised upload flow.",
+    role: "UX/UI design and research.",
     tags: ["UI/UX", "Research", "Branding"],
     highlight: "Marketplace",
-  },
-  {
-    slug: "this-website",
-    number: "03",
-    title: "This Website",
-    summary: "My personal portfolio, designed and developed from scratch.",
-    tags: ["UI/UX", "Visual", "Web design"],
-    highlight: "Built from scratch",
   },
 ] as const;
