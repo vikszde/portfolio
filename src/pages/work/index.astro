@@ -1,48 +1,93 @@
 ---
-// All projects. Same cards as the landing page's Selected work.
+// All projects: one wide row per case study, alternating sides. The cover
+// sits on one side as a tilted paper print; the number, title, summary, my
+// role, tags and a link to the case study sit on the other. The page ends
+// like the case studies, with the pink call to action and the footer.
 import Base from "../../layouts/Base.astro";
 import Nav from "../../components/Nav.astro";
-import ProjectCard from "../../components/ProjectCard.astro";
+import Button from "../../components/Button.astro";
+import Sparkle from "../../components/Sparkle.astro";
+import Logo from "../../components/Logo.astro";
 import { projects } from "../../data/site";
 import nearbioCover from "../../assets/work/nearbio-cover.webp?url";
 import barterlandCover from "../../assets/work/barterland-cover.webp?url";
+import eyeStrip from "../../assets/art/eye-strip.webp?url";
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 const covers: Record<string, string | undefined> = { nearbio: nearbioCover, barterland: barterlandCover };
-const shapes = ["A", "B", "C"] as const;
-const tilts = [-1.5, 1, -0.8];
+const count = String(projects.length).padStart(2, "0");
 ---
 
-<Base title="Work · Viktória Varga">
+<Base title="Work · Viktória Varga" description="Case studies by Viktória Varga, from early research to finished interfaces.">
   <Nav current="Work" />
-  <main class="work">
-    <p class="text-label-m accent">Work</p>
-    <h1 class="text-display-l">All projects</h1>
-    <ul class="cards">
-      {
-        projects.map((project, i) => (
-          <li>
-            <ProjectCard
-              number={project.number}
-              title={project.title}
-              summary={project.summary}
-              tags={[...project.tags]}
-              href={`${base}work/${project.slug}/`}
-              cover={covers[project.slug]}
-              shape={shapes[i % 3]}
-              tilt={tilts[i % 3]}
-            />
-          </li>
-        ))
-      }
-    </ul>
+  <main>
+    <div class="work">
+      <header class="work__head">
+        <div class="work__intro" data-stagger="90">
+          <p class="text-label-m accent" data-reveal>Work</p>
+          <h1 class="text-display-l work__title" data-reveal="slam">All projects <Sparkle color="pink" size={40} class="anim-twinkle" /></h1>
+          <p class="text-katakana" lang="ja" data-reveal>作品集</p>
+          <p class="text-body-l secondary" data-reveal>Selected projects from early ideas and research to polished digital experiences.</p>
+        </div>
+        <p class="work__count" data-reveal="pop">
+          <span class="work__count-num">{count}</span>
+          <span class="text-label-s">Case studies</span>
+        </p>
+      </header>
+
+      <ol class="rows">
+        {
+          projects.map((project, i) => {
+            const href = `${base}work/${project.slug}/`;
+            return (
+              <li class:list={["row", { "row--flip": i % 2 === 1 }]}>
+                {/* The cover opens the case study with a mouse or tap; keyboard
+                    and screen reader users get the button, one link per row. */}
+                <div class="row__media" data-reveal="card">
+                  <a class="row__cover" href={href} tabindex="-1" aria-hidden="true">
+                    <img src={covers[project.slug]} alt="" loading={i === 0 ? "eager" : "lazy"} decoding="async" />
+                    <span class="row__num">{project.number}</span>
+                  </a>
+                </div>
+                <div class="row__body" data-stagger="80">
+                  <p class="text-label-m accent" data-reveal>Case study {project.number}</p>
+                  <h2 class="row__title" data-reveal>{project.title}</h2>
+                  <p class="text-body-l secondary" data-reveal>{project.summary}</p>
+                  <dl class="row__facts" data-reveal>
+                    <dt class="text-label-s accent">Role</dt>
+                    <dd class="text-body-m">{project.role}</dd>
+                  </dl>
+                  <p class="row__tags text-label-s" data-reveal>
+                    {project.tags.map((tag, t) => <span>{t > 0 && <span class="row__dot" aria-hidden="true">·</span>}# {tag}</span>)}
+                  </p>
+                  <div data-reveal>
+                    <Button variant="secondary" href={href} arrow>Read the case study<span class="visually-hidden">: {project.title}</span></Button>
+                  </div>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </div>
+
+    <!-- Call to action (always pink), as on the case studies -->
+    <section class="cta theme-light" aria-label="Get in touch">
+      <a class="cta__link" href={`${base}#contact`}>Let's create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
+      <div class="cta__strip anim-float" aria-hidden="true"><img src={eyeStrip} alt="" width="560" height="160" loading="lazy" /></div>
+      <Sparkle color="ink" size={40} class="cta__spark anim-twinkle" />
+    </section>
   </main>
+
+  <footer class="footer theme-dark">
+    <Logo variant="wordmark" height={40} label="VIKSZDE" />
+    <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
+    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+  </footer>
 </Base>
 
 <style>
   .work {
-    display: grid;
-    gap: var(--spacing-6);
     padding: var(--spacing-16) var(--gutter) var(--spacing-24);
   }
 
@@ -50,25 +95,277 @@ const tilts = [-1.5, 1, -0.8];
     color: var(--color-text-accent);
   }
 
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .secondary {
+    color: var(--color-text-secondary);
+  }
+
+  /* Header: the intro on the left, the project count big and pink on the
+     right. */
+  .work__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     gap: var(--spacing-8);
-    margin: var(--spacing-8) 0 0;
+  }
+
+  .work__intro {
+    display: grid;
+    gap: var(--spacing-4);
+    max-width: 680px;
+  }
+
+  .work__title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .work__count {
+    display: grid;
+    justify-items: end;
+    gap: var(--spacing-2);
+    margin: 0;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+  }
+
+  .work__count-num {
+    color: var(--color-bg-primary);
+    font: 400 clamp(5rem, 11vw, 10rem) / 0.85 var(--font-display);
+  }
+
+  /* Rows: cover and text side by side, the cover a little wider. Every
+     other row swaps sides, and the covers tilt opposite ways. */
+  .rows {
+    display: grid;
+    gap: clamp(var(--spacing-16), 9vw, 140px);
+    margin: clamp(var(--spacing-16), 7vw, 112px) 0 0;
     padding: 0;
     list-style: none;
   }
 
-  @media (max-width: 1023px) {
-    .cards {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(var(--spacing-8), 6vw, 96px);
+  }
+
+  .row--flip .row__media {
+    order: 2;
+  }
+
+  /* The cover as a print on white paper with an ink edge, the number tab on
+     its corner. It straightens and lifts on hover, or while the row's button
+     is hovered or focused. */
+  .row__cover {
+    --tilt: -2deg;
+    position: relative;
+    display: block;
+    padding: 16px;
+    border: 2.5px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    rotate: var(--tilt);
+    transition:
+      rotate var(--motion-duration-base) var(--motion-ease-snap),
+      translate var(--motion-duration-base) var(--motion-ease-snap);
+  }
+
+  .row--flip .row__cover {
+    --tilt: 2deg;
+  }
+
+  .row__cover img {
+    display: block;
+    width: 100%;
+    /* The covers' own framing, as on the project cards. */
+    aspect-ratio: 372 / 330;
+    object-fit: cover;
+    object-position: top center;
+    background: var(--color-bg-accent-subtle);
+  }
+
+  .row__num {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    padding: 8px 14px;
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+    font: 700 1.125rem / 1 var(--font-sans);
+  }
+
+  @media (hover: hover) {
+    .row__cover:hover,
+    .row:has(.button:hover) .row__cover {
+      rotate: 0deg;
+      translate: 0 -6px;
     }
   }
 
+  .row:has(.button:focus-visible) .row__cover {
+    rotate: 0deg;
+    translate: 0 -6px;
+  }
+
+  .row__body {
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-4);
+  }
+
+  /* Names keep their own casing (nearb.io is lower case). */
+  .row__title {
+    font: 400 clamp(3rem, 6vw, 5.5rem) / 1 var(--font-display);
+  }
+
+  .row__facts {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+  }
+
+  .row__facts dd {
+    margin: 0;
+  }
+
+  .row__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--spacing-2);
+    margin: 0;
+  }
+
+  .row__dot {
+    margin-right: var(--spacing-2);
+    color: var(--color-text-accent);
+  }
+
+  .row__body > :last-child {
+    margin-top: var(--spacing-2);
+  }
+
+  /* Call to action, as on the case studies */
+  .cta {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    padding: var(--spacing-12) var(--gutter);
+    background: var(--color-bg-primary);
+  }
+
+  .cta__link {
+    flex: 1;
+    color: var(--color-white-1000);
+    font: 400 clamp(2.5rem, 5vw, 4.5rem) / 1 var(--font-display);
+    text-decoration: none;
+  }
+
+  .cta__arrow {
+    display: inline-block;
+    animation: slide 1.8s ease-in-out infinite;
+    --slide: 14px;
+  }
+
+  .cta__strip:global(.anim-float) {
+    --float: -10px;
+    --dur: 5s;
+  }
+
+  .cta__strip {
+    width: 308px;
+    aspect-ratio: 308 / 88;
+    overflow: hidden;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-paper-100);
+    rotate: -3deg;
+  }
+
+  .cta__strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  :global(.cta__spark) {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--gutter);
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) var(--gutter);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  /* Tablets: the rows stay side by side, the text column a touch wider. */
+  @media (max-width: 1023px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .cta__strip {
+      display: none;
+    }
+
+    .footer {
+      flex-wrap: wrap;
+    }
+
+    .footer p {
+      white-space: nowrap;
+    }
+
+    .footer .text-katakana {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Phones: each row stacks, cover first, and the count becomes a short
+     line under the intro. */
   @media (max-width: 767px) {
-    .cards {
+    .work__head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--spacing-6);
+    }
+
+    .work__count {
+      display: flex;
+      align-items: baseline;
+      gap: var(--spacing-3);
+    }
+
+    .work__count-num {
+      font-size: 3rem;
+    }
+
+    .work__title {
+      font-size: 2.75rem;
+    }
+
+    .row {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--spacing-12);
+      gap: var(--spacing-6);
+    }
+
+    .row--flip .row__media {
+      order: 0;
+    }
+
+    .row__title {
+      font-size: 3rem;
+    }
+
+    .footer {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 </style>

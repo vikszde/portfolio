@@ -1,6 +1,7 @@
 ---
 // Temporary case study pages so the project cards don't lead to a 404.
-// Projects with their own page (work/nearbio.astro) are left out here.
+// Projects with their own page (work/nearbio.astro, work/barterland.astro)
+// are left out here.
 import Base from "../../layouts/Base.astro";
 import Nav from "../../components/Nav.astro";
 import Button from "../../components/Button.astro";
@@ -8,7 +9,7 @@ import { projects } from "../../data/site";
 
 export function getStaticPaths() {
   return projects
-    .filter((project) => project.slug !== "nearbio")
+    .filter((project) => project.slug !== "nearbio" && project.slug !== "barterland")
     .map((project) => ({ params: { slug: project.slug }, props: { project } }));
 }
 
@@ -22,7 +23,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
     <p class="text-label-m accent">Case study {project.number}</p>
     <h1 class="text-display-l">{project.title}</h1>
     <p class="text-body-l">This case study is on its way.</p>
-    <Button variant="ghost" href={`${base}#work`}>← All work</Button>
+    <Button variant="ghost" href={`${base}work/`}>← All work</Button>
   </main>
 </Base>
 

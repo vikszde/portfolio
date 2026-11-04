@@ -5,6 +5,7 @@ import "@fontsource/space-grotesk/700.css";
 import "@fontsource/jetbrains-mono/500.css";
 import "@fontsource/noto-sans-jp/900.css";
 import "../styles/global.css";
+import PageTransition from "../components/PageTransition.astro";
 
 interface Props {
   title: string;
@@ -33,9 +34,27 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
       } catch {}
       // Scroll reveals start hidden only when JavaScript can show them again.
       document.documentElement.classList.add("js");
+      // Arriving through a page transition (PageTransition.astro): cover the
+      // page from its first paint so it can open in the same style it closed.
+      // A visitor already moving around the site skips the logo intro.
+      try {
+        const raw = sessionStorage.getItem("pt");
+        if (raw) {
+          sessionStorage.removeItem("pt");
+          const pt = JSON.parse(raw);
+          if (Date.now() - pt.t < 10000) {
+            const html = document.documentElement;
+            html.dataset.pt = pt.k;
+            html.dataset.ptX = pt.x;
+            html.dataset.ptY = pt.y;
+            sessionStorage.setItem("intro-seen", "1");
+          }
+        }
+      } catch {}
     </script>
   </head>
   <body>
+    <PageTransition />
     <slot />
     <script>
       import { afterIntro } from "../scripts/after-intro";
