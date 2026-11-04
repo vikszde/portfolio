@@ -1,0 +1,141 @@
+---
+// Numbered case study section heading from Figma: a big pink number, then a
+// ruled block with the section label and a condensed title. As it scrolls
+// into view the number stamps down, the rule draws from the top and the
+// label and title rise in after it.
+interface Props {
+  number: string;
+  label: string;
+  id: string;
+  class?: string;
+}
+
+const { number, label, id, class: className } = Astro.props;
+---
+
+<div class:list={["section-head", className]} data-reveal="head">
+  <span class="section-head__number" aria-hidden="true">{number}</span>
+  <div class="section-head__text">
+    <p class="text-label-m section-head__label">/ {label}</p>
+    <h2 {id} class="section-head__title"><span class="visually-hidden">{number}, </span><slot /></h2>
+  </div>
+</div>
+
+<style>
+  .section-head {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-6);
+  }
+
+  .section-head__number {
+    font: 400 7rem / 1 var(--font-display);
+    color: var(--color-bg-primary);
+  }
+
+  .section-head__text {
+    position: relative;
+    display: grid;
+    gap: 10px;
+    padding: var(--spacing-3) 0 var(--spacing-1) var(--spacing-6);
+  }
+
+  /* The rule is its own layer so it can draw down from the top. */
+  .section-head__text::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--border-thin);
+    background: var(--color-border-default);
+    transform-origin: top;
+  }
+
+  .section-head__label {
+    color: var(--color-text-secondary);
+  }
+
+  .section-head__title {
+    font: 400 3.25rem / 1 var(--font-display);
+    text-wrap: balance;
+  }
+
+  /* Reveal: the block itself stays put; its parts animate. */
+  :global(.js) .section-head[data-reveal] {
+    opacity: 1;
+    translate: none;
+  }
+
+  :global(.js) .section-head:not(.is-visible) .section-head__number {
+    opacity: 0;
+  }
+
+  :global(.js) .section-head:not(.is-visible) .section-head__text::before {
+    transform: scaleY(0);
+  }
+
+  :global(.js) .section-head:not(.is-visible) :is(.section-head__label, .section-head__title) {
+    opacity: 0;
+    translate: 0 24px;
+  }
+
+  .section-head.is-visible .section-head__number {
+    animation: head-stamp 560ms cubic-bezier(0.5, 0, 0.6, 1) both;
+  }
+
+  .section-head__text::before {
+    transition: transform 500ms var(--motion-ease-out) 260ms;
+  }
+
+  .section-head__label,
+  .section-head__title {
+    transition:
+      opacity 400ms var(--motion-ease-out) 380ms,
+      translate 700ms var(--motion-ease-out) 380ms;
+  }
+
+  .section-head__title {
+    transition-delay: 460ms;
+  }
+
+  @keyframes head-stamp {
+    from {
+      opacity: 0;
+      transform: scale(2.2) rotate(-10deg);
+    }
+
+    60% {
+      opacity: 1;
+      transform: scale(0.92) rotate(2deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .section-head {
+      gap: var(--spacing-3);
+    }
+
+    .section-head__number {
+      font-size: 4.5rem;
+    }
+
+    .section-head__text {
+      padding-left: var(--spacing-3);
+    }
+
+    .section-head__label {
+      font-size: 0.75rem;
+      line-height: 1rem;
+    }
+
+    .section-head__title {
+      font-size: 2.125rem;
+    }
+  }
+</style>

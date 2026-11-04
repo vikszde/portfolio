@@ -1,0 +1,54 @@
+---
+// A screenshot in the Figma "Image panel" frame: straight, heavy outline,
+// optional caption. `mobile` swaps in a tighter crop on phones, where the
+// full crop would be too small to read. `sizes` describes the rendered width
+// so the browser picks a sensible file from the generated set. `reveal` sets
+// the scroll reveal variant ("" is the default rise; false turns it off).
+import type { ImageMetadata } from "astro";
+import { Image, getImage } from "astro:assets";
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  mobile?: ImageMetadata;
+  caption?: string;
+  sizes?: string;
+  eager?: boolean;
+  reveal?: string | false;
+  class?: string;
+}
+
+const { src, alt, mobile, caption, sizes = "(min-width: 1440px) 1280px, 92vw", eager = false, reveal = "", class: className } = Astro.props;
+const phone = mobile ? await getImage({ src: mobile, format: "webp" }) : undefined;
+const widths = [480, 800, 1280, src.width].filter((w, i, all) => w <= src.width && all.indexOf(w) === i);
+---
+
+<figure class:list={["shot", className]} data-reveal={reveal === false ? undefined : reveal}>
+  <picture>
+    {phone && <source media="(max-width: 767px)" srcset={phone.src} width={mobile!.width} height={mobile!.height} />}
+    <Image {src} {alt} {widths} {sizes} format="webp" loading={eager ? "eager" : "lazy"} />
+  </picture>
+  {caption && <figcaption class="text-body-m shot__caption">{caption}</figcaption>}
+  <slot />
+</figure>
+
+<style>
+  .shot {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    min-width: 0;
+  }
+
+  .shot img {
+    width: 100%;
+    height: auto;
+    border: var(--border-heavy) solid var(--color-border-default);
+    background: var(--color-ink-1000);
+  }
+
+  .shot__caption {
+    color: var(--color-text-secondary);
+  }
+</style>
