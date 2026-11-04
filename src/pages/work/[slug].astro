@@ -1,13 +1,15 @@
 ---
 // Temporary case study pages so the project cards don't lead to a 404.
-// Replace with the real case study template next.
+// Projects with their own page (work/nearbio.astro) are left out here.
 import Base from "../../layouts/Base.astro";
 import Nav from "../../components/Nav.astro";
 import Button from "../../components/Button.astro";
 import { projects } from "../../data/site";
 
 export function getStaticPaths() {
-  return projects.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+  return projects
+    .filter((project) => project.slug !== "nearbio")
+    .map((project) => ({ params: { slug: project.slug }, props: { project } }));
 }
 
 const { project } = Astro.props;

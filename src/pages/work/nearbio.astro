@@ -1,0 +1,1424 @@
+---
+// nearb.io case study, built from the Figma "nearb.io / Desktop" and
+// "nearb.io / Mobile" frames on the Case study page. Screenshots are crops of
+// the nearb.io product file and of the implemented app, cut to the same
+// frames as the Figma image panels.
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import Button from "../../components/Button.astro";
+import Tag from "../../components/Tag.astro";
+import Sticker from "../../components/Sticker.astro";
+import Sparkle from "../../components/Sparkle.astro";
+import Decor from "../../components/Decor.astro";
+import ToolChip from "../../components/ToolChip.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import Logo from "../../components/Logo.astro";
+import SectionHead from "../../components/case-study/SectionHead.astro";
+import Shot from "../../components/case-study/Shot.astro";
+import CaseIcon from "../../components/case-study/CaseIcon.astro";
+import Device from "../../components/case-study/Device.astro";
+import { projects } from "../../data/site";
+import eyeStrip from "../../assets/art/eye-strip.webp?url";
+import barterlandCover from "../../assets/work/barterland-cover.webp?url";
+
+import heroLanding from "../../assets/work/nearbio/hero-landing.webp";
+import heroSavedMobile from "../../assets/work/nearbio/hero-saved-mobile.webp";
+import flowReturnVisit from "../../assets/work/nearbio/flow-return-visit.webp";
+import wireframeAddress from "../../assets/work/nearbio/wireframe-address.webp";
+import wireframeSaved from "../../assets/work/nearbio/wireframe-saved.webp";
+import wireframeCompare from "../../assets/work/nearbio/wireframe-compare.webp";
+import landingEarlier from "../../assets/work/nearbio/page-landing-earlier.webp";
+import landingCurrent from "../../assets/work/nearbio/page-landing-current.webp";
+import addressEarlier from "../../assets/work/nearbio/page-address-earlier.webp";
+import addressCurrent from "../../assets/work/nearbio/page-address-current.webp";
+import explore from "../../assets/work/nearbio/explore.webp";
+import saved from "../../assets/work/nearbio/saved.webp";
+import savedCard from "../../assets/work/nearbio/saved-card.webp";
+import compareOverview from "../../assets/work/nearbio/compare-overview.webp";
+import compareOverviewMobile from "../../assets/work/nearbio/compare-overview-mobile.webp";
+import compareTransport from "../../assets/work/nearbio/compare-transport.webp";
+import compareTransportMobile from "../../assets/work/nearbio/compare-transport-mobile.webp";
+import savedMobile from "../../assets/work/nearbio/page-saved-mobile.webp";
+import compareMobile from "../../assets/work/nearbio/page-compare-mobile.webp";
+import scoreGaugeFigma from "../../assets/work/nearbio/scoregauge-figma.webp";
+import scoreGaugeStorybook from "../../assets/work/nearbio/scoregauge-storybook.webp";
+import implementedLanding from "../../assets/work/nearbio/page-implemented-landing.webp";
+import implementedSaved from "../../assets/work/nearbio/page-implemented-saved.webp";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const next = projects.find((project) => project.slug === "barterland")!;
+
+const full = "(min-width: 1440px) 1280px, 92vw";
+const narrow = "(min-width: 1100px) 1000px, 92vw";
+const half = "(min-width: 1440px) 620px, (min-width: 768px) 45vw, 92vw";
+const third = "(min-width: 1440px) 405px, (min-width: 768px) 30vw, 92vw";
+
+const details = [
+  ["Role", "Product design, visual identity, and AI-assisted frontend implementation."],
+  ["Collaboration", "Working with a developer on the product."],
+  ["Current scope", "Product designs in Figma, a coded component library, and selected implemented interfaces."],
+];
+
+const contributions = [
+  { icon: "pen-tool", title: "Product design", body: "User flows, wireframes, desktop and mobile layouts, and detailed interface designs." },
+  { icon: "stack", title: "Identity and system", body: "The logo, visual foundations, reusable components, and their variants and states." },
+  { icon: "code", title: "AI-assisted implementation", body: "The Storybook component library, landing page, and saved-locations interface, built with Claude." },
+] as const;
+
+const personas = [
+  { icon: "briefcase", title: "Real-estate agent", body: "May need to review several addresses and communicate their differences.", tilt: -1 },
+  { icon: "home", title: "Home buyer", body: "May evaluate a location for long-term suitability.", tilt: 1 },
+  { icon: "key", title: "Renter", body: "May prioritise everyday convenience and access to essential services.", tilt: -0.8 },
+] as const;
+
+const callouts = [
+  { n: 1, title: "Overall score", body: "An entry point for a quick first impression.", x: 0.3, y: 0.7 },
+  { n: 2, title: "Category cards", body: "Break the location down into specific factors, each with its data sources.", x: 0.3, y: 15.1 },
+  { n: 3, title: "Map", body: "Adds geographic context.", x: 0.3, y: 46.7 },
+  { n: 4, title: "AI summary", body: "A written overview alongside the structured information.", x: 67.5, y: 46.7 },
+];
+
+const groups = [
+  { title: "Visual foundations", body: "Colour, typography, spacing, and radius establish a shared visual language across the product." },
+  { title: "Reusable interface patterns", body: "Navigation, account controls, buttons, inputs, cards, dialogs, and feedback components support recurring interactions." },
+  { title: "Location-specific components", body: "Score gauges, category scores, metric bars, rating tags, and location cards provide reusable ways to present location information." },
+];
+
+const nextSteps = [
+  { icon: "users", title: "Understand audience priorities", body: "Speak with potential users about how they currently evaluate locations, which information they trust, and where they encounter difficulties." },
+  { icon: "checklist", title: "Test the saved-locations journey", body: "Ask participants to save an address, find it again, and reopen its details. Observe where they hesitate or lose context." },
+  { icon: "chart", title: "Evaluate comparison and score comprehension", body: "Ask participants to compare two addresses for a stated need and explain their choice. Explore how they interpret the overall scores, category scores, and displayed differences." },
+  { icon: "refresh", title: "Iterate from the findings", body: "Use the findings to prioritise changes to the information hierarchy, workflows, and supporting components." },
+] as const;
+---
+
+<Base
+  title="nearb.io case study · Viktória Varga"
+  description="How Viktória Varga designed nearb.io, from user flows and wireframes to a design system, Storybook library, and implemented interfaces."
+>
+  <Nav current="Work" />
+
+  <main class="case">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__copy" data-stagger="90">
+        <div class="hero__eyebrow" data-reveal>
+          <Tag>Case study 01</Tag>
+          <a class="text-label-m hero__back" href={`${base}work/`}>← All work</a>
+        </div>
+        <h1 id="hero-title" class="hero__title" data-reveal="slam">nearb.io</h1>
+        <p class="hero__subtitle" data-reveal>From an address to a more informed decision.</p>
+        <p class="text-body-l secondary" data-reveal>nearb.io brings location information together to help people explore addresses, save options, and compare places.</p>
+        <p class="text-body-l secondary" data-reveal>I designed the product experience, visual identity, and design system—from user flows and wireframes to detailed screens. Using Claude, I also built the Storybook component library and implemented the landing page and saved-locations interface.</p>
+      </div>
+
+      <div class="hero__art" aria-hidden="true">
+        <div class="hero__strip anim-sway"><img src={eyeStrip} alt="" width="560" height="160" /></div>
+        <p class="text-label-s hero__note">More context.<br />Better decisions.<br />Brighter places.</p>
+        <Shot class="hero__landing anim-float" reveal={false} src={heroLanding} alt="" sizes="(min-width: 1440px) 600px, (min-width: 768px) 44vw, 84vw" eager />
+        <Shot class="hero__phone anim-float" reveal={false} src={heroSavedMobile} alt="" sizes="(min-width: 768px) 220px, 34vw" eager />
+        <Sparkle color="ink" size={52} class="hero__spark hero__spark--1 anim-twinkle" />
+        <Sparkle color="pink" size={36} class="hero__spark hero__spark--2 anim-twinkle" />
+        <Sparkle color="aqua" size={28} class="hero__spark hero__spark--3 anim-twinkle" />
+      </div>
+
+      <div class="hero__meta" data-stagger="90">
+        <dl class="hero__details" data-reveal>
+          {
+            details.map(([term, value]) => (
+              <div>
+                <dt class="text-label-m accent">{term}</dt>
+                <dd class="text-body-m secondary">{value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="hero__tools" data-reveal>
+          <p class="text-label-m accent">Tools</p>
+          <ul aria-label="Tools">
+            <ToolChip tool="figma" />
+            <ToolChip tool="claude" />
+            <ToolChip tool="storybook" />
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker theme-dark" aria-hidden="true"><div class="ticker__track"><span>Explore</span><i>✦</i><span>Save</span><i>✦</i><span>Compare</span><i>✦</i><span>Explore</span><i>✦</i><span>Save</span><i>✦</i><span>Compare</span><i>✦</i><span>Explore</span><i>✦</i><span>Save</span><i>✦</i><span>Compare</span><i>✦</i><span>Explore</span><i>✦</i><span>Save</span><i>✦</i><span>Compare</span><i>✦</i><span>Explore</span><i>✦</i><span>Save</span><i>✦</i><span>Compare</span><i>✦</i><span>Explore</span><i>✦</i><span>Save</span><i>✦</i><span>Compare</span><i>✦</i><span>Explore</span><i>✦</i><span>Save</span><i>✦</i><span>Compare</span><i>✦</i><span>Explore</span><i>✦</i><span>Save</span><i>✦</i><span>Compare</span><i>✦</i></div></div>
+
+    <!-- 01 The problem -->
+    <section class="problem split" aria-labelledby="problem-title">
+      <div class="split__head">
+        <SectionHead number="01" label="The problem" id="problem-title">An address is only the starting point.</SectionHead>
+        <Decor name="city" width={270} class="problem__city parallax" />
+      </div>
+      <div class="stack" data-stagger="90">
+        <p class="text-body-l secondary" data-reveal>Choosing a location involves more than finding it on a map. People may need to consider transport, nearby services, schools, green spaces, and internet availability—and weigh those factors against other options.</p>
+        <p class="text-body-l secondary" data-reveal>nearb.io brings these categories into one experience. The design challenge was to make detailed location information approachable while supporting a connected journey: exploring an address, saving it for later, and comparing alternatives.</p>
+        <p class="text-body-l secondary" data-reveal>An overall score can provide a starting point, but people also need to understand the individual factors behind it.</p>
+      </div>
+    </section>
+
+    <!-- 02 My role -->
+    <section class="band band--pink" aria-labelledby="role-title">
+      <div class="split">
+        <SectionHead number="02" label="My role" id="role-title">From product structure to reusable UI.</SectionHead>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>My work covered user flows, wireframes, interface design, the logo, and the design system. I also created assumption-based proto-personas to explore potential audiences and their different priorities.</p>
+          <p class="text-body-l secondary" data-reveal>I worked alongside the developer, with responsibility for the product’s design. Using Claude, I translated the Figma system into a Storybook library and implemented the landing page and saved-locations interface.</p>
+        </div>
+      </div>
+      <ul class="ruled ruled--3" data-stagger="90">
+        {
+          contributions.map((item) => (
+            <li data-reveal>
+              <CaseIcon name={item.icon} />
+              <h3 class="text-label-strong">{item.title}</h3>
+              <p class="text-body-m secondary">{item.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- 03 People & priorities -->
+    <section class="band" aria-labelledby="people-title">
+      <Sparkle color="aqua" size={48} class="band__spark band__spark--ink anim-twinkle" />
+      <div class="split">
+        <SectionHead number="03" label="People & priorities" id="people-title">One product, different priorities.</SectionHead>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>A home buyer, renter, and real-estate agent may evaluate the same address for different reasons.</p>
+          <p class="text-body-l secondary" data-reveal>I created assumption-based proto-personas to explore these possible needs. They helped frame design questions, but they were not validated through user interviews.</p>
+        </div>
+      </div>
+      <div class="personas">
+        <Tag color="neutral">Assumption-based proto-personas</Tag>
+        <ul class="personas__list" data-stagger="110">
+          {
+            personas.map((persona) => (
+              <li class="persona" style={`--tilt: ${persona.tilt}deg`} data-reveal="pop">
+                <CaseIcon name={persona.icon} size={36} />
+                <h3 class="text-h3">{persona.title}</h3>
+                <p class="text-body-m secondary">{persona.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <Sticker color="white" class="personas__note">Needs<br />validation</Sticker>
+      </div>
+      <div class="question" data-reveal>
+        <p class="text-label-m accent">The design question</p>
+        <p class="question__text">How can one experience support different priorities without becoming overly complex?</p>
+        <p class="text-body-l secondary">The interface combines an overall view with category-level information. This gives people a common starting point while leaving room to examine the aspects relevant to their own situation.</p>
+        <p class="text-body-l secondary">Which audience to prioritise—and where their needs require different workflows—remains a question for research.</p>
+      </div>
+    </section>
+
+    <!-- 04 Flows, wireframes & iterations -->
+    <section class="band band--pink" aria-labelledby="flows-title">
+      <div class="split">
+        <SectionHead number="04" label="Flows, wireframes & iterations" id="flows-title">Shaping the experience before refining the interface.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>I created user flows and wireframes alongside the detailed screen designs. These explored the product’s structure, the connections between screens, and how information would be organised.</p>
+      </div>
+
+      <div class="block">
+        <div class="split split--tight" data-reveal>
+          <div class="block__title">
+            <p class="text-label-m accent">User flows</p>
+            <h3 class="text-h3">Connecting individual screens into a product journey.</h3>
+          </div>
+          <p class="text-body-l secondary">The flows map how people move through the experience, including exploring an address, saving locations, and comparing alternatives.</p>
+        </div>
+        <Shot src={flowReturnVisit} alt="User flow for a return visit: a signed-in user opens Saved, searches or filters their saved places, and opens Details on a card to reach the address report. With no saved places, an empty state links to the first-check flow." caption="One of four flows: a return visit from the Saved page back into an address report." sizes={full} />
+      </div>
+
+      <div class="block">
+        <div class="split split--tight" data-reveal>
+          <div class="block__title">
+            <p class="text-label-m accent">Wireframes</p>
+            <h3 class="text-h3">Planning the structure of each screen.</h3>
+          </div>
+          <p class="text-body-l secondary">The wireframes show the underlying layout and information hierarchy before the interface’s visual detail.</p>
+        </div>
+        <div class="grid grid--3">
+          <Shot src={wireframeAddress} alt="Wireframe of the address details page: overall score, category cards, map, AI summary, commute times, and a venue table." caption="Address details" sizes={third} />
+          <Shot src={wireframeSaved} alt="Wireframe of the Saved page: summary stats, a grid of saved-location cards, and saved comparisons." caption="Saved locations" sizes={third} />
+          <Shot src={wireframeCompare} alt="Wireframe of the Compare page: two addresses side by side with a category table, AI summary, and map comparison." caption="Compare" sizes={third} />
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="split split--tight" data-reveal>
+          <div class="block__title">
+            <p class="text-label-m accent">Landing page evolution</p>
+            <h3 class="text-h3">Introducing the product and its starting point.</h3>
+          </div>
+          <p class="text-body-l secondary">The earlier and current landing-page designs show how the presentation developed. The current version introduces address evaluation, places address entry prominently, and explains the experience through supporting product content.</p>
+        </div>
+        <div class="grid grid--devices">
+          <Device reveal="from-left" src={landingEarlier} alt="Earlier landing page: headline, a separate address field and Check location button, and a How To Get Started section with three steps." caption="An earlier version of the landing page." />
+          <Device reveal="from-right" src={landingCurrent} alt="Current landing page: headline, a subtitle naming the categories, a search field with the Check location button inside it, example addresses, and How it works." caption="The current landing-page design, with address entry as its main action." />
+        </div>
+        <div class="why" data-reveal>
+          <p class="text-label-m accent">What changed &amp; why</p>
+          <p class="text-body-m">I moved the primary action into the search field to make address entry more direct, and added example addresses to provide a clear starting point. The subtitle now introduces the evaluation categories, helping users understand what nearb.io offers before exploring a location.</p>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="split split--tight" data-reveal>
+          <div class="block__title">
+            <p class="text-label-m accent">Address-detail evolution</p>
+            <h3 class="text-h3">Organising a dense set of location information.</h3>
+          </div>
+          <p class="text-body-l secondary">The current address-detail page starts with an overall score and category summaries, followed by the map and AI summary. This creates a path from a quick overview into more detailed exploration.</p>
+        </div>
+        <div class="grid grid--devices">
+          <Device reveal="from-left" src={addressEarlier} alt="Earlier address page: an overall score, cards listing which delivery, grocery, internet and electricity providers are available, and a venue table below." caption="An earlier approach to presenting address information." />
+          <Device reveal="from-right" src={addressCurrent} alt="Current address page: an overall score, category cards with their own scores and summaries, a map of the area, and an AI summary." caption="An overview-led layout combining scores, category information, and geographic context." />
+        </div>
+        <div class="why" data-reveal>
+          <p class="text-label-m accent">What changed &amp; why</p>
+          <p class="text-body-m">I shifted the focus from provider availability to information that helps users evaluate a location. Category scores and summaries now provide a clearer overview, while the map, AI summary, and commute information appear before the detailed venue table. This hierarchy prioritises understanding the location before exploring individual data points.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 The product experience -->
+    <section class="band" aria-labelledby="product-title">
+      <Sparkle color="aqua" size={64} class="band__spark anim-twinkle" />
+      <div class="product__intro">
+        <SectionHead number="05" label="The product experience" id="product-title">Explore, save, and compare.</SectionHead>
+        <p class="text-body-l secondary">The core experience connects three tasks: understanding a location, keeping it for later, and weighing it against other options.</p>
+      </div>
+
+      <article class="feature" aria-labelledby="feature-explore">
+        <div class="split split--tight" data-reveal>
+          <div class="stack stack--tight">
+            <p class="feature__number" data-reveal="slam"><span>01</span><CaseIcon name="search" size={28} /></p>
+            <h3 id="feature-explore" class="feature__title">Explore an address</h3>
+            <p class="text-h3 feature__sub">Start with an overview, then explore the details.</p>
+            <p class="text-body-l secondary">The overall score provides an entry point, while category cards break the location down into more specific factors. The map adds geographic context, and the AI summary provides a written overview alongside the structured information.</p>
+          </div>
+          <div class="stack">
+            <aside class="annotation" aria-label="Design annotation" data-reveal>
+              <p class="text-label-m accent annotation__label">Design annotation</p>
+              <p class="text-body-l">Balance summary and detail: the overall score is prominent, but the category breakdown remains visible so users can assess individual strengths and weaknesses rather than relying on a single rating.</p>
+            </aside>
+            <div class="row"><Tag>Designed in Figma</Tag></div>
+          </div>
+        </div>
+        <Shot class="explore-shot narrow" src={explore} alt="Address details for Sándor út 102. A: overall score 9.2, category cards for transport, internet, green areas, and food and delivery, a map of the area, and an AI summary. Numbered markers point to the overall score, category cards, map, and AI summary." sizes={narrow}>
+          {
+            callouts.map((c) => (
+              <span class="callout" style={`left: ${c.x}%; top: ${c.y}%; --i: ${c.n - 1}`} aria-hidden="true">
+                {c.n}
+              </span>
+            ))
+          }
+        </Shot>
+        <ol class="legend narrow" data-stagger="120">
+          {
+            callouts.map((c) => (
+              <li data-reveal="pop">
+                <span class="text-label-strong"><b class="legend__n">{c.n}</b>&nbsp;&nbsp;{c.title}</span>
+                <span class="text-body-m secondary">{c.body}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </article>
+
+      <article class="feature" aria-labelledby="feature-save">
+        <div class="split split--tight" data-reveal>
+          <div class="stack stack--tight">
+            <p class="feature__number" data-reveal="slam"><span>02</span><CaseIcon name="bookmark" size={28} /></p>
+            <h3 id="feature-save" class="feature__title">Save a location</h3>
+            <p class="text-h3 feature__sub">Keep useful context when returning to an address.</p>
+            <p class="text-body-l secondary">Saved-location cards bring together the address, a map preview, the overall score, and selected category scores, with buttons to compare the location or open its full report.</p>
+            <p class="text-body-l secondary">The saved-locations experience connects an initial search with a decision that may take several visits.</p>
+          </div>
+          <div class="stack">
+            <aside class="annotation" aria-label="Design annotation" data-reveal>
+              <p class="text-label-m accent annotation__label">Design annotation</p>
+              <p class="text-body-l">Prioritise quick review over full detail: cards surface a small set of scores and location information, while the complete report remains available for deeper exploration.</p>
+            </aside>
+            <div class="row"><Tag>Designed in Figma</Tag><Tag color="aqua">Interface implemented with Claude</Tag></div>
+          </div>
+        </div>
+        <Shot class="narrow" src={saved} mobile={savedCard} alt="Saved locations page: summary stats for saved places, average score, score change, and best overall score, above saved-location cards with a map preview, overall score, three category scores, and Compare and Details buttons." sizes={narrow} />
+      </article>
+
+      <article class="feature" aria-labelledby="feature-compare">
+        <div class="split split--tight" data-reveal>
+          <div class="stack stack--tight">
+            <p class="feature__number" data-reveal="slam"><span>03</span><CaseIcon name="compare" size={28} /></p>
+            <h3 id="feature-compare" class="feature__title">Compare alternatives</h3>
+            <p class="text-h3 feature__sub">Make the differences easier to inspect.</p>
+            <p class="text-body-l secondary">The comparison overview places two addresses side by side, showing their overall ratings, the score for each category, and the difference between them.</p>
+            <p class="text-body-l secondary">The detailed transport comparison extends this approach, allowing a closer look at one category.</p>
+          </div>
+          <div class="stack">
+            <aside class="annotation" aria-label="Design annotation" data-reveal>
+              <p class="text-label-m accent annotation__label">Design annotation</p>
+              <p class="text-body-l">Support individual priorities: rather than presenting one address as the definitive winner, the comparison keeps category-level differences visible so users can weigh the factors that matter most to them.</p>
+            </aside>
+            <div class="row"><Tag>Designed in Figma</Tag></div>
+          </div>
+        </div>
+        <div class="grid grid--compare narrow">
+          <Shot src={compareOverview} mobile={compareOverviewMobile} alt="Comparison overview of Sándor út 102. A and Ráday utca 45.: overall scores 9.2 and 8.1, and a table of category scores with the difference for each." caption="Comparison overview" sizes="(min-width: 1100px) 600px, (min-width: 768px) 55vw, 92vw" />
+          <Shot src={compareTransport} mobile={compareTransportMobile} alt="Detailed transport comparison: transport scores for both addresses, nearest metro, bus stops, night routes, airport time, and a transport map." caption="Detailed transport comparison" sizes="(min-width: 1100px) 385px, (min-width: 768px) 35vw, 92vw" />
+        </div>
+      </article>
+
+      <div class="mobile split split--tight">
+        <div class="stack stack--tight">
+          <p class="text-label-m accent">Desktop and mobile</p>
+          <h3 class="text-h3">Adapting the experience for mobile</h3>
+          <p class="text-body-l secondary">I also created mobile layouts for saved locations and comparison. These explore how to present the same information within a narrower space while keeping the main tasks accessible.</p>
+          <p class="text-body-m secondary">Mobile layouts for saved locations and comparison. The desktop versions are shown above.</p>
+        </div>
+        <div class="mobile__phones">
+          <Device device="phone" reveal="pop" src={savedMobile} alt="Mobile Saved locations layout: summary stats in a two-column grid, saved-location cards, and an insight card." />
+          <Device device="phone" reveal="pop" src={compareMobile} alt="Mobile comparison layout: the two addresses stacked with their overall scores, the category table, and a map comparison." />
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 Design system & implementation (always dark) -->
+    <section class="band theme-dark system" aria-labelledby="system-title">
+      <Sparkle color="pink" size={40} class="band__spark anim-twinkle" />
+      <div class="split">
+        <SectionHead number="06" label="Design system & implementation" id="system-title">Connecting Figma and code.</SectionHead>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>I created the nearb.io logo and design system alongside the product interface. The system combines visual foundations, reusable interface patterns, and components specific to location evaluation.</p>
+          <p class="text-body-l secondary" data-reveal>Using Claude, I built the corresponding Storybook library, with examples of components, variants, and states.</p>
+        </div>
+      </div>
+      <ul class="groups" data-stagger="90">
+        {
+          groups.map((group) => (
+            <li data-reveal>
+              <h3 class="text-label-strong">{group.title}</h3>
+              <p class="text-body-m secondary">{group.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="block">
+        <div class="block__title">
+          <h3 class="text-h3">One component, across design and code</h3>
+          <p class="text-body-l secondary">The score gauge, as a Figma component with a variant for each whole score, and as a coded component documented in Storybook.</p>
+        </div>
+        <div class="grid grid--2">
+          <div class="source">
+            <p class="source__label text-label-strong"><svg viewBox="0 0 38 57" aria-hidden="true" focusable="false"><path d="M19 0H9.5a9.5 9.5 0 0 0 0 19H19z" fill="#F24E1E" /><path d="M19 0h9.5a9.5 9.5 0 0 1 0 19H19z" fill="#FF7262" /><path d="M19 19H9.5a9.5 9.5 0 0 0 0 19H19z" fill="#A259FF" /><path d="M19 28.5a9.5 9.5 0 1 1 19 0a9.5 9.5 0 0 1-19 0z" fill="#1ABCFE" /><path d="M9.5 57a9.5 9.5 0 0 0 9.5-9.5V38H9.5a9.5 9.5 0 0 0 0 19z" fill="#0ACF83" /></svg>Figma — design system</p>
+            <Shot src={scoreGaugeFigma} alt="ScoreGauge component set in Figma: eleven gauges from 0.0 to 10.0, filling with a teal, yellow and green sweep as the score rises." caption="The ScoreGauge component set, with a variant for each whole score from 0 to 10." sizes={half} />
+          </div>
+          <div class="source">
+            <p class="source__label text-label-strong"><span class="source__storybook" aria-hidden="true">S</span>Storybook — component library</p>
+            <Shot src={scoreGaugeStorybook} alt="ScoreGauge docs page in Storybook: a description, a live 8.4 gauge, and a props table for score, size, and label." caption="The coded ScoreGauge in Storybook, with documented props and a live example." sizes={half} />
+          </div>
+        </div>
+      </div>
+      <div class="block">
+        <div class="block__title">
+          <h3 class="text-h3">Implemented interfaces</h3>
+          <p class="text-body-l secondary">My implementation work also covered the landing page and saved-locations interface. These sit alongside the broader product designs in Figma.</p>
+        </div>
+        <div class="grid grid--devices">
+          <Device reveal="from-left" src={implementedLanding} alt="The implemented nearb.io landing page: headline, address search with example addresses, How it works, example reports, and the categories it analyses." caption="Interface implemented with Claude. Captured from a local build with test data." />
+          <Device reveal="from-right" src={implementedSaved} alt="The implemented Saved locations page: summary stats and saved-location cards with scores for food and delivery, internet, and providers." caption="Interface implemented with Claude. Captured from a local build with test data." />
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 Reflection & next steps -->
+    <section class="band" aria-labelledby="reflection-title">
+      <Sparkle color="pink" size={44} class="band__spark anim-twinkle" />
+      <div class="split">
+        <SectionHead number="07" label="Reflection & next steps" id="reflection-title">From design assumptions to evidence.</SectionHead>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>The current work establishes the product’s structure, visual language, and reusable UI. Its usability and impact still need to be evaluated.</p>
+          <p class="text-body-l secondary" data-reveal>The main open question is whether the experience supports the priorities of its potential audiences. A second question is whether people can interpret the scores and use the category information to make a meaningful comparison.</p>
+        </div>
+      </div>
+      <div class="stack">
+        <div><Tag color="aqua">Next steps</Tag></div>
+        <ul class="ruled ruled--4" data-stagger="90">
+          {
+            nextSteps.map((step) => (
+              <li data-reveal>
+                <CaseIcon name={step.icon} />
+                <h3 class="text-label-strong">{step.title}</h3>
+                <p class="text-body-m secondary">{step.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Next project (always dark) -->
+    <section class="next theme-dark" aria-labelledby="next-title">
+      <Decor name="perspective-grid" tone="text" moving stretch class="next__grid" />
+      <Decor name="city" class="next__city" />
+      <Sparkle color="ink" size={88} class="next__star anim-twinkle" />
+      <div class="next__copy" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>Next project →</p>
+        <h2 id="next-title" class="next__title" data-reveal="slam">{next.title}</h2>
+        <p class="text-label-m" data-reveal>{next.tags.map((tag) => `# ${tag}`).join("  ·  ")}</p>
+        <div class="row" data-reveal>
+          <Button variant="secondary" href={`${base}work/${next.slug}/`} arrow>View case study</Button>
+          <Button variant="ghost" href={`${base}work/`}>All work</Button>
+        </div>
+      </div>
+      <div class="next__card theme-light" data-reveal="card">
+        <ProjectCard number={next.number} title={next.title} summary={next.summary} tags={[...next.tags]} href={`${base}work/${next.slug}/`} cover={barterlandCover} shape="B" tilt={3} />
+      </div>
+    </section>
+
+    <!-- Call to action (always pink) -->
+    <section class="cta theme-light" aria-label="Get in touch">
+      <a class="cta__link" href={`${base}#contact`}>Let's create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
+      <div class="cta__strip anim-float" aria-hidden="true"><img src={eyeStrip} alt="" width="560" height="160" loading="lazy" /></div>
+      <Sparkle color="ink" size={40} class="cta__spark anim-twinkle" />
+    </section>
+
+    <nav class="pager text-label-m" aria-label="Case studies">
+      <a href={`${base}work/`}>← Back to work</a>
+      <a href={`${base}work/${next.slug}/`}>Next project: {next.title} ↗</a>
+    </nav>
+  </main>
+
+  <footer class="footer theme-dark">
+    <Logo variant="wordmark" height={40} label="VIKSZDE" />
+    <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
+    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+  </footer>
+</Base>
+
+<style>
+  /* Titles slam in from 150% size; clip so they never widen the page. */
+  .case {
+    overflow-x: clip;
+  }
+
+  .case > section {
+    position: relative;
+    padding: var(--spacing-24) var(--gutter);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  .accent {
+    color: var(--color-text-accent);
+  }
+
+  .secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+
+  .stack {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-4);
+  }
+
+  .stack--tight {
+    gap: var(--spacing-4);
+  }
+
+  /* Two columns: heading on the left, copy on the right, like the Figma
+     "intro row". */
+  .split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 600px));
+    justify-content: space-between;
+    gap: var(--spacing-8) var(--spacing-16);
+    align-items: start;
+  }
+
+  .split--tight {
+    gap: var(--spacing-6) var(--spacing-16);
+  }
+
+  .split__head {
+    display: grid;
+    gap: var(--spacing-16);
+  }
+
+  .band {
+    display: grid;
+    gap: var(--spacing-12);
+  }
+
+  .band--pink {
+    --color-bg-page: var(--color-bg-accent-subtle);
+  }
+
+  /* Big screenshots stop at 1000px so they read as pictures, not walls,
+     and sit centred. Global, because <Shot> receives it as a class. */
+  :global(.narrow) {
+    width: 100%;
+    max-width: 1000px;
+    margin-inline: auto;
+  }
+
+  :global(.band__spark) {
+    position: absolute;
+    top: var(--spacing-8);
+    right: var(--gutter);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--spacing-8);
+    align-items: start;
+  }
+
+  .grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .grid--compare {
+    grid-template-columns: minmax(0, 760fr) minmax(0, 488fr);
+  }
+
+  .grid--devices {
+    grid-template-columns: repeat(2, minmax(0, 500px));
+    justify-content: center;
+    gap: var(--spacing-8) var(--spacing-16);
+  }
+
+  .block {
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .block__title {
+    display: grid;
+    gap: var(--spacing-2);
+    max-width: 840px;
+  }
+
+  /* Hero */
+  .case > .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 600px) minmax(0, 640px);
+    grid-template-areas:
+      "copy art"
+      "meta art";
+    justify-content: space-between;
+    gap: var(--spacing-6) var(--spacing-12);
+    padding-block: var(--spacing-12) var(--spacing-16);
+  }
+
+  .hero__copy {
+    grid-area: copy;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .hero__back {
+    text-decoration: none;
+  }
+
+  .hero__back:hover {
+    color: var(--color-text-accent);
+  }
+
+  .hero__title {
+    font: 400 clamp(5rem, 11vw, 10rem) / 1 var(--font-display);
+  }
+
+  .hero__subtitle {
+    font: 400 clamp(2.125rem, 3.1vw, 2.75rem) / 1.1 var(--font-display);
+    text-wrap: balance;
+  }
+
+  .hero__meta {
+    grid-area: meta;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .hero__details {
+    display: grid;
+    gap: var(--spacing-4);
+    margin: 0;
+  }
+
+  .hero__details dd {
+    margin: var(--spacing-1) 0 0;
+  }
+
+  .hero__tools {
+    display: grid;
+    gap: 10px;
+  }
+
+  .hero__tools ul {
+    display: flex;
+    gap: var(--spacing-4);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* The mockups are placed on the 640 × 700 Figma frame, in percent. */
+  .hero__art {
+    grid-area: art;
+    position: relative;
+    align-self: center;
+    aspect-ratio: 640 / 700;
+  }
+
+  .hero__art > :global(*) {
+    position: absolute;
+  }
+
+  .hero__strip {
+    left: 56%;
+    top: -1.5%;
+    width: 54%;
+    aspect-ratio: 347 / 99;
+    overflow: hidden;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-page);
+    rotate: -3deg;
+  }
+
+  .hero__strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__note {
+    right: -3%;
+    top: 17%;
+    text-align: right;
+  }
+
+  :global(.hero__landing) {
+    left: 0;
+    top: 27%;
+    width: 94%;
+    rotate: -2deg;
+  }
+
+  :global(.hero__phone) {
+    left: 70%;
+    top: 40%;
+    width: 34%;
+    rotate: 3deg;
+  }
+
+  :global(.hero__spark--1) {
+    left: 47%;
+    top: 5%;
+  }
+
+  :global(.hero__spark--2) {
+    left: 3%;
+    top: 17%;
+  }
+
+  :global(.hero__spark--3) {
+    left: 94%;
+    top: 91%;
+  }
+
+  /* 01 Problem */
+  :global(.problem__city) {
+    --decor-sun: var(--color-bg-primary);
+    --decor-skyline: var(--color-ink-900);
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Two- to four-column lists split by thin rules (02 role, 07 next steps). */
+  .ruled {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ruled--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ruled--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .ruled li {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding: 0 var(--spacing-8);
+  }
+
+  .ruled li:first-child {
+    padding-left: 0;
+  }
+
+  .ruled li + li {
+    border-left: var(--border-thin) solid var(--color-border-default);
+  }
+
+  /* 03 People */
+  .personas {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-4);
+  }
+
+  .personas__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-6);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .persona {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    /* `transform`, not `rotate`: the scroll reveal settles `rotate` at 0. */
+    transform: rotate(var(--tilt));
+  }
+
+  :global(.personas__note) {
+    position: absolute;
+    right: calc(var(--spacing-8) * -1);
+    top: 0;
+  }
+
+  .question {
+    display: grid;
+    gap: var(--spacing-3);
+    padding-left: var(--spacing-6);
+    border-left: 6px solid var(--color-bg-primary);
+  }
+
+  .question__text {
+    font: 400 2.5rem / 1.1 var(--font-display);
+    text-wrap: balance;
+  }
+
+  /* 04 Flows */
+  .why {
+    display: grid;
+    gap: var(--spacing-2);
+    max-width: 840px;
+    padding-left: var(--spacing-6);
+    border-left: 6px solid var(--color-bg-secondary);
+  }
+
+  /* 05 Product */
+  .product__intro {
+    display: grid;
+    gap: var(--spacing-12);
+  }
+
+  .feature {
+    display: grid;
+    gap: var(--spacing-8);
+  }
+
+  .feature__number {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    font: 400 3.5rem / 1 var(--font-display);
+    color: var(--color-bg-primary);
+  }
+
+  .feature__number :global(svg) {
+    color: var(--color-text-primary);
+  }
+
+  .feature__title {
+    font: 400 2.75rem / 1 var(--font-display);
+  }
+
+  .feature__sub {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  .annotation {
+    display: grid;
+    gap: 10px;
+    padding: var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  /* Annotation label: an aqua marker sweeps in behind it. */
+  .annotation__label {
+    justify-self: start;
+    margin-left: -6px;
+    padding: 2px 6px;
+    background: linear-gradient(var(--color-bg-secondary-subtle), var(--color-bg-secondary-subtle)) no-repeat left / 0% 100%;
+    transition: background-size 600ms var(--motion-ease-out) 450ms;
+  }
+
+  .annotation:global(.is-visible) .annotation__label,
+  :global(html:not(.js)) .annotation__label {
+    background-size: 100% 100%;
+  }
+
+  /* Numbered markers on the Explore screenshot, in aqua so they read
+     against the dark green UI. They pop in one by one. */
+  .callout {
+    position: absolute;
+    padding: var(--spacing-1) 10px;
+    border: var(--border-thin) solid var(--color-ink-1000);
+    background: var(--color-bg-secondary);
+    color: var(--color-ink-1000);
+    font: 400 1.375rem / 1.2 var(--font-display);
+  }
+
+  :global(.js .explore-shot:not(.is-visible)) .callout {
+    opacity: 0;
+  }
+
+  :global(.explore-shot.is-visible) .callout {
+    animation: callout-pop 480ms var(--motion-ease-snap) calc(500ms + var(--i) * 160ms) both;
+  }
+
+  @keyframes callout-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.2) rotate(-25deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .legend__n {
+    display: inline-block;
+    min-width: 1.5em;
+    margin-right: var(--spacing-2);
+    padding: 0 4px;
+    border: var(--border-thin) solid var(--color-ink-1000);
+    background: var(--color-bg-secondary);
+    color: var(--color-ink-1000);
+    text-align: center;
+  }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--spacing-6);
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+
+  .legend li {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-1);
+  }
+
+  /* Text and phones sit together in the middle rather than at the two
+     edges of the page. */
+  .mobile {
+    grid-template-columns: minmax(0, 520px) auto;
+    justify-content: center;
+    align-items: center;
+    column-gap: var(--spacing-24);
+  }
+
+  .mobile__phones {
+    display: flex;
+    gap: var(--spacing-8);
+  }
+
+  .mobile__phones :global(.device) {
+    width: 220px;
+  }
+
+  /* 06 System */
+  .system {
+    --color-bg-page: var(--color-ink-1000);
+  }
+
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .groups li {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    padding: var(--spacing-6);
+    border: var(--border-thin) solid var(--color-border-subtle);
+    background: var(--color-bg-surface);
+  }
+
+  .source {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-4);
+  }
+
+  .source__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .source__label svg {
+    width: auto;
+    height: 24px;
+  }
+
+  .source__storybook {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    background: #ff4785;
+    color: var(--color-white-1000);
+    font: 700 0.875rem / 1 var(--font-sans);
+  }
+
+  /* Next project */
+  .next {
+    display: grid;
+    grid-template-columns: minmax(0, 500px) minmax(0, 400px);
+    align-items: center;
+    gap: var(--spacing-12) var(--spacing-8);
+    min-height: 736px;
+    overflow: hidden;
+  }
+
+  .next__copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .next__title {
+    font: 400 clamp(3.5rem, 7vw, 6.25rem) / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .next__card {
+    position: relative;
+    z-index: 1;
+  }
+
+  :global(.next__grid) {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 240px;
+    opacity: 0.3;
+    --rung-dur: 3s;
+  }
+
+  :global(.next__city) {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 360px;
+    --decor-sun: var(--color-yellow-500);
+    --decor-skyline: var(--color-ink-700);
+  }
+
+  :global(.next__star) {
+    position: absolute;
+    left: 77%;
+    top: 13%;
+  }
+
+  /* Call to action */
+  .case > .cta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    padding-block: var(--spacing-12);
+    background: var(--color-bg-primary);
+  }
+
+  .cta__link {
+    flex: 1;
+    color: var(--color-white-1000);
+    font: 400 clamp(2.5rem, 5vw, 4.5rem) / 1 var(--font-display);
+    text-decoration: none;
+  }
+
+  .cta__arrow {
+    display: inline-block;
+    animation: slide 1.8s ease-in-out infinite;
+    --slide: 14px;
+  }
+
+  .cta__strip:global(.anim-float) {
+    --float: -10px;
+    --dur: 5s;
+  }
+
+  .cta__strip {
+    width: 308px;
+    aspect-ratio: 308 / 88;
+    overflow: hidden;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-paper-100);
+    rotate: -3deg;
+  }
+
+  .cta__strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  :global(.cta__spark) {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--gutter);
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding: 28px var(--gutter);
+  }
+
+  .pager a {
+    text-decoration: none;
+  }
+
+  .pager a:hover {
+    color: var(--color-text-accent);
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) var(--gutter);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  /* Motion */
+
+  /* Ticker under the hero: the three tasks roll past endlessly. */
+  .ticker {
+    overflow: hidden;
+    border-block: var(--border-regular) solid var(--color-ink-1000);
+    background: var(--color-ink-1000);
+    color: var(--color-paper-100);
+  }
+
+  .ticker__track {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-6);
+    width: max-content;
+    padding: 10px 0;
+    font: 400 1.75rem / 1 var(--font-display);
+    text-transform: uppercase;
+    animation: ticker 30s linear infinite;
+  }
+
+  .ticker__track i {
+    font-style: normal;
+    color: var(--color-bg-secondary);
+  }
+
+  .ticker__track i:nth-of-type(3n + 2) {
+    color: var(--color-bg-accent);
+  }
+
+  @media (max-width: 767px) {
+    .ticker__track {
+      font-size: 1.25rem;
+    }
+  }
+
+  @keyframes ticker {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  /* Hero mockups drop in on load, then float. The entrance is on the
+     picture so it doesn't fight the float on the figure. */
+  :global(.hero__landing.anim-float) {
+    --float: -10px;
+    --dur: 7s;
+  }
+
+  :global(.hero__phone.anim-float) {
+    --float: -14px;
+    --dur: 6s;
+    --delay: -2s;
+  }
+
+  :global(.hero__strip.anim-sway) {
+    --sway: 2deg;
+    --dur: 6s;
+  }
+
+  :global(.hero__landing picture) {
+    display: block;
+    animation: hero-drop 900ms var(--motion-ease-out) 150ms both;
+  }
+
+  :global(.hero__phone picture) {
+    display: block;
+    animation: hero-drop-phone 800ms var(--motion-ease-snap) 550ms both;
+  }
+
+  @keyframes hero-drop {
+    from {
+      opacity: 0;
+      transform: translate(80px, 40px) rotate(5deg);
+    }
+  }
+
+  @keyframes hero-drop-phone {
+    from {
+      opacity: 0;
+      transform: translateY(120px) rotate(12deg) scale(0.8);
+    }
+  }
+
+  /* Earlier and current screens slide in from opposite sides. */
+  :global(.js [data-reveal="from-left"]) {
+    translate: -96px 0;
+    rotate: -4deg;
+  }
+
+  :global(.js [data-reveal="from-right"]) {
+    translate: 96px 0;
+    rotate: 4deg;
+  }
+
+  /* The "Needs validation" sticker stamps down once the cards are in. */
+  :global(.js .personas:not(:has(.persona.is-visible)) .personas__note) {
+    opacity: 0;
+  }
+
+  :global(.personas:has(.persona.is-visible) .personas__note) {
+    animation: sticker-stamp 520ms cubic-bezier(0.5, 0, 0.6, 1) 600ms both;
+  }
+
+  @keyframes sticker-stamp {
+    from {
+      opacity: 0;
+      transform: scale(2.4);
+    }
+
+    60% {
+      opacity: 1;
+      transform: scale(0.92);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  :global(.problem__city.parallax) {
+    --parallax: 40px;
+  }
+
+  :global(.band__spark--ink) {
+    color: var(--color-aqua-700);
+  }
+
+  /* Tablet */
+  @media (max-width: 1023px) {
+    .case > .hero,
+    .split,
+    .next {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .case > .hero {
+      grid-template-areas:
+        "copy"
+        "art"
+        "meta";
+    }
+
+    .hero__art {
+      width: min(100%, 640px);
+    }
+
+    .ruled--4,
+    .legend {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--spacing-8);
+    }
+
+    .ruled--4 li:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .personas__list,
+    .groups {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .persona {
+      max-width: 520px;
+    }
+
+    :global(.personas__note) {
+      right: 0;
+    }
+
+    .mobile__phones {
+      justify-content: center;
+    }
+
+    .next__card {
+      width: min(100%, 400px);
+    }
+
+    .cta__strip {
+      display: none;
+    }
+
+    .footer {
+      flex-wrap: wrap;
+    }
+
+    .footer p {
+      white-space: nowrap;
+    }
+
+    .footer .text-katakana {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Phone */
+  @media (max-width: 767px) {
+    .case > section {
+      padding-block: var(--spacing-16);
+    }
+
+    .case > .hero {
+      padding-block: 28px var(--spacing-12);
+    }
+
+    .hero__strip,
+    .hero__note {
+      display: none;
+    }
+
+    .ruled--3,
+    .ruled--4,
+    .legend,
+    .grid--2,
+    .grid--3,
+    .grid--compare,
+    .grid--devices {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ruled li,
+    .ruled li + li,
+    .ruled--4 li:nth-child(3) {
+      padding: var(--spacing-4) 0 0;
+      border-left: 0;
+      border-top: var(--border-thin) solid var(--color-border-default);
+    }
+
+    /* The sticker drops below the cards and overlaps the last one's corner. */
+    :global(.personas__note) {
+      position: relative;
+      justify-self: end;
+      margin-top: calc(var(--spacing-8) * -1);
+    }
+
+    .question__text {
+      font-size: 1.75rem;
+    }
+
+    .feature__number {
+      font-size: 2.5rem;
+    }
+
+    .feature__title {
+      font-size: 2rem;
+    }
+
+    .mobile__phones {
+      gap: var(--spacing-4);
+    }
+
+    .mobile__phones :global(.device) {
+      width: calc(50% - var(--spacing-2));
+    }
+
+    .case > .next {
+      min-height: 0;
+      padding-bottom: 260px;
+    }
+
+    :global(.next__city) {
+      width: 300px;
+    }
+
+    .pager {
+      flex-direction: column;
+    }
+
+    .footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
