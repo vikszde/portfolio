@@ -192,12 +192,12 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
         <div data-reveal><Button variant="ghost" href={`${base}about/`} arrow>More about me</Button></div>
       </div>
 
-      <div class="about__comic" data-reveal>
+      <!-- Four panels, each its own SVG cut to its own box (in the strip's
+           shared coordinates), so the same panels can stack into the slanted
+           strip on wide screens or line up in a swipeable row below 1200px. -->
+      <div class="about__comic" data-reveal data-comic>
         <ul class="visually-hidden" aria-label="Interests"><li>Creativity</li><li>Organizing</li><li>Anime</li><li>Friends</li><li>And more</li></ul>
-        <svg viewBox="-4 -4 248 478" aria-hidden="true" focusable="false">
-          <defs>
-            <clipPath id="comic-p3"><polygon points="0,218 240,204 240,316 0,300" /></clipPath>
-          </defs>
+        <svg class="comic__cell" viewBox="-4 -4 248 118" aria-hidden="true" focusable="false">
           <g class="comic__panel" style="--i: 0" data-focus>
             <g class="comic__pop">
               <polygon class="comic__fill comic__fill--paper" points="0,0 240,0 240,86 0,110" />
@@ -216,6 +216,8 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
               <polygon class="comic__frame" points="0,0 240,0 240,86 0,110" />
             </g>
           </g>
+        </svg>
+        <svg class="comic__cell" viewBox="-4 90 248 124" aria-hidden="true" focusable="false">
           <g class="comic__panel" style="--i: 1" data-focus>
             <g class="comic__pop">
               <polygon class="comic__fill comic__fill--aqua" points="0,118 240,94 240,196 0,210" />
@@ -236,6 +238,11 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
               <polygon class="comic__frame" points="0,118 240,94 240,196 0,210" />
             </g>
           </g>
+        </svg>
+        <svg class="comic__cell" viewBox="-4 200 248 120" aria-hidden="true" focusable="false">
+          <defs>
+            <clipPath id="comic-p3"><polygon points="0,218 240,204 240,316 0,300" /></clipPath>
+          </defs>
           <g class="comic__panel" style="--i: 2" data-focus>
             <g class="comic__pop">
               <polygon class="comic__fill comic__fill--ink" points="0,218 240,204 240,316 0,300" />
@@ -253,6 +260,8 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
               <polygon class="comic__frame" points="0,218 240,204 240,316 0,300" />
             </g>
           </g>
+        </svg>
+        <svg class="comic__cell" viewBox="-4 304 248 140" aria-hidden="true" focusable="false">
           <g class="comic__panel" style="--i: 3" data-focus>
             <g class="comic__pop">
               <polygon class="comic__fill comic__fill--pink" points="0,308 240,324 240,440 0,440" />
@@ -264,9 +273,10 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
               <polygon class="comic__frame" points="0,308 240,324 240,440 0,440" />
             </g>
           </g>
-          <text x="240" y="466" text-anchor="end" class="comic__more">And more ✦</text>
         </svg>
+        <p class="comic__more" aria-hidden="true">And more ✦</p>
       </div>
+      <p class="about__swipe" aria-hidden="true" hidden>Swipe for more →</p>
     </section>
 
     <!-- Contact (always pink, light tokens) -->
@@ -341,6 +351,29 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       { rootMargin: "-40% 0px -40% 0px" },
     );
     focusables.forEach((el) => centre.observe(el));
+  }
+
+  // Below 1200px the interests comic is a sideways-scrolling row. While it
+  // actually overflows, it becomes a focusable region (so keyboard users can
+  // scroll it with the arrow keys) and the "swipe" hint under it shows.
+  const comic = document.querySelector<HTMLElement>("[data-comic]");
+  const swipeHint = document.querySelector<HTMLElement>(".about__swipe");
+  if (comic) {
+    const checkComic = () => {
+      const scrolls = comic.scrollWidth > comic.clientWidth + 1;
+      if (scrolls) {
+        comic.tabIndex = 0;
+        comic.setAttribute("role", "region");
+        comic.setAttribute("aria-label", "Interests. Scrollable.");
+      } else {
+        comic.removeAttribute("tabindex");
+        comic.removeAttribute("role");
+        comic.removeAttribute("aria-label");
+      }
+      if (swipeHint) swipeHint.hidden = !scrolls;
+    };
+    checkComic();
+    new ResizeObserver(checkComic).observe(comic);
   }
 
   // About stats count up from zero when they scroll into view.
@@ -1352,14 +1385,47 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
   .about__comic {
     position: relative;
     width: clamp(11rem, 16vw, 15rem);
+    aspect-ratio: 248 / 478;
     rotate: 2deg;
   }
 
-  .about__comic svg {
+  /* Each panel's SVG sits where its box falls in the 248 × 478 strip, so
+     together they draw the strip with its angled gutters. */
+  .comic__cell {
+    position: absolute;
+    left: 0;
     display: block;
     width: 100%;
     height: auto;
     overflow: visible;
+  }
+
+  .comic__cell:nth-of-type(2) {
+    top: 19.665%;
+  }
+
+  .comic__cell:nth-of-type(3) {
+    top: 42.678%;
+  }
+
+  .comic__cell:nth-of-type(4) {
+    top: 64.435%;
+  }
+
+  .comic__cell:nth-of-type(1) {
+    top: 0;
+  }
+
+  /* Below 1200px the comic is a sideways row; while it overflows, this
+     hint shows under it (set by the script). */
+  .about__swipe {
+    grid-column: 1 / -1;
+    /* Tucked up under the row, against the section's 64px gap. */
+    margin: calc(-1 * var(--spacing-12)) 0 0;
+    color: var(--color-text-secondary);
+    font: 500 0.75rem / 1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .comic__panel {
@@ -1449,10 +1515,14 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
   }
 
   .comic__more {
-    font: 500 12px var(--font-mono);
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    color: var(--color-ink-900);
+    font: 500 0.75rem / 1 var(--font-mono);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    fill: var(--color-ink-900);
   }
 
   .comic__ink-fill {
@@ -1958,13 +2028,52 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     }
   }
 
-  /* About below 1200px: the photo pile and the comic strip together are too
-     much, so only the photo pile stays. Landscape tablets and small laptops
-     show it beside the text; portrait tablets put the text first and centre
-     the pile under it. */
+  /* About below 1200px: there's no room for the comic strip as a third
+     column, so its panels line up in a row across the full width that you
+     swipe sideways, one panel and the edge of the next in view, ending on
+     "And more". Landscape tablets and small laptops show the photo pile
+     beside the text; portrait tablets put the text first and centre the
+     pile under it. */
   @media (max-width: 1199px) {
     .about__comic {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-4);
+      width: auto;
+      aspect-ratio: auto;
+      margin-inline: calc(-1 * var(--gutter));
+      padding: var(--spacing-3) var(--gutter);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--gutter);
+      scrollbar-width: none;
+      rotate: none;
+    }
+
+    .about__comic::-webkit-scrollbar {
       display: none;
+    }
+
+    .about__comic:focus-visible {
+      outline: var(--border-regular) solid var(--color-border-primary);
+      outline-offset: -4px;
+    }
+
+    .comic__cell {
+      position: static;
+      flex: none;
+      width: min(64vw, 240px);
+      scroll-snap-align: start;
+    }
+
+    .comic__more {
+      position: static;
+      flex: none;
+      padding-inline-end: var(--gutter);
+      white-space: nowrap;
+      scroll-snap-align: end;
     }
   }
 
@@ -1974,13 +2083,24 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     }
   }
 
+  /* Portrait tablets: as on phones, the photo pile sits top right beside the
+     heading and paragraph, at 60% size, instead of full size under the text.
+     The stats, button and comic row then run the full width below. */
   @media (min-width: 768px) and (max-width: 1023px) {
-    .about__copy {
-      order: -1;
+    .about__copy,
+    .about__portrait {
+      grid-row: 1;
+      grid-column: 1;
     }
 
     .about__portrait {
-      justify-self: center;
+      justify-self: end;
+      align-self: start;
+      zoom: 0.6;
+    }
+
+    .about__copy > :nth-child(-n + 4) {
+      margin-right: 330px;
     }
   }
 
@@ -2035,64 +2155,74 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       padding: 0 var(--spacing-3);
     }
 
-    /* The cards stack, so the arrow stands up and points down them. Its
-       tail starts behind the first card, so its end never shows. */
+    /* The cards stack in one column, where the big arrow doesn't fit: it
+       would hide behind the cards and leave only a stray pink stub. So it
+       goes, and the next case study waits under Barterland like the next
+       card in a deck. Only its bottom edge shows, with its title and 準備中.
+       Dealt in last, it slides up into place behind the card. */
     .work__arrow {
-      --arrow-h: 140px;
-      top: var(--spacing-24);
-      left: calc(50% - var(--arrow-h) / 2);
-      right: auto;
-      width: var(--arrow-h);
-      height: auto;
-    }
-
-    :global(.js) .work__arrow[data-reveal]:not(.is-visible) {
-      translate: 0 -40%;
-      opacity: 0;
-    }
-
-    .work__arrow-move {
-      flex-direction: column;
-      animation-name: arrow-nudge-down;
-    }
-
-    .work__arrow-shaft {
-      align-self: center;
-      width: 56%;
-      height: auto;
-      border-block: 0;
-      border-inline: 4px solid var(--color-ink-1000);
-    }
-
-    .work__arrow-head {
-      align-self: center;
-      width: calc(var(--arrow-h) * 0.72);
-      height: var(--arrow-h);
-      margin: calc(var(--arrow-h) * -0.14 - 2px) 0 calc(var(--arrow-h) * -0.14);
-      rotate: 90deg;
+      display: none;
     }
 
     .work__look {
       font-size: 2.5rem;
     }
 
-    /* Under the stacked cards the arrow would cover the teaser, so it stops
-       just above it and points down at it instead. */
-    .work__cards > .work__soon {
-      --soon-h: 240px;
-      align-self: center;
-      width: 64%;
-      height: var(--soon-h);
-      margin: var(--spacing-8) 0 0;
-      transform: rotate(5deg);
+    /* 見て! shares the paragraph's row instead of taking a row of its own
+       with nothing beside it. */
+    .work .section-head {
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: var(--spacing-4);
     }
 
-    .work__arrow {
-      bottom: calc(240px + var(--spacing-3));
+    .work .section-head > * {
+      grid-column: 1 / -1;
+    }
+
+    .work .section-head > .text-body-m {
+      grid-column: 1;
+    }
+
+    .work .section-head > .work__look {
+      grid-column: 2;
+      align-self: center;
+    }
+
+    .work__cards > .work__soon {
+      --soon-h: 140px;
+      --peek: 58px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "title jp"
+        "meta jp";
+      align-content: end;
+      align-items: end;
+      column-gap: var(--spacing-3);
+      justify-self: end;
+      width: 94%;
+      height: var(--soon-h);
+      margin: calc(-1 * (var(--spacing-16) + var(--soon-h) - var(--peek))) 0 0;
+      padding: var(--spacing-3) var(--spacing-4);
+      transform: rotate(3deg);
+    }
+
+    .work__soon-title {
+      grid-area: title;
+      margin-top: 0;
+      font-size: 1.25rem;
+    }
+
+    .work__soon-meta {
+      grid-area: meta;
+      margin-top: 4px;
     }
 
     .work__soon-jp {
-      align-self: stretch;
+      grid-area: jp;
+      padding: 0;
+      border: 0;
+      font-size: 1.5rem;
       writing-mode: horizontal-tb;
     }
 
@@ -2124,10 +2254,43 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       gap: var(--spacing-4);
     }
 
-    /* Phones: the eye strip and its shard are too cramped to read well, so
-       the section is just the copy and the tool chips. */
+    /* Phones: fitted inside the column, the eye strip was too small to read,
+       so it comes back as a tilted band that runs off both edges of the
+       screen, between the heading and the text, with the pink shard and the
+       halftone behind it. The copy's own box steps aside (display: contents)
+       so the band can sit among its lines. */
+    .skills {
+      gap: var(--spacing-6);
+    }
+
+    .skills__copy {
+      display: contents;
+    }
+
+    .skills__copy > :nth-child(n + 4) {
+      order: 2;
+    }
+
     .skills__art {
-      display: none;
+      order: 1;
+      min-height: 0;
+      width: calc(100% + 2 * var(--gutter) + 40px);
+      margin: var(--spacing-2) calc(-1 * var(--gutter) - 20px);
+      aspect-ratio: 560 / 210;
+    }
+
+    /* A gentler drift, so the band's ends never come into view. */
+    .skills__strip {
+      --parallax: 24px;
+      left: -3%;
+      top: 14%;
+    }
+
+    /* The dots stay behind the band, clear of the text under it. */
+    :global(.skills__burst) {
+      left: 50%;
+      top: -12%;
+      width: 40%;
     }
 
     :global(.skills__patch) {
@@ -2141,9 +2304,37 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       gap: var(--spacing-8);
     }
 
+    /* The photo pile shrinks and moves up beside the heading, like a profile
+       picture, so the section ends on the comic row instead of a big image.
+       It shares the copy's grid cell, pinned top right. zoom shrinks the
+       whole pile, card positions included, without touching the transforms
+       its animations use. "About" and "me" stack, and the label, title and
+       Japanese line keep clear of the pile. */
+    .about__copy,
     .about__portrait {
-      height: 420px;
-      order: 1;
+      grid-row: 1;
+      grid-column: 1;
+    }
+
+    .about__portrait {
+      justify-self: end;
+      align-self: start;
+      width: 330px;
+      height: 400px;
+      zoom: 0.5;
+    }
+
+    .about__title .pink {
+      display: block;
+    }
+
+    .about__copy > :nth-child(-n + 3) {
+      margin-right: 170px;
+    }
+
+    /* The section's gap is 32px on phones. */
+    .about__swipe {
+      margin-top: calc(-1 * var(--spacing-6));
     }
 
     .about__copy {
