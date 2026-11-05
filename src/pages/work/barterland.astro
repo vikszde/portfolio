@@ -285,9 +285,9 @@ const nextSteps = [
       <div class="finding">
         <div class="finding__stat" data-reveal>
           <Tag>Key finding</Tag>
-          <p class="finding__headline">4 of 6 participants needed assistance to complete item upload.</p>
+          <p class="finding__headline">5 of 6 participants had difficulty completing item upload.</p>
           <ul class="finding__people" aria-hidden="true">
-            {Array.from({ length: 6 }, (_, i) => <li class:list={{ "is-hit": i < 4 }}><CaseIcon name="users" size={44} /></li>)}
+            {Array.from({ length: 6 }, (_, i) => <li class:list={{ "is-hit": i < 5 }}><CaseIcon name="users" size={44} /></li>)}
           </ul>
         </div>
         <div class="stack" data-stagger="90">
