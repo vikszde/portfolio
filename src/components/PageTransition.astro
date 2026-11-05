@@ -259,6 +259,29 @@ import Logo from "./Logo.astro";
       y: Number(html.dataset.ptY ?? 0.5) * window.innerHeight,
     };
     busy = true;
+    // Arriving at a #section (the nav's Contact, the case studies' closing
+    // link): jump there while the page is still covered. Left to the browser,
+    // a link-opened page starts at the top and, with smooth scrolling on,
+    // glides the whole page down after the cover has opened, so the section's
+    // entrance is over before it arrives.
+    const target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+    if (target) {
+      const land = () => target.scrollIntoView({ behavior: "instant", block: "start" });
+      land();
+      // Lazy images fill in after the jump and the page grows, which can
+      // leave the section short of its spot. For a few seconds, land on it
+      // again whenever the page changes size, until the visitor takes over.
+      const watch = new ResizeObserver(land);
+      const stop = () => {
+        watch.disconnect();
+        ["wheel", "touchstart", "keydown", "pointerdown"].forEach((type) => window.removeEventListener(type, stop));
+      };
+      watch.observe(document.body);
+      ["wheel", "touchstart", "keydown", "pointerdown"].forEach((type) =>
+        window.addEventListener(type, stop, { once: true, passive: true }),
+      );
+      setTimeout(stop, 3000);
+    }
     requestAnimationFrame(() => open(stillMotion() ? "fade" : arriving, at));
   }
 </script>

@@ -288,9 +288,21 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       <h2 id="contact-title" class="contact__title" data-reveal="slam">Let's make<br />something bright</h2>
       <p class="contact__invite" data-reveal>Have a project in mind? Let's talk.</p>
       <div class="row" data-reveal>
-        {site.email && <Button variant="secondary" href={`mailto:${site.email}`} arrow>Say hello</Button>}
-        {site.linkedin && <Button variant="ghost" href={site.linkedin}>LinkedIn</Button>}
+        {site.email && <Button variant="secondary" href={`mailto:${site.email}`} arrow data-say-hello>Say hello</Button>}
+        {site.email && (
+          <Button variant="ghost" class="contact__email" data-copy-email={site.email} title="Copy email address">
+            <span class="visually-hidden">Copy email address: </span>
+            <span data-copy-label>{site.email}</span>
+            <svg class="contact__copy-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+              <rect x="5" y="5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" />
+              <path d="M2 11V2h9" fill="none" stroke="currentColor" stroke-width="2" />
+            </svg>
+          </Button>
+        )}
+        {site.linkedin && <Button variant="ghost" href={site.linkedin} target="_blank" rel="noopener">LinkedIn</Button>}
+        <span class="visually-hidden" aria-live="polite" data-copy-status></span>
       </div>
+      <p class="contact__note" role="status" data-mail-note hidden></p>
     </section>
   </main>
 
@@ -305,6 +317,69 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
   import { afterIntro } from "../scripts/after-intro";
 
   const stillMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Contact: the email button shows the address and copies it on click, for
+  // visitors whose mailto link opens nothing (webmail users). The label reads
+  // "Copied!" for a moment; if the clipboard is blocked the address is
+  // selected instead so it can be copied by hand.
+  const copyButton = document.querySelector<HTMLButtonElement>("[data-copy-email]");
+  const copyLabel = copyButton?.querySelector<HTMLElement>("[data-copy-label]");
+  const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
+
+  // "Say hello" is a mailto link, which does nothing at all when no mail app
+  // is set up. If the page still has focus a moment after the click (nothing
+  // opened over it), copy the address and say so under the buttons.
+  const sayHello = document.querySelector<HTMLAnchorElement>("[data-say-hello]");
+  const mailNote = document.querySelector<HTMLElement>("[data-mail-note]");
+  if (sayHello && mailNote) {
+    const email = decodeURIComponent(sayHello.href.replace(/^mailto:/, ""));
+    sayHello.addEventListener("click", () => {
+      let left = false;
+      const away = () => (left = true);
+      window.addEventListener("blur", away, { once: true });
+      document.addEventListener("visibilitychange", away, { once: true });
+      setTimeout(async () => {
+        window.removeEventListener("blur", away);
+        document.removeEventListener("visibilitychange", away);
+        if (left || !document.hasFocus()) return;
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(email);
+          copied = true;
+        } catch {}
+        mailNote.textContent = copied
+          ? `No mail app opened? I’ve copied my address for you: ${email}`
+          : `No mail app opened? Write to me at ${email}`;
+        mailNote.hidden = false;
+      }, 1200);
+    });
+  }
+
+  if (copyButton && copyLabel) {
+    const email = copyButton.dataset.copyEmail ?? "";
+    let reset: ReturnType<typeof setTimeout> | undefined;
+    copyButton.addEventListener("click", async () => {
+      // Keep the width so the row doesn't jump when the label changes.
+      copyButton.style.minWidth = `${copyButton.offsetWidth}px`;
+      clearTimeout(reset);
+      copyLabel.textContent = email;
+      try {
+        await navigator.clipboard.writeText(email);
+        copyLabel.textContent = "Copied!";
+        if (copyStatus) copyStatus.textContent = "Email address copied to the clipboard.";
+        reset = setTimeout(() => {
+          copyLabel.textContent = email;
+          if (copyStatus) copyStatus.textContent = "";
+        }, 2000);
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(copyLabel);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+        if (copyStatus) copyStatus.textContent = `Email address: ${email}`;
+      }
+    });
+  }
 
   // Hero speech bubble: types a line, holds it, deletes it, types the next.
   // With reduced motion it just keeps the first line.
@@ -1906,6 +1981,22 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     font: 700 1.75rem / 2rem var(--font-sans);
   }
 
+  /* The address keeps its real lowercase, so it reads (and gets typed)
+     exactly as it is, and can be selected like text. */
+  .contact [data-copy-label] {
+    text-transform: none;
+    user-select: text;
+  }
+
+  .contact__copy-icon {
+    flex: none;
+  }
+
+  .contact__note {
+    max-width: 36rem;
+    font: 700 1rem / 1.5rem var(--font-sans);
+  }
+
   /* Footer */
   .footer {
     display: flex;
@@ -1947,18 +2038,6 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.6fr);
       gap: var(--spacing-8);
       padding: 0;
-    }
-
-    /* The teaser fills its narrow column, with 準備中 set vertically. */
-    .work__cards > .work__soon {
-      width: 100%;
-      transform: rotate(4deg);
-    }
-
-    .work__soon-jp {
-      align-self: center;
-      writing-mode: vertical-rl;
-      padding: var(--spacing-2);
     }
 
     /* The six steps still share one row, each just as wide as its name. */
@@ -2087,6 +2166,28 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
      heading and paragraph, at 60% size, instead of full size under the text.
      The stats, button and comic row then run the full width below. */
   @media (min-width: 768px) and (max-width: 1023px) {
+    /* The arrow shrinks with the narrow teaser column, so its head points
+       into the card instead of covering it. */
+    .work__arrow {
+      --arrow-h: 150px;
+    }
+
+    /* The teaser is a short sign rather than a strip as tall as the project
+       cards: 準備中 above the arrow head and the title below it, as on
+       desktop. */
+    .work__cards > .work__soon {
+      align-self: center;
+      width: 100%;
+      min-height: 330px;
+      margin-block: 0;
+      transform: rotate(4deg);
+    }
+
+    .work__soon-jp {
+      padding: var(--spacing-2) var(--spacing-1);
+      font-size: 1.5rem;
+    }
+
     .about__copy,
     .about__portrait {
       grid-row: 1;

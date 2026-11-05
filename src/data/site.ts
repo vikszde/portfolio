@@ -1,8 +1,8 @@
 // Contact details used across the site. Fill these in before publishing:
 // while a value is empty, the button that needs it is not rendered.
 export const site = {
-  email: "",
-  linkedin: "",
+  email: "vrg.viktoria09@gmail.com",
+  linkedin: "https://www.linkedin.com/in/vikszde",
 };
 
 // `highlight` is the short tag pinned to the project's card on the home
