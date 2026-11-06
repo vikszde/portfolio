@@ -1,31 +1,1773 @@
 ---
-// Placeholder until the full About page is designed.
+// About page, built from the Figma "About / Desktop · A comic strip" and
+// "About / Mobile · A comic strip" frames: a character-profile hero, origin
+// story, how I work, toolkit, side quests, then the shared contact band and
+// footer. Only the side quests are cards; the rest is type and rules.
 import Base from "../layouts/Base.astro";
 import Nav from "../components/Nav.astro";
 import Button from "../components/Button.astro";
+import Tag from "../components/Tag.astro";
+import Sticker from "../components/Sticker.astro";
+import Sparkle from "../components/Sparkle.astro";
+import Decor from "../components/Decor.astro";
+import ToolChip from "../components/ToolChip.astro";
+import Logo from "../components/Logo.astro";
+import Contact from "../components/Contact.astro";
+import HobbyArt from "../components/HobbyArt.astro";
+import portrait from "../assets/photo/viki-portrait.webp?url";
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+
+const profile = [
+  ["Class", "Product designer & visual creator"],
+  ["Base", "Budapest"],
+  ["Languages", "English, Hungarian"],
+  ["Experience", "Designing since 2020"],
+  ["Main quest", "My next product design role"],
+];
+
+const milestones = [
+  { year: "2019", title: "Studied UX/UI", body: "Budapest University of Technology and Economics, and self-taught" },
+  { year: "2020", title: "Early branding work", body: "Poroszló Camp, brand design" },
+  { year: "Now", title: "nearb.io", body: "Product design, research and AI-assisted frontend work." },
+];
+
+// Each step links to the part of a case study that shows it.
+const steps = [
+  {
+    title: "Understand",
+    body: "Clarify the problem, review available research, and identify what still needs to be learned.",
+    link: "Barterland research",
+    href: `${base}work/barterland/#research-title`,
+  },
+  {
+    title: "Explore",
+    body: "User flows, wireframes and lots of rough options.",
+    link: "nearb.io flows and wireframes",
+    href: `${base}work/nearbio/#flows-title`,
+  },
+  {
+    title: "Design & build",
+    body: "Refine the interface, develop reusable components, and explore implementation with Claude.",
+    link: "nearb.io Storybook",
+    href: `${base}work/nearbio/#system-title`,
+  },
+  {
+    title: "Test",
+    body: "Use usability testing and feedback to identify problems and improve the design.",
+    link: "Barterland upload flow",
+    href: `${base}work/barterland/#testing-title`,
+  },
+] as const;
+
+const tools = [
+  { tool: "figma", use: "Design systems, user flows and prototypes." },
+  { tool: "illustrator", use: "Logos, icons and illustration." },
+  { tool: "photoshop", use: "Image editing, textures and retouching." },
+  { tool: "rive", use: "Learning how to create interactive animations with Rive.", learning: true },
+  { tool: "claude", use: "AI-assisted frontend: Storybook, landing pages and this site." },
+] as const;
+
+// Side quests, coloured like the home page's About comic panels (paper,
+// aqua, ink, pink) and dealt with a tilt each.
+const hobbies = [
+  { art: "learning", title: "Learning", body: "I enjoy trying new things and exploring creative tools.", tone: "paper", tilt: -3 },
+  { art: "organising", title: "Organising", body: "I like planning events, thinking through the details, and bringing people together.", tone: "aqua", tilt: 2 },
+  { art: "anime", title: "Anime", body: "I enjoy getting absorbed in a good story. Frieren is one of my favourites.", tone: "ink", tilt: -2 },
+  { art: "food", title: "Friends & food", body: "Good food, time with friends, and making plans together.", tone: "pink", tilt: 3 },
+] as const;
 ---
 
-<Base title="About · Viktória Varga">
+<Base
+  title="About · Viktória Varga"
+  description="Viktória Varga, product designer and visual creator in Budapest: her story, how she works, her tools, and what she does off the clock."
+>
   <Nav current="About" />
-  <main class="soon">
-    <p class="text-label-m accent">About</p>
-    <h1 class="text-display-l">More soon</h1>
-    <p class="text-body-l">A longer story about me, my process and my tools is on its way.</p>
-    <Button variant="ghost" href={`${base}#about`}>← Back</Button>
+
+  <main class="about">
+    <!-- Profile -->
+    <section class="hero" aria-labelledby="hero-title">
+      <Decor name="perspective-grid" tone="accent" moving stretch class="hero__grid" />
+
+      <div class="hero__copy" data-stagger="110">
+        <p class="text-label-m accent" data-reveal>Profile</p>
+        <h1 id="hero-title" class="hero__title" data-reveal="slam">About <span class="pink">me</span></h1>
+        <p class="text-katakana" lang="ja" data-reveal>プロフィール</p>
+        <p class="text-body-l secondary hero__intro" data-reveal>
+          Product designer and visual creator. I turn messy problems into clear, thoughtful experiences with personality.
+        </p>
+      </div>
+
+      <dl class="profile" data-reveal>
+        {
+          profile.map(([term, value]) => (
+            <div>
+              <dt class="text-label-m accent">{term}</dt>
+              <dd class="text-body-m">{value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div class="hero__art" data-reveal="hand" data-reveal-at="0.9">
+        <div class="hero__card hero__card--photo" data-deal>
+          <div class="hero__float anim-float">
+            <img src={portrait} alt="Viktória smiling, in a black turtleneck and silver chains" width="840" height="1120" />
+            <p class="hero__bubble" aria-hidden="true">Hi, I’m Viki.</p>
+            <Sticker color="aqua" tilt={-6} class="hero__sticker">Open to opportunities</Sticker>
+          </div>
+        </div>
+        <Sparkle color="pink" size={48} class="hero__spark anim-twinkle" />
+      </div>
+    </section>
+
+    <!-- 01 Origin story -->
+    <section class="story" aria-labelledby="story-title">
+      <header class="head" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>01 / Story</p>
+        <h2 id="story-title" class="text-display-l head__title" data-reveal="slam">Origin story</h2>
+        <p class="text-katakana" lang="ja" data-reveal>はじまり</p>
+        <p class="text-body-m secondary" data-reveal>How I got here, in three stops.</p>
+      </header>
+      <!-- The quest map (tablet and up): a dashed trail winding through a
+           checkpoint above each stop, a star on Now, and a "?" flag where it
+           runs on to the next quest. The pink marker runs the trail when the
+           map comes into view (script below). -->
+      <div class="quest-map" data-reveal aria-hidden="true">
+        <svg viewBox="0 0 1200 120" focusable="false">
+          <defs>
+            <mask id="quest-trail-mask" maskUnits="userSpaceOnUse">
+              <path class="quest-map__draw" d="M14 84C150 84 250 30 400 30S650 84 800 84S1020 34 1150 34" pathLength="1" />
+            </mask>
+          </defs>
+          <path class="quest-map__trail" d="M14 84C150 84 250 30 400 30S650 84 800 84S1020 34 1150 34" mask="url(#quest-trail-mask)" />
+          <path id="quest-run" d="M14 84C150 84 250 30 400 30S650 84 800 84" fill="none" />
+          <g transform="translate(14 84)"><g class="quest-map__stop" style="--at: 150ms"><rect x="-11" y="-11" width="22" height="22" transform="rotate(45)" /></g></g>
+          <g transform="translate(400 30)"><g class="quest-map__stop" style="--at: 1050ms"><rect x="-11" y="-11" width="22" height="22" transform="rotate(45)" /></g></g>
+          <g transform="translate(800 84)">
+            <g class="quest-map__stop quest-map__stop--now" style="--at: 2000ms">
+              <path d="M0 -26L7.6 -10.5L24.7 -8L12.4 4L15.3 21L0 13L-15.3 21L-12.4 4L-24.7 -8L-7.6 -10.5Z" />
+            </g>
+          </g>
+          <g transform="translate(1150 34)">
+            <g class="quest-map__next">
+              <path class="quest-map__pole" d="M0 22V-30" />
+              <path class="quest-map__flag" d="M0 -30H34L26 -18L34 -6H0Z" />
+              <text x="11" y="-10">?</text>
+            </g>
+          </g>
+          <g class="quest-map__player">
+            <circle r="9" />
+            <animateMotion dur="2s" begin="indefinite" fill="freeze" calcMode="spline" keyTimes="0;1" keyPoints="0;1" keySplines="0.45 0 0.25 1">
+              <mpath href="#quest-run" />
+            </animateMotion>
+          </g>
+        </svg>
+      </div>
+      <ol class="timeline" data-stagger="140">
+        {
+          milestones.map((m, i) => (
+            <li class="milestone" data-reveal>
+              <span class:list={["milestone__track", i === milestones.length - 1 && "milestone__track--now"]} aria-hidden="true" />
+              <p class="text-label-m accent milestone__year">
+                {m.year}
+                {i === milestones.length - 1 && <span class="milestone__here">You are here</span>}
+              </p>
+              <h3 class="text-h3 milestone__title">{m.title}</h3>
+              <p class="text-body-m secondary">{m.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <!-- 02 How I work (always dark) -->
+    <section class="process theme-dark" aria-labelledby="process-title">
+      <Decor name="stripes" class="process__stripes anim-slide" />
+      <Decor name="halftone-patch" tone="accent" class="process__patch anim-breathe" />
+      <header class="head" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>02 / Process</p>
+        <h2 id="process-title" class="text-display-l head__title" data-reveal="slam">How I work</h2>
+        <p class="text-katakana" lang="ja" data-reveal>やりかた</p>
+        <p class="text-body-m secondary" data-reveal>Four steps, each backed by a real project.</p>
+      </header>
+      <ol class="steps" data-stagger="120">
+        {
+          steps.map((step, i) => (
+            <li class="step" data-reveal>
+              <span class="step__number" style={`--num-tilt: ${i % 2 ? 3 : -4}deg`} aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 class="step__title">{step.title}</h3>
+              <p class="text-body-m secondary step__body">{step.body}</p>
+              <a class="text-label-m step__link" href={step.href}>
+                {step.link} <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <!-- The repeat loop: the steps run 01 to 04 along a dashed trail that
+           curves back round to 01, and a dot keeps travelling it (script). -->
+      <p class="visually-hidden">After testing, the process starts again from understanding.</p>
+      <div class="loop" data-reveal aria-hidden="true">
+        <svg viewBox="0 0 1200 110" focusable="false">
+          <defs>
+            <mask id="loop-mask" maskUnits="userSpaceOnUse">
+              <path class="loop__draw" d="M3 20H1150C1196 20 1196 92 1150 92H50C4 92 3 62 3 38" pathLength="1" />
+            </mask>
+          </defs>
+          <path class="loop__trail" d="M3 20H1150C1196 20 1196 92 1150 92H50C4 92 3 62 3 38" mask="url(#loop-mask)" />
+          <path id="loop-run" d="M3 20H1150C1196 20 1196 92 1150 92H50C4 92 3 62 3 38" fill="none" />
+          <path class="loop__arrow" d="M-7 46L3 35L13 46" />
+          <g transform="translate(3 20)"><g class="loop__stop" style="--at: 200ms"><rect x="-9" y="-9" width="18" height="18" transform="rotate(45)" /></g></g>
+          <g transform="translate(308 20)"><g class="loop__stop" style="--at: 480ms"><rect x="-9" y="-9" width="18" height="18" transform="rotate(45)" /></g></g>
+          <g transform="translate(613 20)"><g class="loop__stop" style="--at: 760ms"><rect x="-9" y="-9" width="18" height="18" transform="rotate(45)" /></g></g>
+          <g transform="translate(918 20)"><g class="loop__stop" style="--at: 1040ms"><rect x="-9" y="-9" width="18" height="18" transform="rotate(45)" /></g></g>
+          <g class="loop__dot">
+            <circle r="8" />
+            <animateMotion dur="7s" begin="indefinite" repeatCount="indefinite">
+              <mpath href="#loop-run" />
+            </animateMotion>
+          </g>
+        </svg>
+        <span class="text-label-m loop__label">Repeat ↺</span>
+      </div>
+      <p class="text-label-m loop-note" aria-hidden="true"><span class="loop-note__icon">↺</span> Then back to 01</p>
+    </section>
+
+    <!-- 03 Toolkit -->
+    <section class="toolkit" aria-labelledby="tools-title">
+      <header class="head" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>03 / Tools</p>
+        <h2 id="tools-title" class="text-display-l head__title" data-reveal="slam">Toolkit</h2>
+        <p class="text-katakana" lang="ja" data-reveal>ツール</p>
+        <p class="text-body-m secondary" data-reveal>What each tool is actually for.</p>
+      </header>
+      <ul class="tools" data-stagger="80">
+        {
+          tools.map((t) => (
+            <li class="tool-card" data-reveal>
+              <ToolChip as="div" tool={t.tool} />
+              <div class="tool-card__use">
+                {"learning" in t ? <Tag color="yellow">Learning</Tag> : <p class="text-label-s accent">Used for</p>}
+                <p class="text-body-m">{t.use}</p>
+                {"learning" in t && (
+                  <span class="unlock" aria-hidden="true">
+                    <span class="unlock__bar" />
+                    <span class="text-label-s unlock__label">Unlocking…</span>
+                  </span>
+                )}
+              </div>
+              {!("learning" in t) && <span class="text-label-s tool-card__stamp" aria-hidden="true">Equipped</span>}
+            </li>
+          ))
+        }
+        <li class="proof-card" data-reveal="card">
+          <Sparkle color="ink" size={28} class="proof-card__spark anim-twinkle" />
+          <h3 class="proof-card__title">From Figma to Storybook</h3>
+          <p class="text-body-m">The nearb.io design system, designed in Figma and built into a Storybook library with Claude.</p>
+          <Button variant="secondary" href={`${base}work/nearbio/`} arrow>Explore nearb.io</Button>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 04 Side quests -->
+    <section class="quests" aria-labelledby="quests-title">
+      <Decor name="halftone-patch" tone="accent" class="quests__patch anim-breathe" />
+      <header class="head" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>04 / Off the clock</p>
+        <h2 id="quests-title" class="text-display-l head__title" data-reveal="slam">Side quests</h2>
+        <p class="text-katakana" lang="ja" data-reveal>趣味</p>
+        <p class="text-body-m secondary" data-reveal>What I do when I’m not designing.</p>
+      </header>
+      <ul class="hobbies" data-reveal>
+        {
+          hobbies.map((h, i) => (
+            <li class:list={["hobby", `hobby--${h.tone}`]} style={`--quest-tilt: ${h.tilt}deg; --i: ${i}`} data-focus>
+              <span class="hobby__tile">
+                <HobbyArt name={h.art} />
+              </span>
+              <h3 class="text-h3 hobby__title">{h.title}</h3>
+              <p class="text-body-m">{h.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <Contact number="05 / Contact" />
+
+    <!-- Pops up once, the first time the side quests come into view. -->
+    <div class="achievement" role="status" hidden data-achievement>
+      <span class="achievement__badge" aria-hidden="true"><Sparkle color="ink" size={26} /></span>
+      <span class="achievement__text">
+        <span class="text-label-s achievement__label">Achievement unlocked</span>
+        <span class="achievement__title">Side quests found</span>
+      </span>
+    </div>
   </main>
+
+  <footer class="footer theme-dark">
+    <Logo variant="wordmark" height={40} label="VIKSZDE" />
+    <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
+    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+  </footer>
 </Base>
 
+<script>
+  // The side quest cards' hover effect hangs off .is-focus, as on the home
+  // page's comic panels. With a mouse it follows hover and keyboard focus; on
+  // touch screens, which can't hover, a card gets it while it sits in the
+  // middle band of the screen, so the effect plays as you scroll past.
+  const focusables = document.querySelectorAll<Element>("[data-focus]");
+  const setFocus = (el: Element, on: boolean) => el.classList.toggle("is-focus", on);
+  if (window.matchMedia("(hover: hover)").matches) {
+    focusables.forEach((el) => {
+      el.addEventListener("pointerenter", () => setFocus(el, true));
+      el.addEventListener("pointerleave", () => setFocus(el, false));
+      el.addEventListener("focusin", () => setFocus(el, true));
+      el.addEventListener("focusout", () => setFocus(el, false));
+    });
+  } else {
+    const centre = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => setFocus(entry.target, entry.isIntersecting)),
+      { rootMargin: "-40% 0px -40% 0px" },
+    );
+    focusables.forEach((el) => centre.observe(el));
+  }
+
+  const stillMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Quest map: when the map is revealed the marker runs the trail to Now
+  // (SMIL, so it follows the curve at any width). With reduced motion it
+  // just sits on Now.
+  const map = document.querySelector<HTMLElement>(".quest-map");
+  const player = map?.querySelector<SVGGElement>(".quest-map__player");
+  const run = player?.querySelector<SVGAnimationElement>("animateMotion");
+  if (map && player && run) {
+    const start = () => {
+      player.classList.add("is-running");
+      if (stillMotion) {
+        run.remove();
+        player.setAttribute("transform", "translate(800 84)");
+      } else {
+        run.beginElement();
+      }
+    };
+    if (map.classList.contains("is-visible")) start();
+    else map.addEventListener("reveal", start, { once: true });
+  }
+
+  // How I work's repeat loop: once the trail has drawn itself, a dot keeps
+  // travelling round it. With reduced motion it stays put.
+  const loop = document.querySelector<HTMLElement>(".loop");
+  const loopDot = loop?.querySelector<SVGGElement>(".loop__dot");
+  const loopRun = loopDot?.querySelector<SVGAnimationElement>("animateMotion");
+  if (loop && loopDot && loopRun && !stillMotion) {
+    const go = () =>
+      setTimeout(() => {
+        loopDot.classList.add("is-looping");
+        loopRun.beginElement();
+      }, 1700);
+    if (loop.classList.contains("is-visible")) go();
+    else loop.addEventListener("reveal", go, { once: true });
+  }
+
+  // Side quests: an achievement toast pops up once, the first time the cards
+  // come into view, and slides away after a few seconds.
+  const quests = document.querySelector<HTMLElement>(".hobbies");
+  const toast = document.querySelector<HTMLElement>("[data-achievement]");
+  if (quests && toast) {
+    const unlock = () => {
+      toast.hidden = false;
+      toast.classList.add("is-in");
+      setTimeout(() => {
+        toast.classList.replace("is-in", "is-out");
+        setTimeout(() => (toast.hidden = true), 450);
+      }, 4200);
+    };
+    if (quests.classList.contains("is-visible")) unlock();
+    else quests.addEventListener("reveal", unlock, { once: true });
+  }
+
+  // How I work: the dark band sweeps in on a slanted ink edge the first time
+  // it scrolls into view.
+  // A scroll check backs up the observer, so the band can never stay covered.
+  const band = document.querySelector<HTMLElement>(".process");
+  if (band) {
+    const ink = () => band.classList.add("is-inked");
+    const inView = () => {
+      const box = band.getBoundingClientRect();
+      return box.top < window.innerHeight * 0.9 && box.bottom > 0;
+    };
+    if (!("IntersectionObserver" in window) || inView()) {
+      ink();
+    } else {
+      const watch = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          ink();
+          watch.disconnect();
+        },
+        { threshold: 0.1 },
+      );
+      watch.observe(band);
+      const onScroll = () => {
+        if (!inView()) return;
+        ink();
+        watch.disconnect();
+        window.removeEventListener("scroll", onScroll);
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+    }
+  }
+
+  // Hero photo: with a mouse it tilts in 3D towards the pointer, and the
+  // bubble, sticker and star shift against it for depth.
+  const art = document.querySelector<HTMLElement>(".hero__art");
+  if (art && !stillMotion && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    art.addEventListener("pointermove", (event) => {
+      const box = art.getBoundingClientRect();
+      art.style.setProperty("--px", ((event.clientX - box.left) / box.width - 0.5).toFixed(3));
+      art.style.setProperty("--py", ((event.clientY - box.top) / box.height - 0.5).toFixed(3));
+    });
+    art.addEventListener("pointerleave", () => {
+      art.style.setProperty("--px", "0");
+      art.style.setProperty("--py", "0");
+    });
+  }
+</script>
+
 <style>
-  .soon {
-    display: grid;
-    justify-items: start;
-    gap: var(--spacing-6);
+  /* --page-behind is the light page colour, resolved here so the dark How
+     I work band can still use it for its ink-wipe cover. */
+  .about {
+    overflow-x: clip;
+    --page-behind: var(--color-bg-page);
+  }
+
+  .about > section:not(.hero) {
+    position: relative;
     padding: var(--spacing-24) var(--gutter);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  /* Decor sits behind content. */
+  section > :global(.decor) {
+    position: absolute;
+  }
+
+  ol,
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   .accent {
     color: var(--color-text-accent);
+  }
+
+  .secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .pink {
+    color: var(--color-bg-primary);
+  }
+
+  /* Section heads, as on the home page. */
+  .head {
+    position: relative;
+    display: grid;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-12);
+  }  /* Profile: the copy and the profile card on the left, the portrait pile on
+     the right over the pink floor. */
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-areas:
+      "copy art"
+      "profile art";
+    align-items: center;
+    gap: var(--spacing-8) var(--spacing-16);
+    padding: var(--spacing-12) var(--gutter) var(--spacing-24);
+    overflow: clip;
+  }
+
+  :global(.hero__grid) {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 260px;
+    opacity: 0.6;
+  }
+
+  .hero__copy {
+    grid-area: copy;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-6);
+    align-self: end;
+  }
+
+  .hero__title {
+    font: 400 clamp(4.5rem, 11vw, 10rem) / 0.9 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .hero__intro {
+    max-width: 560px;
+  }
+
+  .profile {
+    grid-area: profile;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--spacing-3);
+    width: min(100%, 620px);
+    margin: 0;
+    padding: var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    align-self: start;
+  }
+
+  .profile div {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: var(--spacing-4);
+    align-items: baseline;
+  }
+
+  .profile dd {
+    margin: 0;
+  }
+
+  /* The portrait slams onto the page like the home page's About pile, then
+     floats gently. Once it lands the speech bubble pops up and the sticker
+     stamps down on its lower right; after that the bubble bobs and the
+     sticker sways a little. */
+  .hero__art {
+    grid-area: art;
+    position: relative;
+    z-index: 1;
+    height: 620px;
+  }
+
+  .hero__art > :global(*) {
+    position: absolute;
+  }
+
+  /* --px and --py (-0.5 to 0.5) follow the pointer (script); the photo tilts
+     towards it and the bubble, sticker and star shift for depth. */
+  .hero__card--photo {
+    left: 14%;
+    top: 3%;
+    width: 68%;
+    aspect-ratio: 420 / 520;
+    --tilt: 3deg;
+    --deal-delay: 100ms;
+    transform: perspective(900px) rotateY(calc(var(--px, 0) * 18deg)) rotateX(calc(var(--py, 0) * -14deg));
+    transition: transform 300ms var(--motion-ease-out);
+  }
+
+  .hero__bubble,
+  :global(.hero__sticker),
+  :global(.hero__spark) {
+    transition: translate 300ms var(--motion-ease-out);
+  }
+
+  .hero__bubble {
+    translate: calc(var(--px, 0) * -28px) calc(var(--py, 0) * -20px);
+  }
+
+  :global(.hero__sticker) {
+    translate: calc(var(--px, 0) * 26px) calc(var(--py, 0) * 20px);
+  }
+
+  :global(.hero__spark) {
+    translate: calc(var(--px, 0) * -40px) calc(var(--py, 0) * -30px);
+  }
+
+  .hero__float {
+    position: relative;
+    height: 100%;
+    --float: -10px;
+    --dur: 7s;
+  }
+
+  .hero__float img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 0;
+    background: var(--color-bg-accent-subtle);
+  }
+
+  :global(.hero__sticker) {
+    position: absolute;
+    right: -12%;
+    bottom: 7%;
+    z-index: 2;
+  }
+
+  :global(.js) .hero__art:not(:global(.is-visible)) .hero__bubble,
+  :global(.js) .hero__art:not(:global(.is-visible)) :global(.hero__sticker) {
+    opacity: 0;
+  }
+
+  .hero__art:global(.is-visible) :global(.hero__sticker) {
+    animation:
+      sticker-stamp 480ms cubic-bezier(0.5, 0, 0.6, 1) 900ms backwards,
+      sway 6s ease-in-out 1.5s infinite;
+    --sway: 2.5deg;
+  }
+
+  .hero__art:global(.is-visible) .hero__bubble {
+    animation:
+      bubble-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 650ms backwards,
+      bubble-bob 3.2s ease-in-out 1.3s infinite;
+  }
+
+  /* Strong: lands from oversized, overshoots, settles. */
+  @keyframes sticker-stamp {
+    from {
+      opacity: 0;
+      scale: 2.4;
+    }
+
+    65% {
+      opacity: 1;
+      scale: 0.92;
+    }
+
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* Strong: springs out from its tail. */
+  @keyframes bubble-pop {
+    from {
+      opacity: 0;
+      scale: 0;
+    }
+
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  /* Weak: a slow bob, as if she's still talking. (`transform`, so it adds
+     to the depth shift on `translate`.) */
+  @keyframes bubble-bob {
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  /* The speech line sits on the photo, hanging over its left edge, with the
+     tail pointing down at Viki. It's inside the photo card, so it deals in
+     and tilts with the photo. */
+  .hero__bubble {
+    position: absolute;
+    left: -22%;
+    top: 8%;
+    z-index: 2;
+    white-space: nowrap;
+    padding: var(--spacing-3) var(--spacing-4);
+    border: var(--border-heavy) solid var(--color-ink-900);
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+    font: 500 1.05rem / 1.4 var(--font-mono);
+    rotate: -6deg;
+    transform-origin: 85% 100%;
+  }
+
+  .hero__bubble::before,
+  .hero__bubble::after {
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-color: transparent;
+  }
+
+  .hero__bubble::before {
+    right: 16px;
+    bottom: -24px;
+    border-width: 24px 0 0 22px;
+    border-top-color: var(--color-ink-900);
+  }
+
+  .hero__bubble::after {
+    right: 20px;
+    bottom: -14px;
+    border-width: 15px 0 0 13px;
+    border-top-color: var(--color-bg-primary);
+  }
+
+  /* The star twinkles in the free corner above the photo's right edge. */
+  :global(.hero__spark) {
+    right: 4%;
+    top: 0;
+    --dur: 3.4s;
+  }
+
+  /*
+   * Origin story: a quest map. A dashed trail winds through a checkpoint
+   * above each stop (the SVG's thirds line up with the three columns), past
+   * a star on Now and on to a "?" flag for the next quest.
+   * Strong: the trail draws itself, the marker runs it and each checkpoint
+   * stamps down as the marker gets there. Weak: then the star twinkles, the
+   * flag bobs, the marker pulses and the "You are here" tag rocks.
+   */
+  .quest-map {
+    margin-bottom: var(--spacing-6);
+  }
+
+  .quest-map svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .quest-map__trail {
+    fill: none;
+    stroke: var(--color-border-default);
+    stroke-width: 3;
+    stroke-dasharray: 10 10;
+  }
+
+  .quest-map__draw {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 16;
+    stroke-dasharray: 1;
+  }
+
+  .quest-map:global(.is-visible) .quest-map__draw {
+    animation: trail-draw 2.4s cubic-bezier(0.45, 0, 0.25, 1) 150ms backwards;
+  }
+
+  :global(.js) .quest-map:not(:global(.is-visible)) .quest-map__draw {
+    stroke-dashoffset: 1;
+  }
+
+  .quest-map__stop,
+  .quest-map__next {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .quest-map__stop {
+    fill: var(--color-bg-page);
+    stroke: var(--color-border-default);
+    stroke-width: 3;
+    stroke-linejoin: round;
+  }
+
+  .quest-map__stop--now {
+    fill: var(--color-bg-primary);
+  }
+
+  :global(.js) .quest-map:not(:global(.is-visible)) .quest-map__stop,
+  :global(.js) .quest-map:not(:global(.is-visible)) .quest-map__next {
+    opacity: 0;
+  }
+
+  .quest-map:global(.is-visible) .quest-map__stop {
+    animation: stop-stamp 420ms cubic-bezier(0.5, 0, 0.6, 1) var(--at) backwards;
+  }
+
+  .quest-map:global(.is-visible) .quest-map__stop--now {
+    animation:
+      stop-stamp 420ms cubic-bezier(0.5, 0, 0.6, 1) var(--at) backwards,
+      now-twinkle 2.6s ease-in-out calc(var(--at) + 600ms) infinite;
+  }
+
+  .quest-map:global(.is-visible) .quest-map__next {
+    animation:
+      stop-stamp 420ms cubic-bezier(0.5, 0, 0.6, 1) 2500ms backwards,
+      flag-bob 3s ease-in-out 3s infinite;
+  }
+
+  .quest-map__pole {
+    fill: none;
+    stroke: var(--color-border-default);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .quest-map__flag {
+    fill: var(--color-yellow-500);
+    stroke: var(--color-ink-900);
+    stroke-width: 3;
+    stroke-linejoin: round;
+  }
+
+  .quest-map__next text {
+    fill: var(--color-ink-900);
+    font: 400 20px var(--font-display);
+  }
+
+  /* The marker shows once it starts running (script below). */
+  .quest-map__player {
+    opacity: 0;
+  }
+
+  .quest-map__player:global(.is-running) {
+    opacity: 1;
+  }
+
+  .quest-map__player circle {
+    fill: var(--color-ink-900);
+    stroke: var(--color-white-1000);
+    stroke-width: 3;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .quest-map__player:global(.is-running) circle {
+    animation: player-pulse 1.8s ease-in-out 2.2s infinite;
+  }
+
+  @keyframes trail-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  @keyframes stop-stamp {
+    from {
+      opacity: 0;
+      scale: 2.6;
+    }
+
+    65% {
+      opacity: 1;
+      scale: 0.9;
+    }
+
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  @keyframes now-twinkle {
+    50% {
+      scale: 1.15;
+      rotate: 14deg;
+    }
+  }
+
+  @keyframes flag-bob {
+    50% {
+      translate: 0 -5px;
+    }
+  }
+
+  @keyframes player-pulse {
+    50% {
+      scale: 1.3;
+    }
+  }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .milestone {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-2);
+    padding-right: var(--spacing-8);
+  }
+
+  /* The checkpoint markers for the phone layout; the map has them above. */
+  .milestone__track {
+    display: none;
+  }
+
+  .milestone__year {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-3);
+  }
+
+  .milestone__here {
+    display: inline-block;
+    padding: 2px var(--spacing-2);
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+    rotate: -3deg;
+    animation: sway 4s ease-in-out infinite;
+    --sway: 4deg;
+  }
+
+  .milestone__title {
+    margin-top: var(--spacing-1);
+  }
+
+  /* How I work: four numbered columns over the dark band, each with a
+     tilted pink number and a rule down its left edge. No connecting line,
+     so it doesn't echo the origin story timeline above. */
+  .process {
+    overflow: clip;
+  }
+
+  /* Strong: the first time it scrolls into view the band sweeps in from
+     the left on a slanted ink edge, like the page transitions. A cover in
+     the page colour sits over the band and is cut away left to right (the
+     script adds .is-inked). The band itself is never clipped, so the
+     observer that triggers this can always see it; without JavaScript the
+     cover is cut away from the start. */
+  .process::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background: var(--page-behind);
+    pointer-events: none;
+    clip-path: polygon(120% 0, 120% 0, 120% 100%, 100% 100%);
+  }
+
+  :global(.js) .process:not(:global(.is-inked))::after {
+    clip-path: polygon(0 0, 120% 0, 120% 100%, -20% 100%);
+  }
+
+  .process:global(.is-inked)::after {
+    animation: ink-wipe 900ms cubic-bezier(0.8, 0, 0.2, 1) both;
+  }
+
+  @keyframes ink-wipe {
+    from {
+      clip-path: polygon(0 0, 120% 0, 120% 100%, -20% 100%);
+    }
+
+    to {
+      clip-path: polygon(120% 0, 120% 0, 120% 100%, 100% 100%);
+    }
+  }
+
+  :global(.process__stripes) {
+    right: var(--gutter);
+    top: var(--spacing-16);
+    width: 96px;
+    color: var(--color-bg-accent);
+    --slide: 10px;
+  }
+
+  :global(.process__patch) {
+    right: -60px;
+    bottom: -80px;
+    width: 280px;
+    opacity: 0.5;
+    --breathe: 1.06;
+  }
+
+  .steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--spacing-6);
+  }
+
+  .step {
+    display: grid;
+    grid-template-areas:
+      "number"
+      "title"
+      "body"
+      "link";
+    align-content: start;
+    justify-items: start;
+    gap: var(--spacing-4);
+    padding: var(--spacing-2) 0 var(--spacing-2) var(--spacing-6);
+    border-left: var(--border-regular) solid var(--color-border-default);
+  }
+
+  .step__number {
+    grid-area: number;
+    display: grid;
+    margin-bottom: var(--spacing-2);
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+    font: 400 2rem / 1 var(--font-display);
+    rotate: var(--num-tilt, 0deg);
+  }
+
+  /* Strong: each number stamps down as its step comes in. Weak: then it
+     rocks slowly on its tilt. */
+  .step:global(.is-visible) .step__number {
+    animation:
+      number-stamp 480ms cubic-bezier(0.5, 0, 0.6, 1) calc(var(--reveal-delay, 0ms) + 250ms) backwards,
+      sway 5s ease-in-out calc(var(--reveal-delay, 0ms) + 1s) infinite;
+    --sway: 4deg;
+  }
+
+  @keyframes number-stamp {
+    from {
+      opacity: 0;
+      scale: 2.6;
+    }
+
+    65% {
+      opacity: 1;
+      scale: 0.9;
+    }
+
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  .step__title {
+    grid-area: title;
+    font: 400 2.75rem / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .step__body {
+    grid-area: body;
+  }
+
+  .step__link {
+    grid-area: link;
+    color: var(--color-text-accent);
+    text-decoration: none;
+  }
+
+  .step__link span {
+    display: inline-block;
+    transition: translate var(--motion-duration-base) var(--motion-ease-snap);
+  }
+
+  .step__link:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  .step__link:hover span {
+    translate: var(--spacing-1) 0;
+  }
+
+  /*
+   * The repeat loop under the steps: a checkpoint below each column on a
+   * dashed trail that runs 01 to 04, curves round and comes back to 01.
+   * Strong: the trail draws itself and the checkpoints stamp down. Then a
+   * dot keeps travelling the loop (script) and the "Repeat" tag rocks.
+   */
+  .loop {
+    position: relative;
+    margin-top: var(--spacing-10, 40px);
+  }
+
+  .loop svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .loop__trail,
+  .loop__arrow {
+    fill: none;
+    stroke: var(--color-border-default);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .loop__trail {
+    stroke-dasharray: 10 10;
+  }
+
+  .loop__draw {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 16;
+    stroke-dasharray: 1;
+  }
+
+  .loop:global(.is-visible) .loop__draw {
+    animation: trail-draw 1.6s cubic-bezier(0.45, 0, 0.25, 1) 100ms backwards;
+  }
+
+  :global(.js) .loop:not(:global(.is-visible)) .loop__draw {
+    stroke-dashoffset: 1;
+  }
+
+  .loop__stop {
+    fill: var(--color-bg-primary);
+    stroke: var(--color-border-default);
+    stroke-width: 3;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  :global(.js) .loop:not(:global(.is-visible)) .loop__stop,
+  :global(.js) .loop:not(:global(.is-visible)) .loop__arrow,
+  :global(.js) .loop:not(:global(.is-visible)) .loop__label {
+    opacity: 0;
+  }
+
+  .loop:global(.is-visible) .loop__stop {
+    animation: stop-stamp 420ms cubic-bezier(0.5, 0, 0.6, 1) var(--at) backwards;
+  }
+
+  .loop:global(.is-visible) .loop__arrow {
+    animation: fade-in 300ms ease-out 1.6s backwards;
+  }
+
+  .loop__dot {
+    opacity: 0;
+  }
+
+  .loop__dot:global(.is-looping) {
+    opacity: 1;
+  }
+
+  .loop__dot circle {
+    fill: var(--color-bg-primary);
+    stroke: var(--color-border-default);
+    stroke-width: 3;
+  }
+
+  /* Sits on the trail's return line, in the band's colour so it breaks it. */
+  .loop__label {
+    position: absolute;
+    left: 50%;
+    bottom: calc(18 / 110 * 100%);
+    translate: -50% 50%;
+    padding: 2px var(--spacing-3);
+    background: var(--color-bg-page);
+    color: var(--color-text-accent);
+    white-space: nowrap;
+    rotate: -2deg;
+  }
+
+  .loop:global(.is-visible) .loop__label {
+    animation:
+      stop-stamp 420ms cubic-bezier(0.5, 0, 0.6, 1) 1.5s backwards,
+      sway 4s ease-in-out 2s infinite;
+    --sway: 3deg;
+  }
+
+  /* Phones show a short note instead of the loop. */
+  .loop-note {
+    display: none;
+    align-items: center;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-8);
+    color: var(--color-text-accent);
+  }
+
+  .loop-note__icon {
+    display: inline-block;
+    font-size: 1.5rem;
+    animation: spin 4s linear infinite;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Toolkit: rows of three cards of equal height; the last card is pink. */
+  .tools {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-6);
+  }
+
+  .tool-card {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-6);
+    padding: 20px;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  .tool-card__use {
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-2);
+  }
+
+  /* Equipped and unlocking. The tools in use carry an "Equipped" stamp on
+     the card's top edge, stamped down as the card comes in. Rive, still
+     being learned, has a striped bar that keeps loading instead. */
+  .tool-card {
+    position: relative;
+  }
+
+  .tool-card__stamp {
+    position: absolute;
+    top: -13px;
+    right: var(--spacing-4);
+    padding: 2px var(--spacing-2);
+    border: 2px solid var(--color-border-primary);
+    background: var(--color-bg-surface);
+    color: var(--color-text-accent);
+    rotate: -5deg;
+  }
+
+  .tool-card:global(.is-visible) .tool-card__stamp {
+    animation: stop-stamp 420ms cubic-bezier(0.5, 0, 0.6, 1) calc(var(--reveal-delay, 0ms) + 450ms) backwards;
+  }
+
+  .unlock {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    width: 100%;
+    margin-top: var(--spacing-1);
+  }
+
+  .unlock__bar {
+    position: relative;
+    flex: 1;
+    height: 12px;
+    border: 2px solid var(--color-ink-900);
+    background: var(--color-bg-surface);
+    overflow: hidden;
+  }
+
+  .unlock__bar::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 60%;
+    background: repeating-linear-gradient(-45deg, var(--color-yellow-500) 0 6px, var(--color-ink-900) 6px 8px);
+    background-size: 11.31px 11.31px;
+    animation:
+      unlock-fill 3.2s ease-in-out infinite alternate,
+      unlock-stripes 0.6s linear infinite;
+  }
+
+  .unlock__label {
+    color: var(--color-text-secondary);
+  }
+
+  @keyframes unlock-fill {
+    from {
+      width: 25%;
+    }
+
+    to {
+      width: 80%;
+    }
+  }
+
+  @keyframes unlock-stripes {
+    to {
+      background-position: 11.31px 0;
+    }
+  }
+
+  /* Strong, on hover: the border turns pink and the tool's mark jumps.
+     (No transition on the card itself: it would replace the reveal's.) */
+  @media (hover: hover) {
+    .tool-card:hover {
+      border-color: var(--color-border-primary);
+    }
+
+    .tool-card:hover :global(.tool__box svg) {
+      animation: tool-jump 600ms var(--motion-ease-snap);
+    }
+  }
+
+  @keyframes tool-jump {
+    35% {
+      translate: 0 -12px;
+      rotate: -12deg;
+      scale: 1.15;
+    }
+
+    70% {
+      translate: 0 2px;
+      rotate: 4deg;
+      scale: 0.95;
+    }
+  }
+
+  .proof-card {
+    display: grid;
+    justify-items: start;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding: 20px var(--spacing-6) var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  .proof-card__title {
+    font: 400 2.25rem / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  /* Weak: a spark twinkles in the proof card's corner. */
+  .proof-card {
+    position: relative;
+  }
+
+  :global(.proof-card__spark) {
+    position: absolute;
+    right: var(--spacing-4);
+    top: var(--spacing-4);
+    --dur: 3s;
+  }
+
+  .proof-card :global(.button) {
+    margin-top: auto;
+  }
+
+  /* Side quests: collectible cards in the home page's comic colours on the
+     paper background, with a halftone patch behind them. */
+  .about > section.quests {
+    overflow: clip;
+  }
+
+  :global(.quests__patch) {
+    right: -40px;
+    top: var(--spacing-12);
+    width: 300px;
+    opacity: 0.45;
+    --breathe: 1.06;
+  }
+
+  .hobbies {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--spacing-6);
+  }
+
+  /* Like the home page's comic panels: once the row scrolls into view the
+     cards slam down one after another, and on focus (see the script) a card
+     pops forward and straightens while its picture acts out the quest. The
+     slam fills only backwards, so the hover transform takes over after it. */
+  .hobby {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--spacing-4);
+    padding: var(--spacing-6);
+    border: var(--border-regular) solid var(--color-ink-900);
+    color: var(--color-ink-900);
+    --tilt-now: var(--quest-tilt, 0deg);
+    transform: rotate(var(--tilt-now));
+    transition: transform 350ms var(--motion-ease-snap);
+  }
+
+  :global(.js) .hobbies:not(.is-visible) .hobby {
+    opacity: 0;
+  }
+
+  .hobbies.is-visible .hobby {
+    animation: quest-slam 520ms cubic-bezier(0.5, 0, 0.6, 1) calc(150ms + var(--i) * 160ms) backwards;
+  }
+
+  .hobby.is-focus {
+    transform: rotate(0deg) scale(1.05);
+  }
+
+  @keyframes quest-slam {
+    from {
+      opacity: 0;
+      transform: rotate(calc(var(--tilt-now) - 4deg)) scale(1.35);
+    }
+
+    60% {
+      opacity: 1;
+      transform: rotate(calc(var(--tilt-now) + 1deg)) scale(0.96);
+    }
+
+    to {
+      opacity: 1;
+      transform: rotate(var(--tilt-now));
+    }
+  }
+
+  .hobby--paper {
+    background: var(--color-white-1000);
+  }
+
+  .hobby--aqua {
+    background: var(--color-bg-secondary);
+  }
+
+  /* Ink, with a pink title, like the home page's Anime panel. */
+  .hobby--ink {
+    background: var(--color-ink-900);
+    color: var(--color-white-1000);
+  }
+
+  .hobby--ink .hobby__title {
+    color: var(--color-bg-primary);
+  }
+
+  .hobby--pink {
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  .hobby__tile {
+    display: grid;
+    place-items: center;
+    width: 88px;
+    height: 88px;
+    border: var(--border-regular) solid var(--color-ink-900);
+    background: var(--color-white-1000);
+  }
+
+  .hobby__title {
+    margin-top: var(--spacing-2);
+  }
+
+  /* Achievement toast: slams in from the right the first time the side
+     quests come into view, its star spins, then it slides away (script). */
+  .achievement {
+    position: fixed;
+    right: var(--spacing-6);
+    bottom: var(--spacing-6);
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) var(--spacing-3);
+    border: var(--border-regular) solid var(--color-ink-900);
+    background: var(--color-ink-900);
+    color: var(--color-white-1000);
+    rotate: -2deg;
+  }
+
+  .achievement[hidden] {
+    display: none;
+  }
+
+  .achievement__badge {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--color-white-1000);
+    background: var(--color-yellow-500);
+  }
+
+  .achievement__text {
+    display: grid;
+    gap: 2px;
+  }
+
+  .achievement__label {
+    color: var(--color-yellow-500);
+  }
+
+  .achievement__title {
+    font: 700 1.125rem / 1.2 var(--font-sans);
+  }
+
+  .achievement:global(.is-in) {
+    animation: toast-in 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .achievement:global(.is-in) .achievement__badge :global(svg) {
+    animation: spin 900ms var(--motion-ease-out) 300ms;
+  }
+
+  .achievement:global(.is-out) {
+    animation: toast-out 400ms ease-in both;
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      translate: 120% 0;
+      scale: 0.9;
+    }
+
+    to {
+      opacity: 1;
+      translate: 0 0;
+      scale: 1;
+    }
+  }
+
+  @keyframes toast-out {
+    to {
+      opacity: 0;
+      translate: 120% 0;
+    }
+  }
+
+  /* Footer, as on every page. */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) var(--gutter);
+    border-top: 1px solid var(--color-border-subtle);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  /* Tablet */
+  @media (max-width: 1023px) {
+    .hero {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "copy"
+        "art"
+        "profile";
+    }
+
+    .hero__copy {
+      align-self: start;
+    }
+
+    .hero__art {
+      width: min(100%, 520px);
+      height: auto;
+      aspect-ratio: 520 / 560;
+      justify-self: center;
+    }
+
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--spacing-12);
+    }
+
+    /* Two steps per row: the loop's checkpoints no longer sit under them. */
+    .loop__stop {
+      display: none;
+    }
+
+    .tools {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hobbies {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacing-8);
+    }
+
+    /* Footer: the Japanese line and the copyright each stay on one line. */
+    .footer {
+      flex-wrap: wrap;
+    }
+
+    .footer p {
+      white-space: nowrap;
+    }
+
+    .footer .text-katakana {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Phone: one column, as in the Figma mobile frame. */
+  @media (max-width: 767px) {
+    .about > section:not(.hero) {
+      padding-block: var(--spacing-12);
+    }
+
+    .hero {
+      gap: var(--spacing-6);
+      padding-block: var(--spacing-8) var(--spacing-12);
+    }
+
+    .hero__title {
+      font-size: 5rem;
+    }
+
+    :global(.hero__grid) {
+      height: 160px;
+    }
+
+    /* Up by her hair here, clear of her face and the sticker. */
+    .hero__bubble {
+      left: -8%;
+      top: -2%;
+      font-size: 0.85rem;
+    }
+
+    :global(.hero__sticker) {
+      right: -6%;
+      bottom: 4%;
+      font-size: 0.75rem;
+    }
+    .profile {
+      padding: 20px;
+    }
+
+    .profile div {
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: var(--spacing-3);
+    }
+
+    .head {
+      margin-bottom: var(--spacing-6);
+    }
+
+    .head__title {
+      font-size: 3.5rem;
+    }
+
+    .timeline {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-8);
+    }
+
+    /* Phone: the map turns to run down the left edge. Each stop has its own
+       checkpoint, joined to the next by a dashed trail; Now gets the star.
+       Each checkpoint stamps down as its stop comes in. */
+    .quest-map {
+      display: none;
+    }
+
+    .milestone {
+      position: relative;
+      padding: 0 0 0 44px;
+    }
+
+    .milestone:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      left: 11px;
+      top: 32px;
+      bottom: calc(-1 * var(--spacing-8) + 4px);
+      border-left: var(--border-regular) dashed var(--color-border-default);
+    }
+
+    .milestone__track {
+      display: block;
+      position: absolute;
+      left: 0;
+      top: -2px;
+      width: 25px;
+      height: 25px;
+    }
+
+    .milestone__track::before {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border: var(--border-regular) solid var(--color-border-default);
+      background: var(--color-bg-page);
+      rotate: 45deg;
+    }
+
+    .milestone__track--now::before {
+      inset: -4px;
+      border: 0;
+      background: var(--color-bg-primary);
+      rotate: none;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    }
+
+    .milestone:global(.is-visible) .milestone__track {
+      animation: stop-stamp 420ms cubic-bezier(0.5, 0, 0.6, 1) calc(var(--reveal-delay, 0ms) + 200ms) backwards;
+    }
+
+    /* No room for the loop: a short note stands in for it. */
+    .loop {
+      display: none;
+    }
+
+    .loop-note {
+      display: flex;
+    }
+
+    .achievement {
+      left: var(--spacing-4);
+      right: var(--spacing-4);
+      bottom: var(--spacing-4);
+    }
+
+    /* Stacked steps: number and title side by side, still on the rule. */
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-8);
+    }
+
+    .step {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        "number title"
+        "body body"
+        "link link";
+      align-items: center;
+      gap: var(--spacing-3);
+      padding-left: var(--spacing-4);
+    }
+
+    .step__number {
+      margin-bottom: 0;
+      width: 56px;
+      height: 56px;
+      font-size: 1.75rem;
+    }
+
+    .step__title {
+      font-size: 2.25rem;
+    }
+
+    .tools {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-4);
+    }
+
+    .tool-card :global(.tool__box) {
+      width: 72px;
+      height: 72px;
+    }
+
+    .proof-card__title {
+      font-size: 2rem;
+    }
+
+    .hobbies {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-8);
+      padding-inline: var(--spacing-1);
+    }
+
+    .hobby {
+      --tilt-now: calc(var(--quest-tilt, 0deg) * 0.6);
+    }
+
+    .hobby.is-focus {
+      transform: rotate(0deg) scale(1.03);
+    }
+
+    .footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>

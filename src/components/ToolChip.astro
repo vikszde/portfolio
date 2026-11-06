@@ -2,14 +2,16 @@
 // A tool from the Figma "Tool chip" set: brand mark in an outlined pink
 // square with its name underneath. Brand shapes come from Simple Icons (CC0)
 // and keep their own colours; Rive follows the text colour. The brands are
-// trademarks of their owners.
+// trademarks of their owners. It renders a list item; pass `as="div"` to use
+// it outside a list, like the About page's tool cards.
 import type { HTMLAttributes } from "astro/types";
 
 type Props = {
   tool: keyof typeof marks;
+  as?: "li" | "div";
 } & HTMLAttributes<"li">;
 
-const { tool, class: className, ...rest } = Astro.props;
+const { tool, as: Tag = "li", class: className, ...rest } = Astro.props;
 
 const marks = {
   figma: {
@@ -78,14 +80,14 @@ const marks = {
 const mark = marks[tool];
 ---
 
-<li class:list={["tool", className]} {...rest}>
+<Tag class:list={["tool", className]} {...rest}>
   <span class="tool__box">
     <svg viewBox={mark.viewBox} aria-hidden="true" focusable="false">
       {mark.paths.map(([d, fill]) => <path d={d} fill={fill} />)}
     </svg>
   </span>
   <span class="tool__label text-label-m">{mark.label}</span>
-</li>
+</Tag>
 
 <style>
   .tool {

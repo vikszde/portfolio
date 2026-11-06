@@ -1,0 +1,312 @@
+---
+// Small spot illustrations for the About page's side quests, drawn to match
+// the "About / Hobby art" components in Figma: ink outlines with pink, aqua
+// and yellow fills. Decorative; the card's title says what it is.
+//
+// They move like the home page's About comic panels. At rest the wand's
+// spark twinkles, ticks pop onto the board, the eye blinks and the heart
+// beats. When the card around them has .is-focus (hover, keyboard focus, or
+// on touch screens while it sits mid-screen) each one acts out its quest:
+// the wand waves and its spark bursts, a card slides to the next column, the
+// eye looks around, the heart hops.
+interface Props {
+  name: "anime" | "organising" | "learning" | "food";
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 64, class: className } = Astro.props;
+---
+
+<svg class:list={["hobby-art", className]} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+  {
+    name === "anime" && (
+      <>
+        <g class="eye">
+          <path class="paper line" d="M4 36C16 18 48 18 60 36C48 50 16 50 4 36Z" stroke-width="3" />
+          <g class="pupil">
+            <circle class="aqua line" cx="32" cy="36" r="11" stroke-width="3" />
+            <circle class="ink" cx="32" cy="36" r="5" />
+            <circle class="paper" cx="28" cy="32" r="2.6" />
+          </g>
+          <path class="stroke" d="M2 33C16 12 48 12 62 33" stroke-width="4" />
+        </g>
+        <path class="pink line spark" d="M52 2L54 7L59 9L54 11L52 16L50 11L45 9L50 7Z" stroke-width="1.5" />
+      </>
+    )
+  }
+  {
+    name === "organising" && (
+      <>
+        <rect class="paper line" x="6" y="10" width="52" height="44" stroke-width="3" />
+        <path class="stroke" d="M23.5 10V54M40.5 10V54" stroke-width="2" />
+        <rect class="pink line" x="10" y="16" width="10" height="8" stroke-width="2" />
+        <rect class="pink line moving" x="10" y="28" width="10" height="8" stroke-width="2" />
+        <rect class="yellow line" x="27" y="16" width="10" height="8" stroke-width="2" />
+        <rect class="aqua line" x="44" y="16" width="10" height="8" stroke-width="2" />
+        <rect class="aqua line" x="44" y="28" width="10" height="8" stroke-width="2" />
+        <path class="stroke tick" d="M45 44l3 3 6-7" stroke-width="2.5" />
+      </>
+    )
+  }
+  {
+    name === "learning" && (
+      <>
+        <g class="wand">
+          <path class="ink" d="M44 60L52 52L30 30L22 38Z" />
+          <path class="yellow line" d="M22 38L30 30L24 24L16 32Z" stroke-width="2.5" />
+        </g>
+        <path class="pink line spark" d="M16 2L18.5 10.5L27 13L18.5 15.5L16 24L13.5 15.5L5 13L13.5 10.5Z" stroke-width="2" />
+        <circle class="aqua line dot" cx="40" cy="12" r="4" stroke-width="2" />
+        <circle class="yellow line dot dot--late" cx="52" cy="28" r="3" stroke-width="2" />
+        <circle class="aqua line dot" cx="6" cy="40" r="2.5" stroke-width="1.5" />
+      </>
+    )
+  }
+  {
+    name === "food" && (
+      <>
+        <path class="stroke chopsticks" d="M38 4L52 30M47 3L58 28" stroke-width="3" />
+        <path class="pink line" d="M6 34H58C58 48 47 58 32 58C17 58 6 48 6 34Z" stroke-width="3" />
+        <path class="paper line" d="M6 34C10 29 14 33 18 29C22 33 26 29 30 29C34 33 38 29 42 33C46 29 50 33 58 34Z" stroke-width="2.5" />
+        <path class="aqua line heart" d="M16 24C9 19 6 16 6 12.5C6 10 8 8 10.5 8C12.5 8 14 9 16 11C18 9 19.5 8 21.5 8C24 8 26 10 26 12.5C26 16 23 19 16 24Z" stroke-width="2" />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .hobby-art {
+    flex: none;
+    overflow: visible;
+  }
+
+  .line,
+  .stroke {
+    stroke: var(--color-ink-1000);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .stroke {
+    fill: none;
+  }
+
+  .ink {
+    fill: var(--color-ink-1000);
+  }
+
+  .paper {
+    fill: var(--color-white-1000);
+  }
+
+  .pink {
+    fill: var(--color-pink-500);
+  }
+
+  .aqua {
+    fill: var(--color-aqua-500);
+  }
+
+  .yellow {
+    fill: var(--color-yellow-500);
+  }
+
+  /* Motion. Every moving part turns about its own box. */
+  .spark,
+  .wand,
+  .eye,
+  .pupil,
+  .tick,
+  .heart,
+  .chopsticks {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* At rest */
+  .spark {
+    animation: quest-twinkle 2.4s ease-in-out infinite;
+  }
+
+  .dot {
+    animation: quest-dot 1.6s ease-in-out infinite alternate;
+  }
+
+  .dot--late {
+    animation-delay: 0.8s;
+  }
+
+  .tick {
+    animation: quest-tick 3s infinite;
+  }
+
+  .eye {
+    animation: quest-blink 4s 2s infinite;
+  }
+
+  .heart {
+    animation: quest-beat 2.4s ease-in-out infinite;
+  }
+
+  /* The wand turns about its handle end. */
+  .wand {
+    transform-origin: 90% 90%;
+  }
+
+  .chopsticks {
+    transform-origin: 30% 90%;
+  }
+
+  /* On focus */
+  :global(.is-focus) .wand {
+    animation: quest-wave 0.5s ease-in-out infinite alternate;
+  }
+
+  :global(.is-focus) .spark {
+    animation: quest-burst 0.5s ease-in-out infinite alternate;
+  }
+
+  :global(.is-focus) .moving {
+    animation: quest-move 1.4s var(--motion-ease-snap) infinite alternate;
+  }
+
+  :global(.is-focus) .pupil {
+    animation: quest-look 1.6s ease-in-out infinite;
+  }
+
+  :global(.is-focus) .heart {
+    animation: quest-hop 0.5s ease-in-out infinite alternate;
+  }
+
+  :global(.is-focus) .chopsticks {
+    animation: quest-pick 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes quest-twinkle {
+    0%,
+    100% {
+      scale: 1;
+      rotate: 0deg;
+    }
+
+    50% {
+      scale: 0.75;
+      rotate: 20deg;
+    }
+  }
+
+  @keyframes quest-dot {
+    to {
+      opacity: 0.3;
+    }
+  }
+
+  @keyframes quest-tick {
+    0%,
+    10% {
+      opacity: 0;
+      scale: 0.2;
+    }
+
+    20%,
+    70% {
+      opacity: 1;
+      scale: 1;
+    }
+
+    85%,
+    100% {
+      opacity: 0;
+      scale: 1;
+    }
+  }
+
+  @keyframes quest-blink {
+    0%,
+    90%,
+    100% {
+      scale: 1 1;
+    }
+
+    94% {
+      scale: 1 0.1;
+    }
+  }
+
+  @keyframes quest-beat {
+    0%,
+    60%,
+    100% {
+      scale: 1;
+    }
+
+    20% {
+      scale: 1.12;
+    }
+  }
+
+  @keyframes quest-wave {
+    from {
+      rotate: -14deg;
+    }
+
+    to {
+      rotate: 10deg;
+    }
+  }
+
+  @keyframes quest-burst {
+    from {
+      scale: 0.9;
+      rotate: 0deg;
+    }
+
+    to {
+      scale: 1.5;
+      rotate: 45deg;
+    }
+  }
+
+  /* The second pink card hops from "to do" into the empty slot under the
+     yellow card in the middle column. */
+  @keyframes quest-move {
+    0%,
+    20% {
+      translate: 0 0;
+    }
+
+    80%,
+    100% {
+      translate: 17px 0;
+    }
+  }
+
+  @keyframes quest-look {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+
+    30% {
+      translate: -6px 1px;
+    }
+
+    65% {
+      translate: 6px -1px;
+    }
+  }
+
+  @keyframes quest-hop {
+    to {
+      translate: 0 -4px;
+      scale: 1.15;
+    }
+  }
+
+  @keyframes quest-pick {
+    to {
+      rotate: -10deg;
+    }
+  }
+</style>
