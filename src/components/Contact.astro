@@ -1,0 +1,227 @@
+---
+// Contact band from the Figma "Section / Contact" frame: always pink with
+// light tokens, a skyline and floor bottom-right. Used on the home and About
+// pages; `number` is the section label, e.g. "04 / Contact".
+// "Say hello" opens the visitor's mail app and the email button copies the
+// address, for visitors whose mailto link opens nothing (webmail users).
+import Button from "./Button.astro";
+import Decor from "./Decor.astro";
+import Sparkle from "./Sparkle.astro";
+import { site } from "../data/site";
+
+interface Props {
+  number: string;
+}
+
+const { number } = Astro.props;
+---
+
+<section class="contact theme-light" id="contact" aria-labelledby="contact-title" data-stagger="110">
+  <Decor name="perspective-grid" tone="ink" moving class="contact__grid" />
+  <Decor name="city" class="contact__city" />
+  <Sparkle color="ink" size={96} class="contact__spark anim-twinkle" />
+  <p class="text-label-m" data-reveal>{number}</p>
+  <h2 id="contact-title" class="contact__title" data-reveal="slam">Let's make<br />something bright</h2>
+  <p class="contact__invite" data-reveal>Have a project in mind? Let's talk.</p>
+  <div class="contact__row" data-reveal>
+    {site.email && <Button variant="secondary" href={`mailto:${site.email}`} arrow data-say-hello>Say hello</Button>}
+    {site.email && (
+      <Button variant="ghost" class="contact__email" data-copy-email={site.email} title="Copy email address">
+        <span class="visually-hidden">Copy email address: </span>
+        <span data-copy-label>{site.email}</span>
+        <svg class="contact__copy-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+          <rect x="5" y="5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M2 11V2h9" fill="none" stroke="currentColor" stroke-width="2" />
+        </svg>
+      </Button>
+    )}
+    {site.linkedin && <Button variant="ghost" href={site.linkedin} target="_blank" rel="noopener">LinkedIn</Button>}
+    <span class="visually-hidden" aria-live="polite" data-copy-status></span>
+  </div>
+  <p class="contact__note" role="status" data-mail-note hidden></p>
+</section>
+
+<script>
+  // The email button shows the address and copies it on click. The label
+  // reads "Copied!" for a moment; if the clipboard is blocked the address is
+  // selected instead so it can be copied by hand.
+  const copyButton = document.querySelector<HTMLButtonElement>("[data-copy-email]");
+  const copyLabel = copyButton?.querySelector<HTMLElement>("[data-copy-label]");
+  const copyStatus = document.querySelector<HTMLElement>("[data-copy-status]");
+
+  // "Say hello" is a mailto link, which does nothing at all when no mail app
+  // is set up. If the page still has focus a moment after the click (nothing
+  // opened over it), copy the address and say so under the buttons.
+  const sayHello = document.querySelector<HTMLAnchorElement>("[data-say-hello]");
+  const mailNote = document.querySelector<HTMLElement>("[data-mail-note]");
+  if (sayHello && mailNote) {
+    const email = decodeURIComponent(sayHello.href.replace(/^mailto:/, ""));
+    sayHello.addEventListener("click", () => {
+      let left = false;
+      const away = () => (left = true);
+      window.addEventListener("blur", away, { once: true });
+      document.addEventListener("visibilitychange", away, { once: true });
+      setTimeout(async () => {
+        window.removeEventListener("blur", away);
+        document.removeEventListener("visibilitychange", away);
+        if (left || !document.hasFocus()) return;
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(email);
+          copied = true;
+        } catch {}
+        mailNote.textContent = copied
+          ? `No mail app opened? I’ve copied my address for you: ${email}`
+          : `No mail app opened? Write to me at ${email}`;
+        mailNote.hidden = false;
+      }, 1200);
+    });
+  }
+
+  if (copyButton && copyLabel) {
+    const email = copyButton.dataset.copyEmail ?? "";
+    let reset: ReturnType<typeof setTimeout> | undefined;
+    copyButton.addEventListener("click", async () => {
+      // Keep the width so the row doesn't jump when the label changes.
+      copyButton.style.minWidth = `${copyButton.offsetWidth}px`;
+      clearTimeout(reset);
+      copyLabel.textContent = email;
+      try {
+        await navigator.clipboard.writeText(email);
+        copyLabel.textContent = "Copied!";
+        if (copyStatus) copyStatus.textContent = "Email address copied to the clipboard.";
+        reset = setTimeout(() => {
+          copyLabel.textContent = email;
+          if (copyStatus) copyStatus.textContent = "";
+        }, 2000);
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(copyLabel);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+        if (copyStatus) copyStatus.textContent = `Email address: ${email}`;
+      }
+    });
+  }
+</script>
+
+<style>
+  /* Pink, white text, graphics bottom-right. */
+  .contact {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: var(--spacing-8);
+    padding: var(--spacing-24) var(--gutter);
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+    overflow: clip;
+    --decor-sun: var(--color-yellow-500);
+    --decor-skyline: var(--color-ink-900);
+  }
+
+  /* Decor sits behind the content. */
+  .contact > :global(.decor) {
+    position: absolute;
+  }
+
+  .contact > p,
+  .contact > h2,
+  .contact__row {
+    position: relative;
+  }
+
+  .contact__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-4);
+  }
+
+  /* Only the near end of the floor shows, as a band along the bottom edge. */
+  :global(.contact__grid) {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    opacity: 0.22;
+    clip-path: inset(62% 0 0 0);
+  }
+
+  :global(.contact__city) {
+    right: 10px;
+    bottom: 0;
+    width: min(492px, 40vw);
+  }
+
+  :global(.contact__spark) {
+    position: absolute;
+    left: 62%;
+    top: 13%;
+    --dur: 4s;
+  }
+
+  /* The sun in the skyline glows slowly. */
+  .contact :global(.decor__sun) {
+    transform-box: fill-box;
+    transform-origin: center;
+    --breathe: 1.14;
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  .contact__title {
+    font: 400 clamp(4rem, 11vw, 10rem) / 0.95 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .contact__invite {
+    font: 700 1.75rem / 2rem var(--font-sans);
+  }
+
+  /* The address keeps its real lowercase, so it reads (and gets typed)
+     exactly as it is, and can be selected like text. */
+  .contact [data-copy-label] {
+    text-transform: none;
+    user-select: text;
+  }
+
+  .contact__copy-icon {
+    flex: none;
+  }
+
+  .contact__note {
+    max-width: 36rem;
+    font: 700 1rem / 1.5rem var(--font-sans);
+  }
+
+  /* Tablet: room under the text for the skyline. */
+  @media (max-width: 1023px) {
+    .contact {
+      padding-bottom: 260px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .contact {
+      padding-block: var(--spacing-16) 240px;
+    }
+
+    .contact__title {
+      font-size: 3.75rem;
+    }
+
+    :global(.contact__city) {
+      width: 372px;
+    }
+
+    :global(.contact__spark) {
+      left: auto;
+      right: var(--gutter);
+      top: var(--spacing-8);
+      width: 48px;
+      height: 48px;
+    }
+
+    :global(.contact__grid) {
+      width: 200%;
+    }
+  }
+</style>

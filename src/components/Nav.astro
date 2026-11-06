@@ -13,12 +13,12 @@ interface Props {
 const { current = "Home" } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 // `section` is the home page section a link stands for, so the indicator can
-// follow it while the home page scrolls. Work goes to the All work page but
-// still lights up over the home page's work section.
+// follow it while the home page scrolls. Work and About go to their own pages
+// but still light up over the home page's matching sections.
 const links: { label: NonNullable<Props["current"]>; href: string; section?: string }[] = [
   { label: "Home", href: base },
   { label: "Work", href: `${base}work/`, section: "work" },
-  { label: "About", href: `${base}#about`, section: "about" },
+  { label: "About", href: `${base}about/`, section: "about" },
   { label: "Playground", href: `${base}playground/` },
   { label: "Contact", href: `${base}#contact`, section: "contact" },
 ];
