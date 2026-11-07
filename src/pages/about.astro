@@ -32,31 +32,33 @@ const milestones = [
   { year: "Now", title: "nearb.io", body: "Product design, research and AI-assisted frontend work." },
 ];
 
-// Each step links to the part of a case study that shows it.
+// Each step links to the part of a case study that shows it. The links go to
+// the section, not its heading, so the page opens at the section's top edge
+// with its number and label in view, not cut off under the nav.
 const steps = [
   {
     title: "Understand",
     body: "Clarify the problem, review available research, and identify what still needs to be learned.",
     link: "Barterland research",
-    href: `${base}work/barterland/#research-title`,
+    href: `${base}work/barterland/#research`,
   },
   {
     title: "Explore",
     body: "User flows, wireframes and lots of rough options.",
     link: "nearb.io flows and wireframes",
-    href: `${base}work/nearbio/#flows-title`,
+    href: `${base}work/nearbio/#flows`,
   },
   {
     title: "Design & build",
     body: "Refine the interface, develop reusable components, and explore implementation with Claude.",
     link: "nearb.io Storybook",
-    href: `${base}work/nearbio/#system-title`,
+    href: `${base}work/nearbio/#system`,
   },
   {
     title: "Test",
     body: "Use usability testing and feedback to identify problems and improve the design.",
     link: "Barterland upload flow",
-    href: `${base}work/barterland/#testing-title`,
+    href: `${base}work/barterland/#testing`,
   },
 ] as const;
 

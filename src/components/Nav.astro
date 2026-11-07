@@ -10,7 +10,8 @@ interface Props {
   current?: "Home" | "Work" | "About" | "Playground" | "Contact";
 }
 
-const { current = "Home" } = Astro.props;
+// Left out (the 404 page), no link is marked as the current page.
+const { current } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 // `section` is the home page section a link stands for, so the indicator can
 // follow it while the home page scrolls. Work and About go to their own pages
@@ -223,7 +224,8 @@ const links: { label: NonNullable<Props["current"]>; href: string; section?: str
   /*
    * Scroll behaviour: the bar sticks to the top and turns compact once the
    * page scrolls, slides away while scrolling down and comes back on any
-   * scroll up. A pink line along its bottom edge shows reading progress, and
+   * scroll up. A pink line along its bottom edge shows reading progress and
+   * stays on screen even while the bar is slid away, and
    * on the home page an ink block slides to the section being read.
    */
   const nav = document.querySelector<HTMLElement>("[data-nav]");
@@ -232,8 +234,11 @@ const links: { label: NonNullable<Props["current"]>; href: string; section?: str
   const sections = navLinks
     .map((link) => ({ link, section: link.dataset.section ? document.getElementById(link.dataset.section) : null }))
     .filter((item): item is { link: HTMLAnchorElement; section: HTMLElement } => item.section !== null);
-  const homeLink = navLinks.find((link) => !link.dataset.section && link.getAttribute("aria-current") === "page");
-  let active = navLinks.find((link) => link.getAttribute("aria-current") === "page") ?? null;
+  // The current page's own link: lit whenever none of the sections is being
+  // read. Not only Home: the About page has a Contact section of its own, and
+  // above it About must stay lit.
+  const pageLink = navLinks.find((link) => link.getAttribute("aria-current") === "page") ?? null;
+  let active = pageLink;
 
   function moveIndicator(link: HTMLAnchorElement | null) {
     if (!indicator) return;
@@ -269,7 +274,7 @@ const links: { label: NonNullable<Props["current"]>; href: string; section?: str
 
     if (sections.length) {
       const probe = window.innerHeight * 0.35;
-      let current: HTMLAnchorElement | null = homeLink ?? null;
+      let current: HTMLAnchorElement | null = pageLink;
       for (const { link, section } of sections) {
         if (section.getBoundingClientRect().top <= probe) current = link;
       }
@@ -340,15 +345,20 @@ const links: { label: NonNullable<Props["current"]>; href: string; section?: str
     height: 82px;
   }
 
-  /* Scrolling down slides the bar away; scrolling up brings it back. */
+  /* Scrolling down slides the bar away; scrolling up brings it back. It stops
+     short by the progress line's height, so that line (which sits flush with
+     the bar's bottom edge) stays pinned to the top of the screen. */
   .nav.is-hidden {
-    translate: 0 -110%;
+    translate: 0 calc(-100% + var(--border-heavy));
   }
 
   .nav.is-compact {
     padding-top: var(--spacing-2);
   }
 
+  /* The bar takes the dark theme's tokens, but text inherits its colour as
+     already worked out on the light page, so it must be set again here, or
+     anything without a colour of its own (the tagline) stays black on black. */
   .nav__bar {
     position: relative;
     display: flex;
@@ -356,6 +366,7 @@ const links: { label: NonNullable<Props["current"]>; href: string; section?: str
     gap: var(--spacing-8);
     padding-bottom: var(--spacing-4);
     border-bottom: var(--border-thin) solid var(--color-border-default);
+    color: var(--color-text-primary);
     transition: padding var(--motion-duration-base) var(--motion-ease-out);
   }
 
