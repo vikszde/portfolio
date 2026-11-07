@@ -1,0 +1,404 @@
+---
+// Page not found, drawn as a manga page: panels of different sizes with
+// heavy ink frames and gutters, read in order. GitHub Pages serves this for
+// any address that doesn't exist, at any depth, so every link is built from
+// the base path. The nav marks no page as current.
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Button from "../components/Button.astro";
+import Decor from "../components/Decor.astro";
+import Sticker from "../components/Sticker.astro";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+---
+
+<Base title="Page not found · Viktória Varga" description="This page doesn't exist. Head back to Viktória Varga's portfolio.">
+  <Nav />
+  <main class="manga">
+    <div class="manga__page" data-stagger="140">
+      <!-- 1. The hit: focus lines rush in on the 404. -->
+      <section class="panel panel--title" aria-label="Error 404" data-reveal>
+        <span class="panel__lines" aria-hidden="true"></span>
+        <Decor name="halftone-fade" tone="ink" class="panel__tone" />
+        <p class="caption text-label-m">Error 404</p>
+        <p class="panel__code" aria-hidden="true">404</p>
+        <Sticker color="yellow" tilt={8} class="panel__sticker">Not found</Sticker>
+      </section>
+
+      <!-- 2. A narrow pink strip, the line set vertically as in manga. -->
+      <section class="panel panel--kana" aria-label="I'm lost" data-reveal>
+        <p class="panel__kana" lang="ja">迷子です。</p>
+        <p class="panel__kana-note text-label-s">Maigo desu<br />I'm lost</p>
+      </section>
+
+      <!-- 3. Narration box and a speech bubble over screen-tone. -->
+      <section class="panel panel--story" data-reveal>
+        <Decor name="halftone-patch" tone="ink" class="panel__patch" />
+        <div class="narration">
+          <h1 class="narration__title">This page wandered off.</h1>
+        </div>
+        <p class="bubble text-body-l">The link may be old, or the address has a&nbsp;typo.</p>
+      </section>
+
+      <!-- 4. Meanwhile, in the city. -->
+      <section class="panel panel--city" aria-hidden="true" data-reveal>
+        <Decor name="perspective-grid" tone="accent" moving stretch class="panel__floor" />
+        <Decor name="city" class="panel__skyline" />
+        <p class="caption text-label-m">Meanwhile, somewhere in the city…</p>
+      </section>
+
+      <!-- 5. The way out. -->
+      <section class="panel panel--next theme-dark" aria-labelledby="next-title" data-reveal>
+        <div class="next__head">
+          <h2 id="next-title" class="text-h2">Where to next?</h2>
+          <p class="text-katakana next__kana" lang="ja">つぎは？</p>
+        </div>
+        <div class="next__actions">
+          <Button variant="primary" href={base} arrow>Back home</Button>
+          <Button variant="ghost" href={`${base}work/`}>See my work</Button>
+          <Button variant="ghost" href={`${base}#contact`}>Get in touch</Button>
+        </div>
+      </section>
+    </div>
+  </main>
+</Base>
+
+<style>
+  /* Clipped sideways so the panels' entrances can't widen a phone page. */
+  .manga {
+    padding: var(--spacing-12) var(--gutter) var(--spacing-16);
+    overflow-x: clip;
+  }
+
+  /* The page: a 12-column grid of panels with white gutters between heavy
+     ink frames. */
+  .manga__page {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-areas:
+      "title title title title title title title title kana kana kana kana"
+      "story story story story story story story city city city city city"
+      "next next next next next next next next next next next next";
+    gap: var(--spacing-3);
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+
+  .panel {
+    position: relative;
+    min-width: 0;
+    border: var(--border-heavy) solid var(--color-ink-1000);
+    background: var(--color-bg-page);
+    overflow: clip;
+  }
+
+  .panel > :global(.decor) {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  /* Narration caption: a plain boxed label in a panel's corner. */
+  .caption {
+    position: absolute;
+    left: calc(-1 * var(--border-heavy));
+    top: calc(-1 * var(--border-heavy));
+    z-index: 2;
+    margin: 0;
+    padding: var(--spacing-2) var(--spacing-3);
+    border: var(--border-heavy) solid var(--color-ink-1000);
+    background: var(--color-white-1000);
+    color: var(--color-ink-1000);
+  }
+
+  /* 1. Title panel. */
+  .panel--title {
+    grid-area: title;
+    display: grid;
+    place-items: center;
+    min-height: clamp(280px, 32vw, 440px);
+  }
+
+  /* Manga focus lines: thin ink rays converging on the 404, faded out
+     towards the middle so the number sits in a clear spot. */
+  .panel__lines {
+    position: absolute;
+    inset: 0;
+    background: repeating-conic-gradient(
+      from 0deg at 50% 55%,
+      var(--color-ink-1000) 0deg 0.8deg,
+      transparent 0.8deg 6deg
+    );
+    -webkit-mask-image: radial-gradient(ellipse at 50% 55%, transparent 28%, #000 72%);
+    mask-image: radial-gradient(ellipse at 50% 55%, transparent 28%, #000 72%);
+    opacity: 0.55;
+  }
+
+  :global(.panel__tone) {
+    right: 0;
+    bottom: 0;
+    width: 55%;
+    opacity: 0.18;
+  }
+
+  .panel__code {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font: 400 clamp(8rem, 22vw, 17rem) / 0.8 var(--font-display);
+    color: var(--color-ink-1000);
+    /* A paper outline cuts the number out of the focus lines. */
+    -webkit-text-stroke: 10px var(--color-bg-page);
+    paint-order: stroke fill;
+  }
+
+  :global(.panel__sticker) {
+    position: absolute;
+    right: var(--spacing-6);
+    bottom: var(--spacing-6);
+    z-index: 2;
+  }
+
+  /* 2. The vertical line, white on pink. */
+  .panel--kana {
+    grid-area: kana;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-8) var(--spacing-4);
+    background: var(--color-bg-primary);
+    color: var(--color-text-on-primary);
+  }
+
+  .panel__kana {
+    margin: 0;
+    writing-mode: vertical-rl;
+    font: 900 clamp(3rem, 6vw, 5.5rem) / 1.05 var(--font-jp);
+    letter-spacing: 0.08em;
+  }
+
+  .panel__kana-note {
+    margin: 0;
+    writing-mode: vertical-rl;
+    opacity: 0.85;
+  }
+
+  /* 3. Story panel: screen-tone dots behind a narration box and bubble. */
+  .panel--story {
+    grid-area: story;
+    display: grid;
+    align-content: space-between;
+    gap: var(--spacing-8);
+    min-height: 320px;
+    padding: var(--spacing-8);
+  }
+
+  :global(.panel__patch) {
+    right: -60px;
+    top: -60px;
+    width: 300px;
+    opacity: 0.12;
+  }
+
+  .narration {
+    position: relative;
+    justify-self: start;
+    max-width: 100%;
+    padding: var(--spacing-4) var(--spacing-6);
+    border: var(--border-heavy) solid var(--color-ink-1000);
+    background: var(--color-white-1000);
+    rotate: -1.5deg;
+  }
+
+  /* Sized in its own font, so it wraps as "This page / wandered off." */
+  .narration__title {
+    max-width: 14ch;
+    margin: 0;
+    font: 400 clamp(2.5rem, 4.6vw, 4.25rem) / 0.95 var(--font-display);
+    text-transform: uppercase;
+    color: var(--color-ink-1000);
+  }
+
+  /* A round speech bubble with its tail pointing up-left, at the
+     narration. */
+  .bubble {
+    position: relative;
+    justify-self: end;
+    max-width: 21rem;
+    margin: 0;
+    padding: var(--spacing-6) var(--spacing-8);
+    border: var(--border-heavy) solid var(--color-ink-1000);
+    border-radius: 50%;
+    background: var(--color-white-1000);
+    color: var(--color-ink-1000);
+    text-align: center;
+  }
+
+  .bubble::before,
+  .bubble::after {
+    content: "";
+    position: absolute;
+    border-style: solid;
+    border-color: transparent;
+  }
+
+  .bubble::before {
+    left: 22%;
+    top: -30px;
+    border-width: 0 0 34px 26px;
+    border-bottom-color: var(--color-ink-1000);
+  }
+
+  .bubble::after {
+    left: calc(22% + 6px);
+    top: -19px;
+    border-width: 0 0 24px 17px;
+    border-bottom-color: var(--color-white-1000);
+  }
+
+  /* 4. City panel: the rolling floor and the skyline with its sun. */
+  .panel--city {
+    grid-area: city;
+    min-height: 320px;
+    --decor-sun: var(--color-yellow-500);
+    --decor-skyline: var(--color-ink-900);
+  }
+
+  :global(.panel__floor) {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 45%;
+    opacity: 0.45;
+  }
+
+  /* Capped, so a full-width panel (tablet) doesn't blow the skyline up
+     past the panel's top. */
+  :global(.panel__skyline) {
+    right: 4%;
+    bottom: 0;
+    width: min(88%, 440px);
+  }
+
+  .panel--city :global(.decor__sun) {
+    transform-box: fill-box;
+    transform-origin: center;
+    --breathe: 1.12;
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  /* 5. The way out: an ink panel. */
+  .panel--next {
+    grid-area: next;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-6) var(--spacing-12);
+    padding: var(--spacing-8);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  .next__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-4);
+  }
+
+  .next__head h2 {
+    margin: 0;
+  }
+
+  .next__kana {
+    margin: 0;
+    color: var(--color-text-accent);
+  }
+
+  .next__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-4);
+  }
+
+  /* Tablet: title and the pink strip share a row; story, city and the way
+     out each get the full width. */
+  @media (max-width: 1023px) {
+    .manga__page {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-areas:
+        "title title title title kana kana"
+        "story story story story story story"
+        "city city city city city city"
+        "next next next next next next";
+    }
+  }
+
+  /* Phone: one column, except the pink strip, which stands beside the 404
+     as a narrow vertical panel. */
+  @media (max-width: 767px) {
+    .manga {
+      padding-top: var(--spacing-12);
+    }
+
+    .manga__page {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-areas:
+        "title title title kana"
+        "story story story story"
+        "city city city city"
+        "next next next next";
+      gap: var(--spacing-2);
+    }
+
+    .panel--title {
+      min-height: 220px;
+    }
+
+    .panel__code {
+      font-size: 5.5rem;
+      -webkit-text-stroke-width: 6px;
+    }
+
+    :global(.panel__sticker) {
+      right: var(--spacing-3);
+      bottom: var(--spacing-3);
+    }
+
+    .panel--kana {
+      flex-direction: column;
+      align-items: center;
+      padding: var(--spacing-6) var(--spacing-2);
+    }
+
+    .panel__kana {
+      font-size: 2rem;
+    }
+
+    .panel__kana-note {
+      display: none;
+    }
+
+    .panel--story {
+      min-height: 0;
+      padding: var(--spacing-6) var(--spacing-4);
+    }
+
+    .narration__title {
+      font-size: 2.5rem;
+    }
+
+    .bubble {
+      padding: var(--spacing-4) var(--spacing-6);
+    }
+
+    .panel--city {
+      min-height: 220px;
+    }
+
+    .panel--next {
+      padding: var(--spacing-6) var(--spacing-4);
+    }
+  }
+</style>
