@@ -103,6 +103,40 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
             else if (!el.dataset.revealAt) observer.observe(el);
           });
 
+          // Jumping to a #section (the nav's Contact, the case studies'
+          // closing link) reveals that whole section as one entrance once it
+          // arrives. The jump lands the section near the top, and on a short
+          // desktop window a tall one (Contact's big title) leaves its lower
+          // parts, like the email row, below the reveal line with the scroll
+          // already over, so they'd sit blank until the visitor scrolled on.
+          let jumpTarget: HTMLElement | null = null;
+          const revealJumpTarget = () => {
+            if (!jumpTarget) return;
+            const box = jumpTarget.getBoundingClientRect();
+            if (box.top > window.innerHeight * 0.6 || box.bottom < 0) return;
+            jumpTarget.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-visible)").forEach((el) => {
+              reveal(el);
+              observer.unobserve(el);
+            });
+            jumpTarget = null;
+          };
+          const jumpTo = (hash: string) => {
+            const id = decodeURIComponent(hash.slice(1));
+            jumpTarget = id ? document.getElementById(id) : null;
+            revealJumpTarget();
+          };
+          // Arrived at a #section from another page.
+          if (location.hash) jumpTo(location.hash);
+          // A #section link on this page. Watching clicks, not hashchange,
+          // also catches a second click when the hash is already #contact.
+          document.addEventListener("click", (event) => {
+            const link = (event.target as Element | null)?.closest<HTMLAnchorElement>("a[href*='#']");
+            if (!link) return;
+            const url = new URL(link.href, location.href);
+            if (url.hash && url.pathname === location.pathname && url.search === location.search) jumpTo(url.hash);
+          });
+          window.addEventListener("hashchange", () => jumpTo(location.hash));
+
           // Safety net: a fast scroll can outrun the observer, so also check on
           // scroll and reveal anything that has reached the screen.
           let queued = false;
@@ -113,6 +147,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
               queued = true;
               setTimeout(() => {
                 queued = false;
+                revealJumpTarget();
                 document.querySelectorAll<HTMLElement>("[data-reveal]:not(.is-visible)").forEach((el) => {
                   if (!onScreen(el)) return;
                   reveal(el);
