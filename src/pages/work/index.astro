@@ -87,8 +87,12 @@ const count = String(projects.length).padStart(2, "0");
 </Base>
 
 <style>
+  /* Clipped sideways: the title's slam entrance starts at 1.5x, which on a
+     phone reaches well past the screen edge and would make the whole page
+     (nav included) briefly scroll sideways. */
   .work {
     padding: var(--spacing-16) var(--gutter) var(--spacing-24);
+    overflow-x: clip;
   }
 
   .accent {
