@@ -1,6 +1,6 @@
 # Portfolio
 
-Personal portfolio of Viktória Varga, product designer. Anime-inspired brutalism, built with [Astro](https://docs.astro.build) as a static site (no server).
+Personal portfolio of Viktória Simóné Varga, product designer. Anime-inspired brutalism, built with [Astro](https://docs.astro.build) as a static site (no server).
 
 ## Requirements
 

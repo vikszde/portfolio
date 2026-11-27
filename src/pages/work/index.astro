@@ -11,14 +11,17 @@ import Logo from "../../components/Logo.astro";
 import { projects } from "../../data/site";
 import nearbioCover from "../../assets/work/nearbio-cover.webp?url";
 import barterlandCover from "../../assets/work/barterland-cover.webp?url";
+import vitaradarCover from "../../assets/work/vitaradar-cover.png?url";
 import eyeStrip from "../../assets/art/eye-strip.webp?url";
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-const covers: Record<string, string | undefined> = { nearbio: nearbioCover, barterland: barterlandCover };
+const covers: Record<string, string | undefined> = { nearbio: nearbioCover, barterland: barterlandCover, vitaradar: vitaradarCover };
 const count = String(projects.length).padStart(2, "0");
+// The newest case study leads; the rest keep their order.
+const newestFirst = [...projects.filter((project) => project.slug === "vitaradar"), ...projects.filter((project) => project.slug !== "vitaradar")];
 ---
 
-<Base title="Work · Viktória Varga" description="Case studies by Viktória Varga, from early research to finished interfaces.">
+<Base title="Work · Viktória Simóné Varga" description="Case studies by Viktória Simóné Varga, from early research to finished interfaces.">
   <Nav current="Work" />
   <main>
     <div class="work">
@@ -37,7 +40,7 @@ const count = String(projects.length).padStart(2, "0");
 
       <ol class="rows">
         {
-          projects.map((project, i) => {
+          newestFirst.map((project, i) => {
             const href = `${base}work/${project.slug}/`;
             return (
               <li class:list={["row", { "row--flip": i % 2 === 1 }]}>
@@ -73,7 +76,7 @@ const count = String(projects.length).padStart(2, "0");
 
     <!-- Call to action (always pink), as on the case studies -->
     <section class="cta theme-light" aria-label="Get in touch">
-      <a class="cta__link" href={`${base}#contact`}>Let's create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
+      <a class="cta__link" href={`${base}#contact`}>Let’s create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
       <div class="cta__strip anim-float" aria-hidden="true"><img src={eyeStrip} alt="" width="560" height="160" loading="lazy" /></div>
       <Sparkle color="ink" size={40} class="cta__spark anim-twinkle" />
     </section>
@@ -82,7 +85,7 @@ const count = String(projects.length).padStart(2, "0");
   <footer class="footer theme-dark">
     <Logo variant="wordmark" height={40} label="VIKSZDE" />
     <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
-    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+    <p class="text-label-m secondary">© 2026 Viktória Simóné Varga</p>
   </footer>
 </Base>
 

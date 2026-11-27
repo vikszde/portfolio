@@ -21,8 +21,8 @@ const { number } = Astro.props;
   <Decor name="city" class="contact__city" />
   <Sparkle color="ink" size={96} class="contact__spark anim-twinkle" />
   <p class="text-label-m" data-reveal>{number}</p>
-  <h2 id="contact-title" class="contact__title" data-reveal="slam">Let's make<br />something bright</h2>
-  <p class="contact__invite" data-reveal>Have a project in mind? Let's talk.</p>
+  <h2 id="contact-title" class="contact__title" data-reveal="slam">Let’s make<br />something bright</h2>
+  <p class="contact__invite" data-reveal>Have a project in mind? Let’s talk.</p>
   <div class="contact__row" data-reveal>
     {site.email && <Button variant="secondary" href={`mailto:${site.email}`} arrow data-say-hello>Say hello</Button>}
     {site.email && (

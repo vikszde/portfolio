@@ -29,4 +29,13 @@ export const projects = [
     tags: ["UI/UX", "Research", "Branding"],
     highlight: "Marketplace",
   },
+  {
+    slug: "vitaradar",
+    number: "03",
+    title: "vitaradar.hu",
+    summary: "Live fact-checks of the Hungarian Parliament’s stream. My work: the phone and desktop design, built with Claude, tested and fixed.",
+    role: "Product design, AI-assisted build and testing.",
+    tags: ["UI/UX", "Mobile first", "Testing"],
+    highlight: "Live fact-checks",
+  },
 ] as const;

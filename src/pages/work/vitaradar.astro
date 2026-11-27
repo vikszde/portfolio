@@ -1,0 +1,1263 @@
+---
+// vitaradar.hu case study, in the same design and layouts as the nearb.io and
+// Barterland case studies. Sources: the vitaradar.hu repository (README, the
+// two GitHub issues, manual-tests.md, the merged pull requests and commits),
+// the design prototype (sample data) and screenshots of the live site taken
+// on 27 November 2026, shown inside phones and monitors.
+import Base from "../../layouts/Base.astro";
+import Nav from "../../components/Nav.astro";
+import Button from "../../components/Button.astro";
+import Tag from "../../components/Tag.astro";
+import Chip from "../../components/Chip.astro";
+import Sticker from "../../components/Sticker.astro";
+import Sparkle from "../../components/Sparkle.astro";
+import Decor from "../../components/Decor.astro";
+import ToolChip from "../../components/ToolChip.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import Logo from "../../components/Logo.astro";
+import SectionHead from "../../components/case-study/SectionHead.astro";
+import CaseIcon from "../../components/case-study/CaseIcon.astro";
+import Device from "../../components/case-study/Device.astro";
+import Shot from "../../components/case-study/Shot.astro";
+import { projects } from "../../data/site";
+import eyeStrip from "../../assets/art/eye-strip.webp?url";
+import nearbioCover from "../../assets/work/nearbio-cover.webp?url";
+
+import beforeLive from "../../assets/work/vitaradar/before-live.png";
+import beforeFacts from "../../assets/work/vitaradar/before-facts.png";
+import beforeReplay from "../../assets/work/vitaradar/before-replay.png";
+import beforeDesktop from "../../assets/work/vitaradar/before-desktop.png";
+import protoFeed from "../../assets/work/vitaradar/proto-feed.png";
+import protoComments from "../../assets/work/vitaradar/proto-comments.png";
+import protoGame from "../../assets/work/vitaradar/proto-game.png";
+import protoMenu from "../../assets/work/vitaradar/proto-menu.png";
+import mLive from "../../assets/work/vitaradar/m-live.webp";
+import mFactOpen from "../../assets/work/vitaradar/m-fact-open.webp";
+import mPulledUp from "../../assets/work/vitaradar/m-pulled-up.webp";
+import mGame from "../../assets/work/vitaradar/m-game-standby.webp";
+import mChat from "../../assets/work/vitaradar/m-chat.webp";
+import mMenu from "../../assets/work/vitaradar/m-menu.webp";
+import mReplay from "../../assets/work/vitaradar/m-replay-speakers.webp";
+import mArchive from "../../assets/work/vitaradar/m-archive.webp";
+import mMps from "../../assets/work/vitaradar/m-mps.webp";
+import mMp from "../../assets/work/vitaradar/m-mp.webp";
+import dReplay from "../../assets/work/vitaradar/d-replay.webp";
+import dArchive from "../../assets/work/vitaradar/d-archive.webp";
+import dMps from "../../assets/work/vitaradar/d-mps.webp";
+import dMp from "../../assets/work/vitaradar/d-mp.webp";
+import flowLive from "../../assets/work/vitaradar/flow-live.png";
+import flowPhone from "../../assets/work/vitaradar/flow-phone.png";
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const next = projects.find((project) => project.slug === "nearbio")!;
+
+const full = "(min-width: 1440px) 1280px, 92vw";
+const phone = "(min-width: 768px) 240px, 44vw";
+const monitor = "(min-width: 1100px) 620px, (min-width: 768px) 45vw, 92vw";
+
+const details = [
+  ["Role", "Product design, AI-assisted build and testing."],
+  ["Collaboration", "Working with the developer, who built the product and its fact-checking."],
+  ["Time", "About 30 hours, up to publication."],
+];
+
+const scope = ["UX audit", "User flows", "UI design", "Motion", "Testing", "Bug fixing"];
+
+const findings = [
+  ["721 px", "On a phone, the first fact started 721 px down, under the player, a support note, the speaker card and the tally."],
+  ["~700 px", "A checked fact showed everything at once, so one fact filled the screen."],
+  ["Off-screen", "The player wasn’t pinned, so scrolling down to the facts moved the video away."],
+  ["Covered", "The CHAT button sat on the video, and game cards popped up over the facts."],
+  ["952 px", "At 1366 × 768 the player was cut off and the facts started 952 px down."],
+  ["77,000 px", "With 200 facts the live page grew to about 77,000 px, with neon glow and constant motion."],
+];
+
+const rules = [
+  { icon: "checklist", title: "Hungarian, word for word", body: "The interface stays Hungarian, and the verdict labels stay exactly as the fact-checks name them." },
+  { icon: "search", title: "The AI notice stays", body: "“Automatikus (AI) ellenőrzés — tévedhet” (an automatic check that can be wrong) stays above the facts." },
+  { icon: "stack", title: "Nothing covers the video", body: "The player is never covered and never scrolls off-screen." },
+  { icon: "refresh", title: "Calm motion", body: "Calm by default, and still for visitors who ask for reduced motion." },
+] as const;
+
+const phoneCards = [
+  {
+    tag: "Live",
+    title: "The video stays, the page doesn’t move",
+    body: "The player is pinned at the top with nothing on it. Under it, a strip names the speaker, links to their page and counts the speech under way in all eight verdicts. Only the open tab scrolls.",
+    src: mLive,
+    alt: "The live page on a phone: the header with the online count, the player between broadcasts, the speaker strip with counts for all eight verdicts, the Állítások, Chat and Játék tabs, and compact fact rows under the speaker’s name.",
+  },
+  {
+    tag: "Facts",
+    title: "Scan first, open what matters",
+    body: "Each fact is one row: the time, the verdict and a headline. A tap opens it in place, with what was said, the explanation and the sources. One fact is open at a time, and the row keeps its place.",
+    src: mFactOpen,
+    alt: "A replay on a phone with the video playing and a fact opened under it: its Hamis verdict, the speaker, the headline, what was said (Elhangzott) and the explanation (Indoklás).",
+  },
+  {
+    tag: "Pull up",
+    title: "More room to read, the sound plays on",
+    body: "Pulling the panel up covers the video to show more of the facts. The video keeps playing in the background, a bar says so, and pulling it down brings the picture back.",
+    src: mPulledUp,
+    alt: "The panel pulled up over the video: a bar reading “A videó szól a háttérben” (the video plays in the background) and “Húzd le” (pull down), the tabs, and an opened fact with its sources, votes and comments link.",
+  },
+];
+
+const stats = [
+  ["79", "Test cases"],
+  ["40", "Bugs found"],
+  ["36", "Bugs fixed"],
+  ["13", "Pull requests merged"],
+  ["120", "Commits"],
+];
+
+const bugs = [
+  "On iPhone the first tap on Belépés (sign in) opened nothing, because Safari blocked the late sign-in window.",
+  "While typing, Safari scrolled the whole page, so the header and the video left the screen.",
+  "After the keyboard closed, the page stayed about 40 pt too high until a reload.",
+  "Text fields under 16 px made Safari zoom in and stay zoomed.",
+  "With no stream, the native video controls showed over “most nincs élő adás”.",
+  "At 320 px the AI notice ran under a button and was cut off.",
+];
+
+const nextSteps = [
+  { icon: "chart", title: "Measure use", body: "See how often people open facts, comment and play, once the site measures it." },
+  { icon: "checklist", title: "Fix the last four", body: "Four logged bugs are still open, among them raw English labels on a few facts." },
+  { icon: "refresh", title: "Keep it calm", body: "Check new features against the same rules: nothing over the video, calm motion." },
+] as const;
+---
+
+<Base
+  title="vitaradar.hu case study · Viktória Simóné Varga"
+  description="How Viktória Simóné Varga designed the phone and desktop experience of vitaradar.hu, the Hungarian Parliament’s live stream with automatic fact-checks, then built, tested and fixed it with Claude."
+  type="article"
+  image="og-vitaradar.png"
+  imageAlt="The vitaradar.hu case study: “Fact-checks you can read while you watch”, with the replay page on a monitor between two phones: a replay with its speakers and an opened fact."
+>
+  <Nav current="Work" />
+
+  <main class="case">
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__copy" data-stagger="90">
+        <div class="hero__eyebrow" data-reveal>
+          <Tag>Case study 03</Tag>
+          <a class="text-label-m hero__back" href={`${base}work/`}>← All work</a>
+        </div>
+        <h1 id="hero-title" class="hero__title" data-reveal="slam">vitaradar.hu</h1>
+        <p class="hero__subtitle" data-reveal>Fact-checks you can read while you watch.</p>
+        <p class="text-body-l secondary" data-reveal>vitaradar.hu streams the Hungarian Parliament with automatic fact-checks: every checkable claim appears under the video, with its verdict, as it is said. I designed its phone and desktop experience, built it with Claude, and tested and fixed it in Chrome and on iPhone.</p>
+      </div>
+
+      <div class="hero__art" aria-hidden="true">
+        <Device class="hero__monitor anim-float" device="monitor" reveal={false} src={dReplay} alt="" sizes="(min-width: 1440px) 560px, (min-width: 768px) 42vw, 84vw" />
+        <Device class="hero__phone anim-float" device="phone" reveal={false} src={mFactOpen} alt="" sizes="(min-width: 768px) 180px, 30vw" />
+        <Device class="hero__phone-live anim-float" device="phone" reveal={false} src={mReplay} alt="" sizes="180px" />
+        <p class="text-label-s hero__note">Every claim.<br />With its verdict.<br />As it’s said.</p>
+        <Sticker color="pink" tilt={6} class="hero__live">Live</Sticker>
+        <Sparkle color="ink" size={52} class="hero__spark hero__spark--1 anim-twinkle" />
+        <Sparkle color="pink" size={36} class="hero__spark hero__spark--2 anim-twinkle" />
+        <Sparkle color="aqua" size={28} class="hero__spark hero__spark--3 anim-twinkle" />
+      </div>
+
+      <div class="hero__meta" data-stagger="90">
+        <dl class="hero__details" data-reveal>
+          {
+            details.map(([term, value]) => (
+              <div>
+                <dt class="text-label-m accent">{term}</dt>
+                <dd class="text-body-m secondary">{value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="hero__tools" data-reveal>
+          <p class="text-label-m accent">Tools</p>
+          <ul aria-label="Tools">
+            <ToolChip tool="claude" />
+          </ul>
+        </div>
+        <div class="hero__scope" data-reveal>
+          <p class="text-label-m accent">Scope</p>
+          <ul class="row" aria-label="Scope">
+            {scope.map((item) => <li><Chip>{item}</Chip></li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 01 The first version -->
+    <section class="problem band" aria-labelledby="first-title">
+      <div class="split">
+        <div class="split__head">
+          <SectionHead number="01" label="The first version" id="first-title">Watching and reading couldn’t happen at once.</SectionHead>
+          <Decor name="city" width={270} class="problem__city parallax" />
+        </div>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>The developer built the product: the stream processing, the fact-checking and the site’s first version. The facts are the point of the site, so I started by measuring where they actually landed, on a phone (390 × 844) and on laptop and desktop screens.</p>
+          <p class="text-body-l secondary" data-reveal>I wrote the findings up as two public GitHub issues, one for phones and one for desktop, each with screenshots, a proposal and a plan.</p>
+        </div>
+      </div>
+      <ul class="findings" data-stagger="80">
+        {
+          findings.map(([stat, body]) => (
+            <li data-reveal>
+              <p class="findings__stat">{stat}</p>
+              <p class="text-body-m secondary">{body}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="phones phones--3" data-stagger="110">
+        <Device device="phone" reveal="pop" src={beforeLive} sizes={phone} alt="The first version on a phone: the player with the CHAT button over it, a support note, the speaker card and the tally; the first fact starts at the bottom edge." caption="The live page’s first screen." />
+        <Device device="phone" reveal="pop" src={beforeFacts} sizes={phone} alt="Scrolled to the facts: one checked fact fills most of the screen with its quote, explanation, sources and votes, and a sign-in box sits over the bottom." caption="Scrolled to the facts." />
+        <Device device="phone" reveal="pop" src={beforeReplay} sizes={phone} alt="The replay page’s first screen: a title block and the video, with no facts in view." caption="The replay page." />
+      </div>
+    </section>
+
+    <!-- 02 Direction -->
+    <section class="band band--pink" aria-labelledby="direction-title">
+      <div class="split">
+        <SectionHead number="02" label="Direction" id="direction-title">A calmer matrix.</SectionHead>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>The neon look was too vibrant to read for long, but its matrix character was worth keeping. I explored several style directions side by side, chose one called “Adás” (broadcast) and turned it into a clickable prototype with sample data.</p>
+          <p class="text-body-l secondary" data-reveal>A near-black background, one green accent without glow, solid verdict labels, Chakra Petch for labels and Inter Tight for reading. The matrix rain only plays while the player loads, and nothing blinks.</p>
+        </div>
+      </div>
+      <div class="phones phones--4" data-stagger="110">
+        <Device device="phone" reveal="pop" src={protoFeed} sizes={phone} alt="Prototype, the feed: the player, a speaker strip with the tally, the Állítások, Chat and Játék tabs, and compact fact rows, one opened." caption="Facts as compact rows." />
+        <Device device="phone" reveal="pop" src={protoComments} sizes={phone} alt="Prototype, an opened fact with its comments: replies, thumbs up and down, and a field to write a comment." caption="Comments inside a fact." />
+        <Device device="phone" reveal="pop" src={protoGame} sizes={phone} alt="Prototype, the Játék tab during a challenge: a claim with a countdown and two answers, Igaz and Hamis." caption="Games in their own tab." />
+        <Device device="phone" reveal="pop" src={protoMenu} sizes={phone} alt="Prototype, the menu: the pages, the account, the online count and a support button with a heart." caption="The menu." />
+      </div>
+      <p class="text-body-m secondary phones__note" data-reveal>Prototype screens with sample data.</p>
+      <div class="stack">
+        <div><Tag color="aqua">Rules I designed within</Tag></div>
+        <ul class="ruled ruled--4" data-stagger="90">
+          {
+            rules.map((rule) => (
+              <li data-reveal>
+                <CaseIcon name={rule.icon} />
+                <h3 class="text-label-strong">{rule.title}</h3>
+                <p class="text-body-m secondary">{rule.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- 03 User flows (always dark) -->
+    <section class="band theme-dark" id="flows" aria-labelledby="flows-title">
+      <Sparkle color="pink" size={40} class="band__spark anim-twinkle" />
+      <div class="split">
+        <SectionHead number="03" label="User flows" id="flows-title">Four journeys, mapped end to end.</SectionHead>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>I mapped four user flows: following a sitting live, replaying one from the archive, checking an MP’s track record, and the features built for watching on a phone. Each one names who it is for, follows the phone screens through every decision, and marks the edge states, such as no connection, no sitting today or a video still uploading.</p>
+          <p class="text-body-l secondary" data-reveal>Each flow also notes how desktop differs, so one design serves both.</p>
+        </div>
+      </div>
+      <div class="block">
+        <div class="split split--tight" data-reveal>
+          <div class="block__title">
+            <p class="text-label-m accent">Flow 01</p>
+            <h3 class="text-h3">Following Parliament as it is fact-checked.</h3>
+          </div>
+          <p class="text-body-l secondary">A viewer opens the site, follows the fact-checks as they arrive and opens one to see why a claim got its verdict. Voting or commenting is one sign-in away; everything else works without an account.</p>
+        </div>
+        <Shot src={flowLive} sizes={full} alt="User flow 01: a viewer opens vitaradar.hu; if offline they see the no-connection page, if no sitting is on they see the last sitting’s facts and a link to the archive; otherwise the live page. Tapping a fact opens it; to react, a guest meets the sign-in gate and Google’s account chooser, and a signed-in viewer votes or comments, ending at reaction saved. A note says desktop follows the same journey on one screen." caption="Flow 01 of 4. Branches: offline, no sitting today, guest or signed in." />
+      </div>
+      <div class="block">
+        <div class="split split--tight" data-reveal>
+          <div class="block__title">
+            <p class="text-label-m accent">From flow 04</p>
+            <h3 class="text-h3">Built for watching on a phone.</h3>
+          </div>
+          <p class="text-body-l secondary">Two of its journeys: pulling the panels up for more room to read without stopping the video, and joining a game that runs with the stream, from the note at the foot of the feed to the result.</p>
+        </div>
+        <Shot src={flowPhone} sizes={full} alt="Part of user flow 04. A: the video pinned, then the panels pulled up over it while playback continues, and dragged back down. B: watching live, a game opens; on the Állítások or Chat tab a note appears at the foot, the Játék tab shows the game card, and answering in time leads to the result; between games the tab waits." caption="Parts A and B of flow 04. The app install journey, and flows 02 and 03 (replaying a sitting, an MP’s track record), aren’t shown here." />
+      </div>
+    </section>
+
+    <!-- 04 On a phone -->
+    <section class="band" aria-labelledby="phone-title">
+      <Sparkle color="aqua" size={48} class="band__spark band__spark--ink anim-twinkle" />
+      <div class="split">
+        <SectionHead number="04" label="On a phone" id="phone-title">Watch, read and play on one screen.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>Everything a viewer needs sits under the video instead of on top of it, and the page itself never moves.</p>
+      </div>
+      <div class="cards" data-stagger="110">
+        {
+          phoneCards.map((card) => (
+            <article class="pcard" data-reveal="pop">
+              <Device device="phone" reveal={false} class="pcard__phone" src={card.src} sizes={phone} alt={card.alt} />
+              <Tag color="aqua">{card.tag}</Tag>
+              <h3 class="pcard__title">{card.title}</h3>
+              <p class="text-body-m secondary">{card.body}</p>
+            </article>
+          ))
+        }
+      </div>
+      <div class="block">
+        <div class="split split--tight" data-reveal>
+          <div class="block__title">
+            <p class="text-label-m accent">Games, chat and menu</p>
+            <h3 class="text-h3">Nothing pops up over the facts.</h3>
+          </div>
+          <p class="text-body-l secondary">Games moved out of a dock over the feed into their own tab, which waits quietly until the next one starts. The chat is 18+, blurred until you sign in, and its messages go after an hour. The menu opens under the player, never over it.</p>
+        </div>
+        <div class="phones phones--3" data-stagger="110">
+          <Device device="phone" reveal="pop" src={mGame} sizes={phone} alt="The Játék tab with no game running: a radar icon, “Nincs futó játék” (no game running) and “Szólunk, amikor indul a következő” (we’ll tell you when the next one starts)." caption="Games" />
+          <Device device="phone" reveal="pop" src={mChat} sizes={phone} alt="The Chat tab for a visitor: “Chat · 18+ · 1 óra után törlődik” above blurred messages and a sign-in prompt." caption="Chat" />
+          <Device device="phone" reveal="pop" src={mMenu} sizes={phone} alt="The menu opened under the player: the pages, sign in and register, the support button with a heart, and the contact links." caption="Menu" />
+        </div>
+      </div>
+      <div class="block">
+        <div class="block__title" data-reveal>
+          <p class="text-label-m accent">Every other page</p>
+          <h3 class="text-h3">The same design, from the replay to an MP’s page.</h3>
+        </div>
+        <div class="phones phones--4" data-stagger="110">
+          <Device device="phone" reveal="pop" src={mReplay} sizes={phone} alt="The replay page on a phone: the sitting’s date and length, the video, the speaker strip, and the Felszólalók tab listing the speakers with their times and number of facts." caption="Replay" />
+          <Device device="phone" reveal="pop" src={mArchive} sizes={phone} alt="The archive on a phone: sitting days with their replays as compact rows, each with a thumbnail, time, speakers and a verdict bar." caption="Archive" />
+          <Device device="phone" reveal="pop" src={mMps} sizes={phone} alt="The MPs on a phone: a search, sort and filter chips, and rows with each MP’s photo, name, party, a verdict bar and their number of facts." caption="MPs" />
+          <Device device="phone" reveal="pop" src={mMp} sizes={phone} alt="An MP’s page on a phone: their photo and role, a row for each verdict with its count, and their speeches grouped by day." caption="An MP’s page" />
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 On desktop -->
+    <section class="band band--pink" aria-labelledby="desktop-title">
+      <div class="split">
+        <SectionHead number="05" label="On desktop" id="desktop-title">The phone’s design, as an app.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>On wider screens the live and replay pages fit one screen: the video on the left, sized by the window’s height so it is never cut off, the speaker strip under it, and the tabs in a sidebar. The archive, the MPs and the footer got their own wide layouts.</p>
+      </div>
+      <div class="grid grid--devices">
+        <Device device="monitor" reveal="from-left" src={dReplay} sizes={monitor} alt="The replay page at 1440 × 900: the video with its speaker strip on the left, the facts in a sidebar on the right, and a one-line footer." caption="Replay: video and facts side by side, only the sidebar scrolls." />
+        <Device device="monitor" reveal="from-right" src={dArchive} sizes={monitor} alt="The archive at 1440 × 900: a calendar, a filter by MP and party, and totals on the left; each sitting day’s replays as rows with a thumbnail, time, speakers, counts and a verdict bar; and the full footer." caption="Archive: a calendar and a filter beside the replays." />
+        <Device device="monitor" reveal="from-left" src={dMps} sizes={monitor} alt="The MPs page at 1440 × 900: the three parties’ totals side by side, a search with party filters, and a sortable table of MPs with their verdict bars and counts." caption="MPs: the parties side by side above a sortable table." />
+        <Device device="monitor" reveal="from-right" src={dMp} sizes={monitor} alt="An MP’s page at 1440 × 900: a row with a bar for each verdict, a search in their speeches, and their speeches grouped by sitting day." caption="An MP’s page: every verdict as a row, and a search in their speeches." />
+      </div>
+      <div class="before" data-reveal>
+        <Device device="monitor" src={beforeDesktop} reveal={false} sizes="(min-width: 768px) 360px, 92vw" alt="Before: the first version at 1366 × 768, with the video filling the screen and cut off, and the facts out of view below it." />
+        <div class="why">
+          <p class="text-label-m accent">What changed &amp; why</p>
+          <p class="text-body-m">At 1366 × 768 the first version showed only video, with the facts 952 px further down. Sizing the player by the window’s height and moving the facts beside it means watching and reading happen side by side, with no page scroll.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 Testing & bug fixes -->
+    <section class="band" aria-labelledby="testing-title">
+      <Sparkle color="pink" size={44} class="band__spark anim-twinkle" />
+      <div class="split">
+        <SectionHead number="06" label="Testing & bug fixes" id="testing-title">Every page tested, every bug logged.</SectionHead>
+        <div class="stack" data-stagger="90">
+          <p class="text-body-l secondary" data-reveal>I wrote test cases for every page: the header and menu, live, replay, archive, MPs, an MP’s page, the profile, the impressum, and desktop with resizing. I ran them in Chrome at 390 × 844, 320 × 640 and 1280 × 800, and in Safari in the iOS Simulator, then checked on my own iPhone against the live site.</p>
+          <p class="text-body-l secondary" data-reveal>Every failure was logged with its case, fixed and re-tested. Several of the bugs were on the live site too, and their fixes shipped in the same pull requests.</p>
+        </div>
+      </div>
+      <ul class="stats" data-stagger="80">
+        {
+          stats.map(([n, label]) => (
+            <li data-reveal="pop">
+              <span class="stats__n">{n}</span>
+              <span class="text-label-m">{label}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <ol class="bugs" data-stagger="70">
+        {
+          bugs.map((bug) => (
+            <li data-reveal>
+              <Tag>Bug</Tag>
+              <span class="text-body-m">{bug}</span>
+              <Tag color="aqua">Fixed</Tag>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <!-- 07 Reflection & next steps -->
+    <section class="band band--pink" aria-labelledby="reflection-title">
+      <div class="split">
+        <SectionHead number="07" label="Reflection & next steps" id="reflection-title">Live on vitaradar.hu.</SectionHead>
+        <p class="text-body-l secondary" data-reveal>The design is live on phones and on desktop, and all thirteen of my pull requests are merged. How it changes the way people watch and read hasn’t been measured yet.</p>
+      </div>
+      <div class="stack">
+        <div><Tag color="aqua">Next steps</Tag></div>
+        <ul class="ruled ruled--3" data-stagger="90">
+          {
+            nextSteps.map((step) => (
+              <li data-reveal>
+                <CaseIcon name={step.icon} />
+                <h3 class="text-label-strong">{step.title}</h3>
+                <p class="text-body-m secondary">{step.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Next project (always dark) -->
+    <section class="next theme-dark" aria-labelledby="next-title">
+      <Decor name="perspective-grid" tone="text" moving stretch class="next__grid" />
+      <Decor name="city" class="next__city" />
+      <Sparkle color="ink" size={88} class="next__star anim-twinkle" />
+      <div class="next__copy" data-stagger="90">
+        <p class="text-label-m accent" data-reveal>Next project →</p>
+        <h2 id="next-title" class="next__title" data-reveal="slam">{next.title}</h2>
+        <p class="text-label-m" data-reveal>{next.tags.map((tag) => `# ${tag}`).join("  ·  ")}</p>
+        <div class="row" data-reveal>
+          <Button variant="secondary" href={`${base}work/${next.slug}/`} arrow>View case study</Button>
+          <Button variant="ghost" href={`${base}work/`}>All work</Button>
+        </div>
+      </div>
+      <div class="next__card theme-light" data-reveal="card">
+        <ProjectCard number={next.number} title={next.title} summary={next.summary} tags={[...next.tags]} href={`${base}work/${next.slug}/`} cover={nearbioCover} shape="C" tilt={-3} />
+      </div>
+    </section>
+
+    <!-- Call to action (always pink) -->
+    <section class="cta theme-light" aria-label="Get in touch">
+      <a class="cta__link" href={`${base}#contact`}>Let’s create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
+      <div class="cta__strip anim-float" aria-hidden="true"><img src={eyeStrip} alt="" width="560" height="160" loading="lazy" /></div>
+      <Sparkle color="ink" size={40} class="cta__spark anim-twinkle" />
+    </section>
+
+    <nav class="pager text-label-m" aria-label="Case studies">
+      <a href={`${base}work/`}>← Back to work</a>
+      <a href={`${base}work/${next.slug}/`}>Next project: {next.title} ↗</a>
+    </nav>
+  </main>
+
+  <footer class="footer theme-dark">
+    <Logo variant="wordmark" height={40} label="VIKSZDE" />
+    <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
+    <p class="text-label-m secondary">© 2026 Viktória Simóné Varga</p>
+  </footer>
+</Base>
+
+<style>
+  /* Titles slam in from 150% size; clip so they never widen the page. */
+  .case {
+    overflow-x: clip;
+  }
+
+  .case > section {
+    position: relative;
+    padding: var(--spacing-24) var(--gutter);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  .accent {
+    color: var(--color-text-accent);
+  }
+
+  .secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-2);
+  }
+
+  .stack {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-4);
+  }
+
+  .stack--tight {
+    gap: var(--spacing-4);
+  }
+
+  /* Two columns: heading on the left, copy on the right, like the Figma
+     "intro row". */
+  .split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 600px));
+    justify-content: space-between;
+    gap: var(--spacing-8) var(--spacing-16);
+    align-items: start;
+  }
+
+  .split--tight {
+    gap: var(--spacing-6) var(--spacing-16);
+  }
+
+  .split__head {
+    display: grid;
+    gap: var(--spacing-16);
+  }
+
+  .band {
+    display: grid;
+    gap: var(--spacing-12);
+  }
+
+  .band--pink {
+    --color-bg-page: var(--color-bg-accent-subtle);
+  }
+
+  /* Big screenshots stop at 1000px so they read as pictures, not walls,
+     and sit centred. Global, because <Shot> receives it as a class. */
+  :global(.narrow) {
+    width: 100%;
+    max-width: 1000px;
+    margin-inline: auto;
+  }
+
+  :global(.band__spark) {
+    position: absolute;
+    top: var(--spacing-8);
+    right: var(--gutter);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--spacing-8);
+    align-items: start;
+  }
+
+  .grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .grid--compare {
+    grid-template-columns: minmax(0, 760fr) minmax(0, 488fr);
+  }
+
+  .grid--devices {
+    grid-template-columns: repeat(2, minmax(0, 500px));
+    justify-content: center;
+    gap: var(--spacing-8) var(--spacing-16);
+  }
+
+  .block {
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .block__title {
+    display: grid;
+    gap: var(--spacing-2);
+    max-width: 840px;
+  }
+
+  /* Hero */
+  .case > .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 600px) minmax(0, 640px);
+    grid-template-areas:
+      "copy art"
+      "meta art";
+    justify-content: space-between;
+    gap: var(--spacing-6) var(--spacing-12);
+    padding-block: var(--spacing-12) var(--spacing-16);
+  }
+
+  .hero__copy {
+    grid-area: copy;
+    display: grid;
+    gap: var(--spacing-6);
+    min-width: 0;
+  }
+
+  /* Above the title: it slams in from 150% size and its box would otherwise
+     cover the All work link until the animation ends. */
+  .hero__eyebrow {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+  }
+
+  .hero__back {
+    text-decoration: none;
+  }
+
+  .hero__back:hover {
+    color: var(--color-text-accent);
+  }
+
+  /* Twelve letters: smaller than the other titles, so it stays in its column. */
+  .hero__title {
+    font: 400 clamp(3.5rem, 8vw, 7.5rem) / 1 var(--font-display);
+  }
+
+  .hero__subtitle {
+    font: 400 clamp(2.125rem, 3.1vw, 2.75rem) / 1.1 var(--font-display);
+    text-wrap: balance;
+  }
+
+  .hero__meta {
+    grid-area: meta;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .hero__details {
+    display: grid;
+    gap: var(--spacing-4);
+    margin: 0;
+  }
+
+  .hero__details dd {
+    margin: var(--spacing-1) 0 0;
+  }
+
+  .hero__tools,
+  .hero__scope {
+    display: grid;
+    gap: 10px;
+  }
+
+  .hero__scope ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hero__tools ul {
+    display: flex;
+    gap: var(--spacing-4);
+    margin: 0;
+    padding: 0;
+  }
+
+  /* The mockups are placed on a 640 × 920 frame, in percent, as tall as
+     the copy and details beside it: the monitor on top, a replay and an
+     open fact-check on two phones below it, and a short note
+     between them, so the column has no empty corner. */
+  .hero__art {
+    grid-area: art;
+    position: relative;
+    align-self: center;
+    aspect-ratio: 640 / 920;
+  }
+
+  .hero__art > :global(*) {
+    position: absolute;
+  }
+
+  :global(.hero__monitor) {
+    left: 0;
+    top: 9%;
+    width: 94%;
+    rotate: -2deg;
+  }
+
+  :global(.hero__phone) {
+    left: 65%;
+    top: 43%;
+    width: 31%;
+    rotate: 4deg;
+  }
+
+  :global(.hero__phone-live) {
+    left: 9%;
+    top: 50%;
+    width: 29%;
+    rotate: -5deg;
+  }
+
+  .hero__note {
+    left: 41%;
+    top: 86%;
+  }
+
+  :global(.hero__live) {
+    right: 2%;
+    top: 4%;
+  }
+
+  :global(.hero__spark--1) {
+    left: 45%;
+    top: 2%;
+  }
+
+  :global(.hero__spark--2) {
+    left: 1%;
+    top: 12%;
+  }
+
+  :global(.hero__spark--3) {
+    left: 90%;
+    top: 92%;
+  }
+
+  /* 01 Problem */
+  :global(.problem__city) {
+    --decor-sun: var(--color-bg-primary);
+    --decor-skyline: var(--color-ink-900);
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Two- to four-column lists split by thin rules (02 role, 07 next steps). */
+  .ruled {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ruled--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ruled--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .ruled li {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding: 0 var(--spacing-8);
+  }
+
+  .ruled li:first-child {
+    padding-left: 0;
+  }
+
+  .ruled li + li {
+    border-left: var(--border-thin) solid var(--color-border-default);
+  }
+
+  /* 01 Findings and 05 stats: tiles in the heavy outline. */
+  .findings,
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .findings li,
+  .stats li {
+    display: grid;
+    align-content: start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-6);
+    border: var(--border-heavy) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  .findings__stat,
+  .stats__n {
+    font: 400 clamp(2.25rem, 4vw, 3.5rem) / 1 var(--font-display);
+    color: var(--color-bg-primary);
+  }
+
+  .stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  /* Phones in a row, centred, each at most 240px. */
+  .phones {
+    display: grid;
+    justify-content: center;
+    gap: var(--spacing-8);
+  }
+
+  .phones--3 {
+    grid-template-columns: repeat(3, minmax(0, 220px));
+  }
+
+  .phones--4 {
+    grid-template-columns: repeat(4, minmax(0, 240px));
+  }
+
+  .phones__note {
+    margin-top: calc(var(--spacing-8) * -1);
+    text-align: center;
+  }
+
+  /* The screenshots have no status bar: a strip under the notch, in the
+     app's own near-black. */
+  .case :global(.device--phone .device__screen) {
+    overflow: hidden;
+    padding-top: 26px;
+    background: #040706;
+  }
+
+  /* 03 Phone cards: the phone on top, then the copy. */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--spacing-8);
+  }
+
+  .pcard {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--spacing-3);
+  }
+
+  .pcard :global(.pcard__phone) {
+    justify-self: center;
+    width: min(100%, 250px);
+    margin-bottom: var(--spacing-3);
+  }
+
+  .pcard__title {
+    font: 400 1.875rem / 1.05 var(--font-display);
+  }
+
+  /* 04 The first version's desktop beside what changed. */
+  .before {
+    display: grid;
+    grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacing-8);
+    max-width: 960px;
+  }
+
+  /* 05 Bugs: found, then fixed. */
+  .bugs {
+    display: grid;
+    gap: var(--spacing-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bugs li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  /* 04 Flows */
+  .why {
+    display: grid;
+    gap: var(--spacing-2);
+    max-width: 840px;
+    padding-left: var(--spacing-6);
+    border-left: 6px solid var(--color-bg-secondary);
+  }
+
+  /* 05 Product */
+  .product__intro {
+    display: grid;
+    gap: var(--spacing-12);
+  }
+
+  .feature {
+    display: grid;
+    gap: var(--spacing-8);
+  }
+
+  .feature__number {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    font: 400 3.5rem / 1 var(--font-display);
+    color: var(--color-bg-primary);
+  }
+
+  .feature__number :global(svg) {
+    color: var(--color-text-primary);
+  }
+
+  .feature__title {
+    font: 400 2.75rem / 1 var(--font-display);
+  }
+
+  .feature__sub {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  .annotation {
+    display: grid;
+    gap: 10px;
+    padding: var(--spacing-6);
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-bg-surface);
+  }
+
+  /* Annotation label: an aqua marker sweeps in behind it. */
+  .annotation__label {
+    justify-self: start;
+    margin-left: -6px;
+    padding: 2px 6px;
+    background: linear-gradient(var(--color-bg-secondary-subtle), var(--color-bg-secondary-subtle)) no-repeat left / 0% 100%;
+    transition: background-size 600ms var(--motion-ease-out) 450ms;
+  }
+
+  .annotation:global(.is-visible) .annotation__label,
+  :global(html:not(.js)) .annotation__label {
+    background-size: 100% 100%;
+  }
+
+  /* Next project */
+  .next {
+    display: grid;
+    grid-template-columns: minmax(0, 500px) minmax(0, 400px);
+    align-items: center;
+    gap: var(--spacing-12) var(--spacing-8);
+    min-height: 736px;
+    overflow: hidden;
+  }
+
+  .next__copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--spacing-6);
+  }
+
+  .next__title {
+    font: 400 clamp(3.5rem, 7vw, 6.25rem) / 1 var(--font-display);
+    text-transform: uppercase;
+  }
+
+  .next__card {
+    position: relative;
+    z-index: 1;
+  }
+
+  :global(.next__grid) {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 240px;
+    opacity: 0.3;
+    --rung-dur: 3s;
+  }
+
+  :global(.next__city) {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 360px;
+    --decor-sun: var(--color-yellow-500);
+    --decor-skyline: var(--color-ink-700);
+  }
+
+  :global(.next__star) {
+    position: absolute;
+    left: 77%;
+    top: 13%;
+  }
+
+  /* Call to action */
+  .case > .cta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    padding-block: var(--spacing-12);
+    background: var(--color-bg-primary);
+  }
+
+  .cta__link {
+    flex: 1;
+    color: var(--color-white-1000);
+    font: 400 clamp(2.5rem, 5vw, 4.5rem) / 1 var(--font-display);
+    text-decoration: none;
+  }
+
+  .cta__arrow {
+    display: inline-block;
+    animation: slide 1.8s ease-in-out infinite;
+    --slide: 14px;
+  }
+
+  .cta__strip:global(.anim-float) {
+    --float: -10px;
+    --dur: 5s;
+  }
+
+  .cta__strip {
+    width: 308px;
+    aspect-ratio: 308 / 88;
+    overflow: hidden;
+    border: var(--border-regular) solid var(--color-border-default);
+    background: var(--color-paper-100);
+    rotate: -3deg;
+  }
+
+  .cta__strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  :global(.cta__spark) {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--gutter);
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding: 28px var(--gutter);
+  }
+
+  .pager a {
+    text-decoration: none;
+  }
+
+  .pager a:hover {
+    color: var(--color-text-accent);
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-8);
+    padding: var(--spacing-8) var(--gutter);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  /* Motion */
+
+  /* The monitor and phone drop in on load, then float. */
+  :global(.hero__monitor.anim-float) {
+    --float: -8px;
+    --dur: 6s;
+  }
+
+  :global(.hero__phone.anim-float) {
+    --float: -12px;
+    --dur: 5s;
+    --delay: 0.6s;
+  }
+
+  :global(.hero__phone-live.anim-float) {
+    --float: -10px;
+    --dur: 5.5s;
+    --delay: 1.2s;
+  }
+
+  /* Earlier and current screens slide in from opposite sides. */
+  :global(.js [data-reveal="from-left"]) {
+    translate: -96px 0;
+    rotate: -4deg;
+  }
+
+  :global(.js [data-reveal="from-right"]) {
+    translate: 96px 0;
+    rotate: 4deg;
+  }
+
+  :global(.problem__city.parallax) {
+    --parallax: 40px;
+  }
+
+  :global(.band__spark--ink) {
+    color: var(--color-aqua-700);
+  }
+
+  /* Tablet */
+  @media (max-width: 1023px) {
+    .case > .hero,
+    .split,
+    .next {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .case > .hero {
+      grid-template-areas:
+        "copy"
+        "art"
+        "meta";
+    }
+
+    /* Stacked above the details, the art goes back to the shorter 640 ×
+       700 frame with one phone, so the hero doesn't grow. */
+    .hero__art {
+      width: min(100%, 640px);
+      aspect-ratio: 640 / 700;
+    }
+
+    :global(.hero__monitor) {
+      left: 4%;
+      top: 14%;
+      width: 92%;
+    }
+
+    :global(.hero__phone) {
+      left: 66%;
+      top: 40%;
+      width: 30%;
+    }
+
+    .hero__art > :global(.hero__phone-live),
+    .hero__note {
+      display: none;
+    }
+
+    :global(.hero__live) {
+      top: 6%;
+    }
+
+    :global(.hero__spark--1) {
+      left: 47%;
+      top: 5%;
+    }
+
+    :global(.hero__spark--2) {
+      left: 3%;
+      top: 17%;
+    }
+
+    :global(.hero__spark--3) {
+      left: 94%;
+      top: 91%;
+    }
+
+    .ruled--4,
+    .findings,
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--spacing-8);
+    }
+
+    .ruled--4 li:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .phones--4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--spacing-4);
+    }
+
+    .cards {
+      gap: var(--spacing-6);
+    }
+
+    .next__card {
+      width: min(100%, 400px);
+    }
+
+    .cta__strip {
+      display: none;
+    }
+
+    .footer {
+      flex-wrap: wrap;
+    }
+
+    .footer p {
+      white-space: nowrap;
+    }
+
+    .footer .text-katakana {
+      font-size: 1.25rem;
+    }
+  }
+
+  /* Phone */
+  @media (max-width: 767px) {
+    .case > section {
+      padding-block: var(--spacing-16);
+    }
+
+    .case > .hero {
+      padding-block: 28px var(--spacing-12);
+    }
+
+    :global(.hero__live) {
+      top: 0;
+    }
+
+    .ruled--3,
+    .ruled--4,
+    .findings,
+    .cards,
+    .before,
+    .grid--2,
+    .grid--3,
+    .grid--compare,
+    .grid--devices {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ruled li,
+    .ruled li + li,
+    .ruled--4 li:nth-child(3) {
+      padding: var(--spacing-4) 0 0;
+      border-left: 0;
+      border-top: var(--border-thin) solid var(--color-border-default);
+    }
+
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stats li:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .phones--3,
+    .phones--4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--spacing-4);
+    }
+
+    .pcard :global(.pcard__phone) {
+      width: min(64%, 250px);
+    }
+
+    .bugs li {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--spacing-2);
+      padding: var(--spacing-4);
+    }
+
+    .feature__number {
+      font-size: 2.5rem;
+    }
+
+    .feature__title {
+      font-size: 2rem;
+    }
+
+
+    .case > .next {
+      min-height: 0;
+      padding-bottom: 260px;
+    }
+
+    :global(.next__city) {
+      width: 300px;
+    }
+
+    .pager {
+      flex-direction: column;
+    }
+
+    .footer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

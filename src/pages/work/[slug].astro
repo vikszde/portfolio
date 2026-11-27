@@ -9,7 +9,7 @@ import { projects } from "../../data/site";
 
 export function getStaticPaths() {
   return projects
-    .filter((project) => project.slug !== "nearbio" && project.slug !== "barterland")
+    .filter((project) => project.slug !== "nearbio" && project.slug !== "barterland" && project.slug !== "vitaradar")
     .map((project) => ({ params: { slug: project.slug }, props: { project } }));
 }
 
@@ -17,7 +17,7 @@ const { project } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
 ---
 
-<Base title={`${project.title} · Viktória Varga`}>
+<Base title={`${project.title} · Viktória Simóné Varga`}>
   <Nav current="Work" />
   <main class="soon">
     <p class="text-label-m accent">Case study {project.number}</p>

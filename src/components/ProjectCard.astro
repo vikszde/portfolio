@@ -56,7 +56,7 @@ const covers = {
   </div>
   <div class="card__body">
     <div class="card__title-row">
-      <h3 class="card__title">{title}</h3>
+      <h3 class="card__title" style={`--chars: ${title.length}`}>{title}</h3>
       <span class="card__arrow" aria-hidden="true">↗</span>
     </div>
     <p class="card__summary text-body-m">{summary}</p>
@@ -146,11 +146,18 @@ const covers = {
     display: flex;
     align-items: center;
     gap: var(--spacing-4);
+    container-type: inline-size;
   }
 
+  /* A one-word title can't wrap, so on a narrow card it shrinks to fit
+     beside the arrow box (52px + the gap): Anton runs about 0.42em a letter.
+     A row of cards can set --title-chars to its longest title, so all of
+     its titles share one size. */
   .card__title {
     flex: 1;
+    min-width: 0;
     font: 400 2.25rem / 1.05 var(--font-display);
+    font-size: min(2.25rem, calc((100cqi - 52px - var(--spacing-4)) / (var(--title-chars, var(--chars, 8)) * 0.42)));
   }
 
   .card__arrow {
