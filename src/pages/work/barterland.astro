@@ -13,11 +13,13 @@ import Decor from "../../components/Decor.astro";
 import ToolChip from "../../components/ToolChip.astro";
 import Logo from "../../components/Logo.astro";
 import SectionHead from "../../components/case-study/SectionHead.astro";
-import Shot from "../../components/case-study/Shot.astro";
+import Device from "../../components/case-study/Device.astro";
 import CaseIcon from "../../components/case-study/CaseIcon.astro";
 import Prototype from "../../components/case-study/Prototype.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
 import { Image } from "astro:assets";
 import eyeStrip from "../../assets/art/eye-strip.webp?url";
+import vitaradarCover from "../../assets/work/vitaradar-cover.png?url";
 
 import home from "../../assets/work/barterland/home.webp";
 import itemDetail from "../../assets/work/barterland/item-detail.webp";
@@ -28,8 +30,10 @@ import originalAccordion from "../../assets/work/barterland/original-accordion.w
 import personaGabor from "../../assets/work/barterland/persona-gabor.webp";
 import personaAnna from "../../assets/work/barterland/persona-anna.webp";
 import logo from "../../assets/work/barterland/logo.webp";
+import { projects } from "../../data/site";
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+const next = projects.find((project) => project.slug === "vitaradar")!;
 
 const phone = "(min-width: 1100px) 277px, (min-width: 768px) 28vw, 80vw";
 
@@ -104,7 +108,7 @@ const revised = [
 
 const outcome = [
   ["What I produced", "An analysis of the existing platform, documented usability findings and software issues, revised interface designs in a high-fidelity Figma prototype, and recommendations for improvement."],
-  ["What testing showed", "In the A/B test, 10 of 12 people who started the stepped upload flow completed it, compared with 10 of 18 on the original. The difference was significant at the 90% level only."],
+  ["What testing showed", "In the A/B test, 10 of 12 people who started the stepped upload flow completed it, compared with 10 of 18 on the original. With 30 participants, that is an encouraging signal rather than a statistically significant result."],
   ["What was not measured", "Behaviour on the live platform after any implementation, such as task completion or abandonment, was not measured as part of this work."],
 ];
 
@@ -116,8 +120,11 @@ const nextSteps = [
 ---
 
 <Base
-  title="Barterland case study · Viktória Varga"
-  description="How Viktória Varga researched and tested Barterland’s item-upload flow, revised it into a stepped interaction, and compared both versions in an A/B test."
+  title="Barterland case study · Viktória Simóné Varga"
+  description="How Viktória Simóné Varga researched and tested Barterland’s item-upload flow, revised it into a stepped interaction, and compared both versions in an A/B test."
+  type="article"
+  image="og-barterland.png"
+  imageAlt="The Barterland case study: “Investigating and improving the item-exchange experience”, with the Barterland home screen and the revised upload step."
 >
   <Nav current="Work" />
 
@@ -137,8 +144,8 @@ const nextSteps = [
       <div class="hero__art" aria-hidden="true">
         <div class="hero__strip anim-sway"><img src={eyeStrip} alt="" width="560" height="160" /></div>
         <p class="text-label-s hero__note">Give unused things<br />a second life.</p>
-        <Shot class="hero__phone hero__phone--home anim-float" reveal={false} src={home} alt="" sizes="(min-width: 768px) 260px, 40vw" eager />
-        <Shot class="hero__phone hero__phone--upload anim-float" reveal={false} src={uploadCategory} alt="" sizes="(min-width: 768px) 260px, 40vw" eager />
+        <Device class="hero__phone hero__phone--home anim-float" device="phone" reveal={false} src={home} alt="" sizes="(min-width: 768px) 260px, 40vw" />
+        <Device class="hero__phone hero__phone--upload anim-float" device="phone" reveal={false} src={uploadCategory} alt="" sizes="(min-width: 768px) 260px, 40vw" />
         <Sparkle color="ink" size={52} class="hero__spark hero__spark--1 anim-twinkle" />
         <Sparkle color="pink" size={36} class="hero__spark hero__spark--2 anim-twinkle" />
         <Sparkle color="aqua" size={28} class="hero__spark hero__spark--3 anim-twinkle" />
@@ -160,6 +167,7 @@ const nextSteps = [
           <ul aria-label="Tools">
             <ToolChip tool="figma" />
             <ToolChip tool="illustrator" />
+            <ToolChip tool="maze" />
           </ul>
         </div>
         <div class="hero__scope" data-reveal>
@@ -292,7 +300,7 @@ const nextSteps = [
         </div>
         <div class="stack" data-stagger="90">
           <p class="text-body-l secondary" data-reveal>The usability study identified difficulty navigating the upload interaction. The original design grouped the form into accordion sections. The revision separated the process into steps and introduced a visible progress indicator and an explicit Next action.</p>
-          <p class="text-body-l secondary" data-reveal>In an unmoderated A/B test on Maze, 10 of the 18 people who started the original flow completed it, compared with 10 of 12 on the stepped flow. Those who finished the stepped flow were faster on average (98.2&nbsp;s vs 114.7&nbsp;s). The completion difference was significant at the 90% level but not at 95%, and one participant still went back to fill in a missed field.</p>
+          <p class="text-body-l secondary" data-reveal>In an unmoderated A/B test on Maze, 10 of the 18 people who started the original flow completed it, compared with 10 of 12 on the stepped flow. Those who finished the stepped flow were faster on average (98.2&nbsp;s vs 114.7&nbsp;s). With 30 participants, the completion difference is not statistically significant, so it is an encouraging signal rather than proof. One participant still went back to fill in a missed field.</p>
         </div>
       </div>
 
@@ -372,21 +380,21 @@ const nextSteps = [
           <h3 class="text-label-m accent">Upload — Move through defined stages</h3>
           <p class="text-body-m secondary">The category, image, and location screens use consistent progress indicators and actions to connect the sequence.</p>
         </div>
-        <Shot class="screen" src={uploadCategory} alt="Upload step two, Category: product status, category and price menus, tags, and a Next button, under a four-step progress indicator." caption="Upload · category" sizes={phone} />
-        <Shot class="screen" src={uploadImages} alt="Upload step three, Image upload: one uploaded photo of a yellow knitted hat and empty slots for more images, with a Next button." caption="Upload · images" sizes={phone} />
-        <Shot class="screen" src={uploadLocation} alt="Upload step four, Location: a note that others only see the distance to the item, a location menu, a map, and a Finish button." caption="Upload · location" sizes={phone} />
+        <Device device="phone" class="screen" src={uploadCategory} alt="Upload step two, Category: product status, category and price menus, tags, and a Next button, under a four-step progress indicator." caption="Upload · category" sizes={phone} />
+        <Device device="phone" class="screen" src={uploadImages} alt="Upload step three, Image upload: one uploaded photo of a yellow knitted hat and empty slots for more images, with a Next button." caption="Upload · images" sizes={phone} />
+        <Device device="phone" class="screen" src={uploadLocation} alt="Upload step four, Location: a note that others only see the distance to the item, a location menu, a map, and a Finish button." caption="Upload · location" sizes={phone} />
       </div>
 
       <div class="screens screens--support">
         <div class="support">
-          <Shot class="screen screen--small" src={home} alt="Barterland home page on mobile: a hero photo with Ready to barter? and an Upload item button, then a Hot deals grid of item cards." sizes="(min-width: 768px) 220px, 60vw" />
+          <Device device="phone" class="screen screen--small" src={home} alt="Barterland home page on mobile: a hero photo with Ready to barter? and an Upload item button, then a Hot deals grid of item cards." sizes="(min-width: 768px) 220px, 60vw" />
           <div class="screens__caption" data-reveal>
             <h3 class="text-label-m accent">Home — Entry into browsing and listing</h3>
             <p class="text-body-m secondary">Item cards support browsing, while the Upload item action provides an entry point for creating a listing.</p>
           </div>
         </div>
         <div class="support">
-          <Shot class="screen screen--small" src={itemDetail} alt="Item detail page on mobile: a large photo of a backpack, the owner, a description, item details, and buttons to pass, swap, or save." sizes="(min-width: 768px) 220px, 60vw" />
+          <Device device="phone" class="screen screen--small" src={itemDetail} alt="Item detail page on mobile: a large photo of a backpack, the owner, a description, item details, and buttons to pass, swap, or save." sizes="(min-width: 768px) 220px, 60vw" />
           <div class="screens__caption" data-reveal>
             <h3 class="text-label-m accent">Item detail — Inspect an item</h3>
             <p class="text-body-m secondary">Images, description, and item details bring the listing information together.</p>
@@ -443,37 +451,42 @@ const nextSteps = [
       </div>
     </section>
 
-    <!-- Keep exploring (always dark) -->
+    <!-- Next project (always dark) -->
     <section class="next theme-dark" aria-labelledby="next-title">
       <Decor name="perspective-grid" tone="text" moving stretch class="next__grid" />
       <Decor name="city" class="next__city" />
       <Sparkle color="ink" size={88} class="next__star anim-twinkle" />
       <div class="next__copy" data-stagger="90">
-        <p class="text-label-m accent" data-reveal>Keep exploring →</p>
-        <h2 id="next-title" class="next__title" data-reveal="slam">All work</h2>
-        <p class="text-body-l" data-reveal>Browse the other case studies and projects.</p>
+        <p class="text-label-m accent" data-reveal>Next project →</p>
+        <h2 id="next-title" class="next__title" data-reveal="slam">{next.title}</h2>
+        <p class="text-label-m" data-reveal>{next.tags.map((tag) => `# ${tag}`).join("  ·  ")}</p>
         <div class="row" data-reveal>
-          <Button variant="secondary" href={`${base}work/`} arrow>View all work</Button>
+          <Button variant="secondary" href={`${base}work/${next.slug}/`} arrow>View case study</Button>
+          <Button variant="ghost" href={`${base}work/`}>All work</Button>
         </div>
+      </div>
+      <div class="next__card theme-light" data-reveal="card">
+        <ProjectCard number={next.number} title={next.title} summary={next.summary} tags={[...next.tags]} href={`${base}work/${next.slug}/`} cover={vitaradarCover} shape="A" tilt={-2} />
       </div>
     </section>
 
     <!-- Call to action (always pink) -->
     <section class="cta theme-light" aria-label="Get in touch">
-      <a class="cta__link" href={`${base}#contact`}>Let's create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
+      <a class="cta__link" href={`${base}#contact`}>Let’s create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
       <div class="cta__strip anim-float" aria-hidden="true"><img src={eyeStrip} alt="" width="560" height="160" loading="lazy" /></div>
       <Sparkle color="ink" size={40} class="cta__spark anim-twinkle" />
     </section>
 
     <nav class="pager text-label-m" aria-label="Case studies">
       <a href={`${base}work/`}>← Back to work</a>
+      <a href={`${base}work/${next.slug}/`}>Next project: {next.title} ↗</a>
     </nav>
   </main>
 
   <footer class="footer theme-dark">
     <Logo variant="wordmark" height={40} label="VIKSZDE" />
     <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
-    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+    <p class="text-label-m secondary">© 2026 Viktória Simóné Varga</p>
   </footer>
 </Base>
 
@@ -1212,11 +1225,14 @@ const nextSteps = [
     color: var(--color-bg-primary);
   }
 
-  /* Keep exploring */
+  /* Keep exploring: the copy on the left, the next project's card on the
+     right, as on the other case studies. */
   .next {
     display: grid;
+    grid-template-columns: minmax(0, 500px) minmax(0, 400px);
     align-items: center;
-    min-height: 546px;
+    gap: var(--spacing-12) var(--spacing-8);
+    min-height: 736px;
     overflow: hidden;
   }
 
@@ -1229,8 +1245,15 @@ const nextSteps = [
     max-width: 600px;
   }
 
+  .next__card {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* A notch smaller than on the other case studies: "vitaradar.hu" is the
+     longest title and would otherwise run into the card. */
   .next__title {
-    font: 400 clamp(3.5rem, 7vw, 6.25rem) / 1 var(--font-display);
+    font: 400 clamp(3.5rem, 6.4vw, 5.75rem) / 1 var(--font-display);
     text-transform: uppercase;
   }
 
@@ -1348,12 +1371,14 @@ const nextSteps = [
     --dur: 6s;
   }
 
-  :global(.hero__phone picture) {
+  :global(.hero__phone picture),
+  :global(.hero__phone .device__body) {
     display: block;
     animation: hero-drop 900ms var(--motion-ease-snap) 200ms both;
   }
 
-  :global(.hero__phone--upload picture) {
+  :global(.hero__phone--upload picture),
+  :global(.hero__phone--upload .device__body) {
     animation-delay: 450ms;
   }
 
@@ -1380,43 +1405,10 @@ const nextSteps = [
   }
 
   /* Tablet */
-  @media (max-width: 1023px) {
-    .case > .hero,
-    .split,
-    .finding,
-    .tryit {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .tryit {
-      justify-items: center;
-    }
-
-    .case > .hero {
-      grid-template-areas:
-        "copy"
-        "art"
-        "meta";
-    }
-
-    .hero__art {
-      width: min(100%, 640px);
-    }
-
-    .methods {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .ruled--4 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      row-gap: var(--spacing-8);
-    }
-
-    .ruled--4 li:nth-child(3) {
-      padding-left: 0;
-      border-left: 0;
-    }
-
+  /* The compare grid and the upload screens need about 1280px for their
+     notes or caption beside the phones; narrower than that, the notes go
+     under the screens and the caption above them. */
+  @media (max-width: 1279px) {
     /* Notes move under the screens and stack in marker order. */
     .compare__grid {
       grid-template-columns: repeat(2, minmax(0, 330px));
@@ -1450,12 +1442,55 @@ const nextSteps = [
     }
 
     .screens--upload {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 277px));
     }
 
     .screens--upload .screens__caption {
       grid-column: 1 / -1;
       max-width: 600px;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .case > .hero,
+    .split,
+    .finding,
+    .tryit,
+    .next {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .tryit {
+      justify-items: center;
+    }
+
+    .next__card {
+      width: min(100%, 400px);
+    }
+
+    .case > .hero {
+      grid-template-areas:
+        "copy"
+        "art"
+        "meta";
+    }
+
+    .hero__art {
+      width: min(100%, 640px);
+    }
+
+    .methods {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ruled--4 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: var(--spacing-8);
+    }
+
+    .ruled--4 li:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
     }
 
     .screens--support {
@@ -1569,7 +1604,7 @@ const nextSteps = [
       font-size: 1.375rem;
     }
 
-    :global(.implications__spark) {
+    .implications :global(.implications__spark) {
       display: none;
     }
 
@@ -1608,6 +1643,11 @@ const nextSteps = [
     .case > .next {
       min-height: 0;
       padding-bottom: 260px;
+    }
+
+    /* Fits "vitaradar.hu" on one line down to 320px. */
+    .next__title {
+      font-size: min(3.5rem, 15.5vw);
     }
 
     :global(.next__city) {

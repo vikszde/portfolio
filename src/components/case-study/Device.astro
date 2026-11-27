@@ -1,5 +1,6 @@
 ---
-// A full page shown inside a device: a laptop or a phone whose screen scrolls
+// A full page shown inside a device: a laptop, a monitor on a stand, or a
+// phone whose screen scrolls
 // on its own, so a long design can be read top to bottom without leaving the
 // case study. The screen is a focusable region, so keyboard users can scroll
 // it with the arrow keys too. Use it only for complete pages; crops of part
@@ -14,7 +15,7 @@ import { Image } from "astro:assets";
 interface Props {
   src: ImageMetadata;
   alt: string;
-  device?: "laptop" | "phone";
+  device?: "laptop" | "monitor" | "phone";
   caption?: string;
   sizes?: string;
   reveal?: string | false;
@@ -24,16 +25,20 @@ interface Props {
 const { src, alt, device = "laptop", caption, sizes, reveal = "", class: className } = Astro.props;
 const widths = device === "phone" ? [400, src.width * 2 > 800 ? 800 : src.width] : [600, 1000, src.width];
 const unique = [...new Set(widths.filter((w) => w <= src.width))];
+// A picture no taller than the screen (an app-like page that never scrolls)
+// gets no scroll hint and isn't announced as a scroll region.
+const scrolls = src.height / src.width > (device === "phone" ? 852 / 393 : 10 / 16) + 0.02;
 ---
 
 <figure class:list={["device", `device--${device}`, className]} data-reveal={reveal === false ? undefined : reveal}>
   <div class="device__body">
-    <div class="device__screen" tabindex="0" role="region" aria-label={`${alt} Scrollable.`} data-device-screen>
+    <div class="device__screen" tabindex={scrolls ? "0" : undefined} role={scrolls ? "region" : undefined} aria-label={scrolls ? `${alt} Scrollable.` : undefined} data-device-screen>
       <Image {src} {alt} widths={unique} sizes={sizes ?? (device === "phone" ? "220px" : "(min-width: 1100px) 470px, (min-width: 768px) 45vw, 88vw")} format="webp" loading="lazy" />
     </div>
-    <span class="device__hint text-label-s" aria-hidden="true">Scroll ↕</span>
+    {scrolls && <span class="device__hint text-label-s" aria-hidden="true">Scroll ↕</span>}
   </div>
   {device === "laptop" && <span class="device__base" aria-hidden="true"></span>}
+  {device === "monitor" && <span class="device__stand" aria-hidden="true"></span>}
   {caption && <figcaption class="text-body-m device__caption">{caption}</figcaption>}
 </figure>
 
@@ -144,6 +149,50 @@ const unique = [...new Set(widths.filter((w) => w <= src.width))];
     background: var(--color-ink-700);
   }
 
+  /* Monitor: a rounded dark bezel around a 16:10 screen, on a neck and a
+     flat foot drawn in the same heavy outline. */
+  .device--monitor .device__body {
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .device--monitor .device__screen {
+    aspect-ratio: 16 / 10;
+    border-radius: 4px;
+  }
+
+  .device__stand {
+    position: relative;
+    display: block;
+    width: 34%;
+    height: 34px;
+  }
+
+  .device__stand::before,
+  .device__stand::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    border: var(--border-heavy) solid var(--color-border-default);
+    background: var(--color-ink-700);
+    translate: -50% 0;
+  }
+
+  /* The neck tucks under the bezel's bottom edge. */
+  .device__stand::before {
+    top: calc(var(--border-heavy) * -1);
+    width: 30%;
+    height: 26px;
+    border-top: 0;
+  }
+
+  .device__stand::after {
+    bottom: 0;
+    width: 100%;
+    height: 12px;
+    border-radius: 8px 8px 2px 2px;
+  }
+
   /* Phone: rounded body and a screen at the iPhone design ratio (393 × 852). */
   .device--phone .device__body {
     padding: 8px;
@@ -196,7 +245,8 @@ const unique = [...new Set(widths.filter((w) => w <= src.width))];
     color: var(--color-text-secondary);
   }
 
-  .device--laptop .device__caption {
+  .device--laptop .device__caption,
+  .device--monitor .device__caption {
     margin-top: var(--spacing-4);
   }
 
@@ -206,7 +256,8 @@ const unique = [...new Set(widths.filter((w) => w <= src.width))];
     }
 
     /* A taller screen on phones shows more of the page at once. */
-    .device--laptop .device__screen {
+    .device--laptop .device__screen,
+    .device--monitor .device__screen {
       aspect-ratio: 4 / 3;
     }
 

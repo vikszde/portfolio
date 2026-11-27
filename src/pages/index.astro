@@ -17,17 +17,25 @@ import portrait from "../assets/photo/viki-portrait.webp?url";
 import eyeStrip from "../assets/art/eye-strip.webp?url";
 import nearbioCover from "../assets/work/nearbio-cover.webp?url";
 import barterlandCover from "../assets/work/barterland-cover.webp?url";
+import vitaradarCover from "../assets/work/vitaradar-cover.png?url";
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
-const covers: Record<string, string | undefined> = { nearbio: nearbioCover, barterland: barterlandCover };
+const covers: Record<string, string | undefined> = { nearbio: nearbioCover, barterland: barterlandCover, vitaradar: vitaradarCover };
 const shapes = ["A", "B", "C"] as const;
 const tilts = [-1.5, 1, -0.8];
+// The home cards share one title size, set by the longest title.
+const titleChars = Math.max(...projects.slice(0, 2).map((project) => project.title.length));
+// The newest case study waits behind the arrow head as a small teaser card.
+const newest = projects[2];
 // About me: the manga burst card, as points on a 100 × 100 box.
 const burst = [[50, 2], [55.7, 17.5], [65, 8.7], [66.5, 21.4], [80.2, 14], [75.3, 28.8], [86.4, 29], [81, 38.7], [97.3, 41.7], [83, 50], [94.3, 57.8], [81, 61.3], [87.2, 71.5], [75.3, 71.2], [80.9, 86.8], [66.5, 78.6], [65, 91.3], [55.7, 82.5], [50, 97], [44.3, 82.5], [35.6, 89.5], [33.5, 78.6], [20.4, 85.2], [24.7, 71.2], [8.4, 74], [19, 61.3], [7.7, 57.5], [17, 50], [3.7, 41.8], [19, 38.7], [11.9, 28], [24.7, 28.8], [19.1, 13.2], [33.5, 21.4], [35.6, 10.5], [44.3, 17.5]];
 const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
 ---
 
-<Base title="Viktória Varga · Product designer & visual creator">
+<Base
+  title="Viktória Simóné Varga · Product designer & visual creator"
+  description="Portfolio of Viktória Simóné Varga, a product designer and visual creator in Budapest: case studies in product design, UX research, usability testing and design systems."
+>
   <Intro />
   <Nav current="Home" />
 
@@ -89,7 +97,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
             </svg>
           </div>
         </div>
-        <ul class="work__cards" data-stagger="150">
+        <ul class="work__cards" style={`--title-chars: ${titleChars}`} data-stagger="150">
           {
             projects.slice(0, 2).map((project, i) => (
               <li data-reveal="card" data-focus>
@@ -107,11 +115,14 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
               </li>
             ))
           }
-          <!-- The next case study, teased behind the arrow head. -->
-          <li class="work__soon" data-reveal="card">
-            <span class="work__soon-jp" lang="ja">準備中</span>
-            <span class="work__soon-title">Coming soon</span>
-            <span class="work__soon-meta">Next case study</span>
+          <!-- The newest case study, teased behind the arrow head. -->
+          <li class="work__new" data-reveal="card">
+            <a class="work__new-link" href={`${base}work/${newest.slug}/`}>
+              <span class="work__new-screen" aria-hidden="true"><img src={covers[newest.slug]} alt="" loading="lazy" decoding="async" /></span>
+              <span class="work__new-title">{newest.title}</span>
+              <span class="work__new-meta"><span lang="ja">新作</span> · New case study →</span>
+            </a>
+            <span class="work__new-sticker" aria-hidden="true">New!</span>
           </li>
         </ul>
       </div>
@@ -142,7 +153,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
           <ToolChip tool="illustrator" data-reveal="pop" />
           <ToolChip tool="photoshop" data-reveal="pop" />
           <ToolChip tool="claude" data-reveal="pop" />
-          <ToolChip tool="rive" data-reveal="pop" />
+          <ToolChip tool="rive" learning data-reveal="pop" />
         </ul>
         <div data-reveal><Button variant="ghost" href={`${base}about/`} arrow>See more</Button></div>
       </div>
@@ -184,7 +195,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
         <p class="text-label-m accent" data-reveal>03 / About</p>
         <h2 id="about-title" class="about__title" data-reveal="slam">About <span class="pink">me</span></h2>
         <p class="text-katakana" lang="ja" data-reveal>私について</p>
-        <p class="text-body-l secondary" data-reveal>I'm Viki, a product designer and visual creator who loves anime, games and creative worlds. I enjoy turning ideas into clean, playful and meaningful experiences.</p>
+        <p class="text-body-l secondary" data-reveal>I’m Viki, a product designer and visual creator who loves anime, games and creative worlds. I enjoy turning ideas into clean, playful and meaningful experiences.</p>
         <dl class="stats" data-reveal data-count>
           <div><dt class="text-label-s">Years<br />designing</dt><dd data-to="5" data-suffix="+">5+</dd></div>
           <div><dt class="text-label-s">Screens &amp;<br />components</dt><dd data-to="100" data-suffix="+">100+</dd></div>
@@ -197,7 +208,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
            shared coordinates), so the same panels can stack into the slanted
            strip on wide screens or line up in a swipeable row below 1200px. -->
       <div class="about__comic" data-reveal data-comic>
-        <ul class="visually-hidden" aria-label="Interests"><li>Creativity</li><li>Organizing</li><li>Anime</li><li>Friends</li><li>And more</li></ul>
+        <ul class="visually-hidden" aria-label="Interests"><li>Learning</li><li>Organising</li><li>Anime</li><li>Friends</li><li>And more</li></ul>
         <svg class="comic__cell" viewBox="-4 -4 248 118" aria-hidden="true" focusable="false">
           <g class="comic__panel" style="--i: 0" data-focus>
             <g class="comic__pop">
@@ -213,7 +224,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
                 <circle cx="8" cy="-24" r="3" class="comic__spark-dot comic__spark-dot--aqua" />
                 <circle cx="-20" cy="-26" r="2.5" class="comic__spark-dot comic__spark-dot--yellow" />
               </g>
-              <text x="70" y="64" class="comic__word comic__word--mid">Creativity</text>
+              <text x="70" y="64" class="comic__word comic__word--mid">Learning</text>
               <polygon class="comic__frame" points="0,0 240,0 240,86 0,110" />
             </g>
           </g>
@@ -235,7 +246,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
                 <path d="M14 -2l2.5 2.5 4.5-5" class="comic__tick comic__tick--2" />
                 <path d="M14 9l2.5 2.5 4.5-5" class="comic__tick comic__tick--3" />
               </g>
-              <text x="14" y="172" class="comic__word comic__word--small">Organizing</text>
+              <text x="14" y="172" class="comic__word comic__word--small">Organising</text>
               <polygon class="comic__frame" points="0,118 240,94 240,196 0,210" />
             </g>
           </g>
@@ -287,7 +298,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
   <footer class="footer theme-dark">
     <Logo variant="wordmark" height={40} label="VIKSZDE" />
     <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
-    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+    <p class="text-label-m secondary">© 2026 Viktória Simóné Varga</p>
   </footer>
 </Base>
 
@@ -534,6 +545,15 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
 
   .skills__strip {
     --parallax: 100px;
+  }
+
+  /* Side by side with the copy, only a 48px gap separates the strip from
+     the text column, so a long drift slid it over the intro paragraph's
+     line ends (and Rive's Learning tag). Keep the drift inside that gap. */
+  @media (min-width: 1024px) {
+    .skills__strip {
+      --parallax: 32px;
+    }
   }
 
   .about__panel img {
@@ -866,8 +886,8 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     margin-top: var(--spacing-16);
   }
 
-  /* Stacking, back to front: the coming soon card, the arrow, the project
-     cards. */
+  /* Stacking, back to front: the new case study card, the arrow, the
+     project cards. */
   .work__stage {
     position: relative;
     isolation: isolate;
@@ -900,6 +920,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     animation-delay: -1.6s;
   }
 
+
   @keyframes tag-wobble {
     0%,
     78%,
@@ -920,42 +941,86 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     }
   }
 
-  /* The next case study: a black card tilted behind the arrow head, its
-     Japanese "in preparation" above the head and the title below it. */
-  .work__cards > .work__soon {
+  /* The newest case study: a black card tilted behind the arrow head, a
+     peek of its screen above the head and its title below it. The whole
+     card is the link; a yellow sticker says it's new. */
+  .work__cards > .work__new {
     z-index: 0;
     align-self: stretch;
     justify-self: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     width: 82%;
     margin-block: var(--spacing-6);
-    padding: var(--spacing-4);
-    background: var(--color-ink-1000);
-    color: var(--color-paper-100);
     transform: rotate(7deg);
   }
 
-  .work__soon-jp {
-    padding: var(--spacing-3);
-    border: 2px dashed var(--color-yellow-500);
-    color: var(--color-yellow-500);
-    font: 900 clamp(1.5rem, 3vw, 2.5rem) / 1 var(--font-jp);
-    text-align: center;
+  .work__new-link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    height: 100%;
+    padding: var(--spacing-4);
+    background: var(--color-ink-1000);
+    color: var(--color-paper-100);
+    text-decoration: none;
   }
 
-  .work__soon-title {
+  .work__new-screen {
+    display: block;
+    aspect-ratio: 16 / 11;
+    overflow: hidden;
+    border: 2px solid var(--color-paper-100);
+    border-radius: 4px;
+    background: #040706;
+    transition: border-color var(--motion-duration-fast) var(--motion-ease-out);
+  }
+
+  .work__new-screen img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top;
+  }
+
+  .work__new-link:hover .work__new-screen,
+  .work__new-link:focus-visible .work__new-screen {
+    border-color: var(--color-bg-primary);
+  }
+
+  .work__new-link:focus-visible {
+    outline: var(--border-regular) solid var(--color-border-primary);
+    outline-offset: 4px;
+  }
+
+  .work__new-title {
     margin-top: auto;
-    font: 400 clamp(1.25rem, 2.4vw, 2rem) / 1 var(--font-display);
+    font: 400 clamp(1.25rem, 2.2vw, 1.875rem) / 1 var(--font-display);
     text-transform: uppercase;
   }
 
-  .work__soon-meta {
-    margin-top: var(--spacing-2);
+  .work__new-meta {
     color: var(--color-yellow-500);
     font: 500 0.75rem / 1.2 var(--font-mono);
     text-transform: uppercase;
+  }
+
+  .work__new-meta span {
+    font: 900 0.875rem / 1 var(--font-jp);
+  }
+
+  .work__new-sticker {
+    position: absolute;
+    top: -14px;
+    right: -12px;
+    z-index: 1;
+    padding: 6px 10px;
+    border: var(--border-regular) solid var(--color-ink-1000);
+    background: var(--color-yellow-500);
+    color: var(--color-ink-1000);
+    font: 700 0.8125rem / 1 var(--font-mono);
+    text-transform: uppercase;
+    transform-origin: 50% 0;
+    animation: tag-wobble 3.2s ease-in-out infinite;
   }
 
   /* How I work: six heavy boxes joined by pink arrows, centred under the
@@ -2006,9 +2071,9 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     }
 
     /* The teaser is a short sign rather than a strip as tall as the project
-       cards: 準備中 above the arrow head and the title below it, as on
+       cards: the screen above the arrow head and the title below it, as on
        desktop. */
-    .work__cards > .work__soon {
+    .work__cards > .work__new {
       align-self: center;
       width: 100%;
       min-height: 330px;
@@ -2016,9 +2081,9 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       transform: rotate(4deg);
     }
 
-    .work__soon-jp {
-      padding: var(--spacing-2) var(--spacing-1);
-      font-size: 1.5rem;
+    .work__new-link {
+      min-height: 330px;
+      padding: var(--spacing-3);
     }
 
     .about__copy,
@@ -2091,9 +2156,8 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
 
     /* The cards stack in one column, where the big arrow doesn't fit: it
        would hide behind the cards and leave only a stray pink stub. So it
-       goes, and the next case study waits under Barterland like the next
-       card in a deck. Only its bottom edge shows, with its title and 準備中.
-       Dealt in last, it slides up into place behind the card. */
+       goes, and the new case study waits under Barterland like the next
+       card in a deck: only its bottom edge shows, with its title. */
     .work__arrow {
       display: none;
     }
@@ -2122,42 +2186,34 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
       align-self: center;
     }
 
-    .work__cards > .work__soon {
-      --soon-h: 140px;
-      --peek: 58px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      grid-template-areas:
-        "title jp"
-        "meta jp";
-      align-content: end;
-      align-items: end;
-      column-gap: var(--spacing-3);
+    .work__cards > .work__new {
+      --new-h: 140px;
+      --peek: 66px;
       justify-self: end;
       width: 94%;
-      height: var(--soon-h);
-      margin: calc(-1 * (var(--spacing-16) + var(--soon-h) - var(--peek))) 0 0;
-      padding: var(--spacing-3) var(--spacing-4);
+      height: var(--new-h);
+      margin: calc(-1 * (var(--spacing-16) + var(--new-h) - var(--peek))) 0 0;
       transform: rotate(3deg);
     }
 
-    .work__soon-title {
-      grid-area: title;
-      margin-top: 0;
+    .work__new-link {
+      justify-content: flex-end;
+      gap: 4px;
+      padding: var(--spacing-3) var(--spacing-4);
+    }
+
+    .work__new-screen {
+      display: none;
+    }
+
+    .work__new-title {
       font-size: 1.25rem;
     }
 
-    .work__soon-meta {
-      grid-area: meta;
-      margin-top: 4px;
-    }
-
-    .work__soon-jp {
-      grid-area: jp;
-      padding: 0;
-      border: 0;
-      font-size: 1.5rem;
-      writing-mode: horizontal-tb;
+    .work__new-sticker {
+      top: auto;
+      bottom: 30px;
+      right: -6px;
     }
 
     .work__process {
@@ -2185,7 +2241,7 @@ const burstPoints = burst.map(([x, y]) => `${x},${y}`).join(" ");
     }
 
     .skills__tools {
-      gap: var(--spacing-4);
+      gap: var(--spacing-6) var(--spacing-4);
     }
 
     /* Phones: fitted inside the column, the eye strip was too small to read,

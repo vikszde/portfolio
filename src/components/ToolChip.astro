@@ -1,17 +1,20 @@
 ---
 // A tool from the Figma "Tool chip" set: brand mark in an outlined pink
 // square with its name underneath. Brand shapes come from Simple Icons (CC0)
-// and keep their own colours; Rive follows the text colour. The brands are
+// and keep their own colours; Rive and Maze follow the text colour. The brands are
 // trademarks of their owners. It renders a list item; pass `as="div"` to use
-// it outside a list, like the About page's tool cards.
+// it outside a list, like the About page's tool cards. `learning` pins the
+// same yellow "Learning" tag the About page's toolkit uses to the box corner.
 import type { HTMLAttributes } from "astro/types";
+import Pill from "./Tag.astro";
 
 type Props = {
   tool: keyof typeof marks;
   as?: "li" | "div";
+  learning?: boolean;
 } & HTMLAttributes<"li">;
 
-const { tool, as: Tag = "li", class: className, ...rest } = Astro.props;
+const { tool, as: Tag = "li", learning = false, class: className, ...rest } = Astro.props;
 
 const marks = {
   figma: {
@@ -75,6 +78,16 @@ const marks = {
       ],
     ],
   },
+  maze: {
+    label: "Maze",
+    viewBox: "0 0 24 24",
+    paths: [
+      [
+        "M1.126 16.547c-1.5013-1.4881-1.5013-3.9009 0-5.389l4.0778-4.042c1.2692-1.258 3.205-1.4525 4.6803-.5836.4564.2687.4524.8852.077 1.2573-.3753.372-.988.34-1.4975.1923-.6524-.1891-1.386-.0287-1.9006.4813l-4.0777 4.0419a1.8935 1.8935 0 0 0 0 2.6945c.7506.744 1.9678.744 2.7184 0l8.1555-8.0836c1.5014-1.4882 3.9355-1.4882 5.437 0l4.0778 4.0418c1.5013 1.4881 1.5013 3.901 0 5.389-1.5014 1.4882-3.9356 1.4882-5.437 0l-1.3593-1.3472-1.699 1.684c-1.2692 1.258-3.205 1.4526-4.6804.5837-.4563-.2687-.4523-.8852-.077-1.2573.3754-.372.988-.34 1.4975-.1923.6524.1892 1.386.0287 1.9006-.4813l1.7476-1.7322c.724-.7175 1.8975-.7175 2.6214 0l1.4078 1.3954c.7507.744 1.9678.744 2.7186 0a1.8936 1.8936 0 0 0 0-2.6945l-4.0779-4.0419c-.7507-.744-1.9678-.744-2.7185 0L6.563 16.5471c-1.5014 1.4882-3.9356 1.4881-5.437 0",
+        "currentColor",
+      ],
+    ],
+  },
 };
 
 const mark = marks[tool];
@@ -87,14 +100,25 @@ const mark = marks[tool];
     </svg>
   </span>
   <span class="tool__label text-label-m">{mark.label}</span>
+  {learning && <Pill color="yellow" class="tool__learning">Learning</Pill>}
 </Tag>
 
 <style>
   .tool {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-3);
     list-style: none;
+  }
+
+  /* After the label in reading order ("Rive, Learning"), drawn as a tilted
+     tag over the box's top-right corner. */
+  .tool :global(.tool__learning) {
+    position: absolute;
+    top: calc(var(--spacing-3) * -1);
+    right: calc(var(--spacing-4) * -1);
+    rotate: 8deg;
   }
 
   .tool__box {

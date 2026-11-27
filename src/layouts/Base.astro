@@ -10,11 +10,31 @@ import PageTransition from "../components/PageTransition.astro";
 interface Props {
   title: string;
   description?: string;
+  /** Keep a page out of search results (404, components, tokens). Such
+      pages also get no canonical or og:url: they aren't meant to be shared. */
+  noindex?: boolean;
+  /** Link-preview image: a 1200×630 PNG in public/, captured from the page. */
+  image?: string;
+  imageAlt?: string;
+  /** "article" for case studies, "website" for everything else. */
+  type?: "website" | "article";
 }
 
-const { title, description = "Viktória Varga, product designer." } = Astro.props;
+const {
+  title,
+  description = "Viktória Simóné Varga, product designer.",
+  noindex = false,
+  image = "og-image.png",
+  imageAlt = "Viktória Simóné Varga, product designer & visual creator, next to her anime-style character.",
+  type = "website",
+} = Astro.props;
 // BASE_URL is "/" locally and "/<repo>/" on GitHub Pages project sites.
 const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+// Link previews (LinkedIn, Slack, Messages) need absolute URLs. The deploy
+// workflow sets `site`; locally they fall back to the dev server's origin.
+const origin = Astro.site ?? Astro.url;
+const pageUrl = new URL(Astro.url.pathname, origin).href;
+const previewImage = new URL(`${base}${image}`, origin).href;
 ---
 
 <!doctype html>
@@ -24,8 +44,27 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {!noindex && Astro.site && <link rel="canonical" href={pageUrl} />}
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Viktória Simóné Varga" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={pageUrl} />}
+    <meta property="og:image" content={previewImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={previewImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <link rel="icon" href={`${base}favicon.ico`} sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
-    <link rel="icon" href={`${base}favicon.ico`} />
+    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
     <title>{title}</title>
     <!-- The site is always Light. Earlier builds saved a theme choice; clear it so nobody gets stuck in Dark. -->
     <script is:inline>
@@ -96,7 +135,11 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
                 observer.unobserve(entry.target);
               }
             },
-            { rootMargin: "0px 0px -10% 0px", threshold: 0.15 },
+            // Reveal as soon as the top crosses the line 10% above the bottom
+            // of the screen. A share of the element's own height (the old
+            // 0.15) left tall blocks, like a stack of phone shots, as a blank
+            // gap for a few hundred pixels of scrolling on phones.
+            { rootMargin: "0px 0px -10% 0px", threshold: 0 },
           );
           document.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
             if (onScreen(el)) reveal(el);

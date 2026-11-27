@@ -22,7 +22,6 @@ import eyeStrip from "../../assets/art/eye-strip.webp?url";
 import barterlandCover from "../../assets/work/barterland-cover.webp?url";
 
 import heroLanding from "../../assets/work/nearbio/hero-landing.webp";
-import heroSavedMobile from "../../assets/work/nearbio/hero-saved-mobile.webp";
 import flowReturnVisit from "../../assets/work/nearbio/flow-return-visit.webp";
 import wireframeAddress from "../../assets/work/nearbio/wireframe-address.webp";
 import wireframeSaved from "../../assets/work/nearbio/wireframe-saved.webp";
@@ -93,8 +92,11 @@ const nextSteps = [
 ---
 
 <Base
-  title="nearb.io case study · Viktória Varga"
-  description="How Viktória Varga designed nearb.io, from user flows and wireframes to a design system, Storybook library, and implemented interfaces."
+  title="nearb.io case study · Viktória Simóné Varga"
+  description="How Viktória Simóné Varga designed nearb.io, from user flows and wireframes to a design system, Storybook library, and implemented interfaces."
+  type="article"
+  image="og-nearbio.png"
+  imageAlt="The nearb.io case study: “From an address to a more informed decision”, with the nearb.io landing page on a monitor and the Saved page on a phone."
 >
   <Nav current="Work" />
 
@@ -115,8 +117,8 @@ const nextSteps = [
       <div class="hero__art" aria-hidden="true">
         <div class="hero__strip anim-sway"><img src={eyeStrip} alt="" width="560" height="160" /></div>
         <p class="text-label-s hero__note">More context.<br />Better decisions.<br />Brighter places.</p>
-        <Shot class="hero__landing anim-float" reveal={false} src={heroLanding} alt="" sizes="(min-width: 1440px) 600px, (min-width: 768px) 44vw, 84vw" eager />
-        <Shot class="hero__phone anim-float" reveal={false} src={heroSavedMobile} alt="" sizes="(min-width: 768px) 220px, 34vw" eager />
+        <Device class="hero__landing anim-float" device="monitor" reveal={false} src={heroLanding} alt="" sizes="(min-width: 1440px) 600px, (min-width: 768px) 44vw, 84vw" />
+        <Device class="hero__phone anim-float" device="phone" reveal={false} src={savedMobile} alt="" sizes="(min-width: 768px) 220px, 34vw" />
         <Sparkle color="ink" size={52} class="hero__spark hero__spark--1 anim-twinkle" />
         <Sparkle color="pink" size={36} class="hero__spark hero__spark--2 anim-twinkle" />
         <Sparkle color="aqua" size={28} class="hero__spark hero__spark--3 anim-twinkle" />
@@ -256,8 +258,8 @@ const nextSteps = [
           <p class="text-body-l secondary">The earlier and current landing-page designs show how the presentation developed. The current version introduces address evaluation, places address entry prominently, and explains the experience through supporting product content.</p>
         </div>
         <div class="grid grid--devices">
-          <Device reveal="from-left" src={landingEarlier} alt="Earlier landing page: headline, a separate address field and Check location button, and a How To Get Started section with three steps." caption="An earlier version of the landing page." />
-          <Device reveal="from-right" src={landingCurrent} alt="Current landing page: headline, a subtitle naming the categories, a search field with the Check location button inside it, example addresses, and How it works." caption="The current landing-page design, with address entry as its main action." />
+          <Device device="monitor" reveal="from-left" src={landingEarlier} alt="Earlier landing page: headline, a separate address field and Check location button, and a How To Get Started section with three steps." caption="An earlier version of the landing page." />
+          <Device device="monitor" reveal="from-right" src={landingCurrent} alt="Current landing page: headline, a subtitle naming the categories, a search field with the Check location button inside it, example addresses, and How it works." caption="The current landing-page design, with address entry as its main action." />
         </div>
         <div class="why" data-reveal>
           <p class="text-label-m accent">What changed &amp; why</p>
@@ -274,8 +276,8 @@ const nextSteps = [
           <p class="text-body-l secondary">The current address-detail page starts with an overall score and category summaries, followed by the map and AI summary. This creates a path from a quick overview into more detailed exploration.</p>
         </div>
         <div class="grid grid--devices">
-          <Device reveal="from-left" src={addressEarlier} alt="Earlier address page: an overall score, cards listing which delivery, grocery, internet and electricity providers are available, and a venue table below." caption="An earlier approach to presenting address information." />
-          <Device reveal="from-right" src={addressCurrent} alt="Current address page: an overall score, category cards with their own scores and summaries, a map of the area, and an AI summary." caption="An overview-led layout combining scores, category information, and geographic context." />
+          <Device device="monitor" reveal="from-left" src={addressEarlier} alt="Earlier address page: an overall score, cards listing which delivery, grocery, internet and electricity providers are available, and a venue table below." caption="An earlier approach to presenting address information." />
+          <Device device="monitor" reveal="from-right" src={addressCurrent} alt="Current address page: an overall score, category cards with their own scores and summaries, a map of the area, and an AI summary." caption="An overview-led layout combining scores, category information, and geographic context." />
         </div>
         <div class="why" data-reveal>
           <p class="text-label-m accent">What changed &amp; why</p>
@@ -335,7 +337,7 @@ const nextSteps = [
             <p class="feature__number" data-reveal="slam"><span>02</span><CaseIcon name="bookmark" size={28} /></p>
             <h3 id="feature-save" class="feature__title">Save a location</h3>
             <p class="text-h3 feature__sub">Keep useful context when returning to an address.</p>
-            <p class="text-body-l secondary">Saved-location cards bring together the address, a map preview, the overall score, and selected category scores, with buttons to compare the location or open its full report.</p>
+            <p class="text-body-l secondary">In the Figma design, saved-location cards bring together the address, a map preview, the overall score, and selected category scores, with buttons to compare the location or open its full report.</p>
             <p class="text-body-l secondary">The saved-locations experience connects an initial search with a decision that may take several visits.</p>
           </div>
           <div class="stack">
@@ -428,8 +430,8 @@ const nextSteps = [
           <p class="text-body-l secondary">My implementation work also covered the landing page and saved-locations interface. These sit alongside the broader product designs in Figma.</p>
         </div>
         <div class="grid grid--devices">
-          <Device reveal="from-left" src={implementedLanding} alt="The implemented nearb.io landing page: headline, address search with example addresses, How it works, example reports, and the categories it analyses." caption="Interface implemented with Claude. Captured from a local build with test data." />
-          <Device reveal="from-right" src={implementedSaved} alt="The implemented Saved locations page: summary stats and saved-location cards with scores for food and delivery, internet, and providers." caption="Interface implemented with Claude. Captured from a local build with test data." />
+          <Device device="monitor" reveal="from-left" src={implementedLanding} alt="The implemented nearb.io landing page: headline, address search with example addresses, How it works, example reports, and the categories it analyses." caption="Interface implemented with Claude. Captured from a local build with test data." />
+          <Device device="monitor" reveal="from-right" src={implementedSaved} alt="The implemented Saved locations page: summary stats and saved-location cards with scores for food and delivery, internet, and providers." caption="Interface implemented with Claude. Captured from a local build with test data." />
         </div>
       </div>
     </section>
@@ -481,7 +483,7 @@ const nextSteps = [
 
     <!-- Call to action (always pink) -->
     <section class="cta theme-light" aria-label="Get in touch">
-      <a class="cta__link" href={`${base}#contact`}>Let's create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
+      <a class="cta__link" href={`${base}#contact`}>Let’s create something cool. <span class="cta__arrow" aria-hidden="true">→</span></a>
       <div class="cta__strip anim-float" aria-hidden="true"><img src={eyeStrip} alt="" width="560" height="160" loading="lazy" /></div>
       <Sparkle color="ink" size={40} class="cta__spark anim-twinkle" />
     </section>
@@ -495,7 +497,7 @@ const nextSteps = [
   <footer class="footer theme-dark">
     <Logo variant="wordmark" height={40} label="VIKSZDE" />
     <p class="text-katakana" lang="ja">つくる、試す、好きで満たす。</p>
-    <p class="text-label-m secondary">© 2026 Viktória Varga</p>
+    <p class="text-label-m secondary">© 2026 Viktória Simóné Varga</p>
   </footer>
 </Base>
 
@@ -729,9 +731,9 @@ const nextSteps = [
   }
 
   :global(.hero__phone) {
-    left: 70%;
-    top: 40%;
-    width: 34%;
+    left: 72%;
+    top: 42%;
+    width: 27%;
     rotate: 3deg;
   }
 
@@ -1210,12 +1212,15 @@ const nextSteps = [
     --dur: 6s;
   }
 
-  :global(.hero__landing picture) {
+  :global(.hero__landing picture),
+  :global(.hero__landing .device__body),
+  :global(.hero__landing .device__stand) {
     display: block;
     animation: hero-drop 900ms var(--motion-ease-out) 150ms both;
   }
 
-  :global(.hero__phone picture) {
+  :global(.hero__phone picture),
+  :global(.hero__phone .device__body) {
     display: block;
     animation: hero-drop-phone 800ms var(--motion-ease-snap) 550ms both;
   }
